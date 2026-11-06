@@ -28,7 +28,7 @@ class GnaniTts:
         self.retry_backoff_s = retry_backoff_s
         self._sem = asyncio.Semaphore(max_concurrency)
 
-    def build_body(self, text: str, lang: Lang) -> dict:
+    def build_body(self, text: str, lang: Lang, audio_config: dict | None = None) -> dict:
         cfg = TTS[lang]
         return {
             "text": text,
@@ -36,14 +36,14 @@ class GnaniTts:
             "model": cfg.model,
             "language": cfg.language,
             "speed": 1.0,
-            "audio_config": AUDIO_CONFIG,
+            "audio_config": audio_config or AUDIO_CONFIG,
         }
 
-    async def synth(self, text: str, lang: Lang) -> bytes:
+    async def synth(self, text: str, lang: Lang, audio_config: dict | None = None) -> bytes:
         text = text.strip()
         if not text or len(text) > MAX_CHARS:
             raise UpstreamError("bad_request")
-        body = self.build_body(text, lang)
+        body = self.build_body(text, lang, audio_config)
         for attempt in (0, 1):
             async with self._sem:
                 try:
