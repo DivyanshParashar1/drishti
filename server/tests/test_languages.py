@@ -8,9 +8,13 @@ def test_every_lang_has_stt_and_tts():
         assert lang in STT and lang in TTS
 
 
-def test_hinglish_uses_codemix_and_the_v25_hinglish_voice():
-    assert STT["hi-en"].format == "codemix"
-    assert STT["hi-en"].language_code == "hi-IN,en-IN"
+def test_single_locale_everywhere():
+    # Realtime Prisma rejects comma-separated language lists (live check 2026-11-06).
+    assert all("," not in c.language_code for c in STT.values())
+
+
+def test_hinglish_is_romanised_and_uses_the_v25_hinglish_voice():
+    assert STT["hi-en"].format == "transliterate"
     assert TTS["hi-en"].model == "timbre-v2.5" and TTS["hi-en"].language == "hi-en"
 
 

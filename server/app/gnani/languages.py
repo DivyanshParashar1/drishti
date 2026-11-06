@@ -1,8 +1,13 @@
 """App language codes → Gnani Prisma (STT) and Timbre (TTS) settings.
 
 Checked against docs.gnani.ai on 2026-11-06:
-- Prisma v3.0 takes 1–4 comma-separated language hints and output styles
-  verbatim | transcribe | codemix | transliterate.
+- Prisma v3.0 output styles: verbatim | transcribe | codemix | transliterate.
+- Live check 2026-11-06: realtime streaming rejects a language list ("exactly one locale is
+  required") although the docs allow 1–4, so every language sends a single locale.
+- Live check: for Hindi/Hinglish speech, `transliterate` returns Latin text ("is ko rahul ke
+  naam se save karo") while `codemix` returned Devanagari even for English words ("सेव").
+  Latin output matches the romanised command phrasings and keeps names in Latin, so hi and
+  hi-en use `transliterate`.
 - Timbre v3.0 voices speak 10 languages but not Hinglish; only Timbre v2.5 has a
   Hinglish voice (Poorvi, language "hi-en").
 - Timbre normalises digits itself when `language` is explicit ("42" → "बयालीस"),
@@ -31,8 +36,8 @@ class TtsConfig:
 
 
 STT: dict[Lang, SttConfig] = {
-    "hi": SttConfig("hi-IN", "verbatim"),
-    "hi-en": SttConfig("hi-IN,en-IN", "codemix"),
+    "hi": SttConfig("hi-IN", "transliterate"),
+    "hi-en": SttConfig("hi-IN", "transliterate"),
     "en": SttConfig("en-IN", "verbatim"),
     "ta": SttConfig("ta-IN", "verbatim"),
 }

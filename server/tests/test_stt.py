@@ -32,8 +32,8 @@ def test_headers_follow_the_docs():
     h = build_headers("key", "hi-en")
     assert h["x-api-key-id"] == "key"
     assert h["model"] == "prisma-v3.0"
-    assert h["language_code"] == "hi-IN,en-IN"
-    assert h["format"] == "codemix"
+    assert h["language_code"] == "hi-IN"
+    assert h["format"] == "transliterate"
     assert h["x-sample-rate"] == "16000"
 
 
