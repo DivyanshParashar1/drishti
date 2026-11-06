@@ -16,6 +16,18 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** the GPU delegate (`android-gpu`) works on the Realme 11 Pro's Mali-G68 (DT-0.3); the face-detector 2.1 frame API inside a `useFrameOutput` worklet (P8); @siteed/audio-studio streams 16 kHz PCM chunks (P7).
 - **Measurements:** laptop CPU sanity check on a street image: both models detect the bus and the people (EfficientDet bus 0.82, person 0.80). No phone numbers yet.
 
+## P1 — Server skeleton: auth, rate limit, health (2026-11-06)
+- **Status:** automated tests pass (pytest 31) | live checks: local uvicorn smoke test done (HTTP 401/200, WebSocket 401 denial and accept, with the `websockets` impl)
+- **Limitations:**
+  - L1.1 The rate limit lives in memory per instance. With more than one Cloud Run instance, each gets its own 30/min window, and a restart resets it. Accepted while min = max = 1. Plan: set `--max-instances 1` in P13.
+  - L1.2 `/health` is exempt from the rate limit (it is pinged for connectivity and costs no credits), but it still requires the token.
+  - L1.3 Unauthenticated requests aren't rate-limited. They are rejected before any paid API call, so credits aren't at risk. Accepted.
+  - L1.4 The 401 denial on the WebSocket handshake works with uvicorn's `websockets` implementations only. `wsproto` isn't installed, and the Dockerfile pins `--ws websockets`.
+  - L1.5 The Docker image wasn't built locally (Docker daemon not running). Plan: build it in P13.
+  - L1.6 `/health` reports only that the process is up. It doesn't check that Gnani or the VLM are reachable. Plan: revisit in P13 if needed.
+- **Unverified assumptions:** Cloud Run passes the `Authorization` header and WebSocket upgrade through unchanged (P13).
+- **Measurements:** none (no latency-relevant code yet).
+
 ## Pending device tests
 
 | ID | Check | Phase | Result | Date | Notes |
