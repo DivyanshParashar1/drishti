@@ -91,6 +91,24 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** expo-audio `preload()` makes `replace()` + `play()` near-instant on Android; `player.pause()` + resolving at once meets the ≤ 50 ms stop; expo-speech `onStopped` fires on `Speech.stop()`.
 - **Measurements:** none yet (device checks pending).
 
+## P6 — Reflex lane: detectors, tracker, hazard alerts (2026-11-07)
+- **Status:** automated tests pass (Jest 89, pytest 195; `tsc` and `expo lint` clean; the Android export bundles and the frame callback compiles as a worklet with the expected closure) | live checks: none in this phase | device checks DT-6.1–6.5 pending. **Nothing in the camera path has run on the phone yet.**
+- **Limitations:**
+  - L6.1 The camera path (VisionCamera v5 `useFrameOutput` → `HybridFrameConverter.convertFrameToImage` → nitro-image `resize(320, 320)` → `toRawPixelData` → fast-tflite `runSync`) is untested on the device (L0.1/L0.2). The HybridObjects are passed into the worklet with `NitroModules.box()`. If a step throws, the debug overlay shows the frame error, and after 5 failures in a row the app says `sys.detector_failed`.
+  - L6.2 Frames are requested as 640×480 `rgb` with `enablePhysicalBufferRotation` so they arrive upright. They are stretched to 320×320 (no letterbox), which distorts aspect for YOLO, trained on letterboxed input. Possible accuracy loss; check in DT-6.1.
+  - L6.3 `frame_ts` is backdated by the worklet's own processing time only. The camera's capture-to-callback delay isn't counted (frame timestamps use another clock), so reflex latency reads slightly optimistic.
+  - L6.4 The detector runs on every 2nd frame callback, and `dropFramesWhileBusy` sheds load if inference is slow. Detections/s is shown in the overlay; there's no adaptive rate yet.
+  - L6.5 Tracker: greedy class + IoU > 0.3. Fast motion (IoU ≤ 0.3 between processed frames) makes a new track, which the per-class cooldown keeps quiet. A change held back by the cooldown is spoken when the cooldown ends, if it still applies (e.g. "person right" about 4 s after "person ahead"). A new object that is near, or an object turning near, always bypasses the cooldown.
+  - L6.6 There's no confirmation frame for new tracks: a one-frame false positive at ≥ 0.5 confidence is announced. That's a trade-off for the < 100 ms target. Watch DT-6.3; if needed, require 2 frames for far objects only.
+  - L6.7 Direction has 0.04 hysteresis around the third-lines. Near/far is still the F1 box rule (height > 45% or bottom in the lowest 15%), with no smoothing. Tune in DT-6.4, or replace it with simulated depth (F11).
+  - L6.8 Priorities: vehicles at any distance and any near object are P0 (interrupt answers); everything else is P2. Persons are announced as "Vyakti"; names come in P8.
+  - L6.9 YOLO decoding loops 2,100 × 80 in the worklet, with non-alert classes skipped before NMS. Its cost on Hermes is unmeasured (DT-6.1).
+  - L6.10 Without generated clips (L4.1), alerts are spoken with expo-speech, so DT-6.2's < 100 ms needs the hi-en pack (X-4.1).
+  - L6.11 Decoder tests use laptop CPU outputs (LiteRT 2.x) recorded by `app/scripts/make_detector_fixtures.py`. On-device GPU-delegate outputs may differ slightly.
+  - L6.12 The P0 boot screen is removed. Use the overlay's detector switch to check that both models load (DT-0.3).
+- **Unverified assumptions:** `toRawPixelData()` on the resized image returns a tightly packed 4-byte format (all nitro-image formats are handled, including row padding); fast-tflite's `runSync` returns outputs in model order (boxes, classes, scores, count for EfficientDet); `performance.now()` exists in the VisionCamera worklet runtime (falls back to `Date.now()`).
+- **Measurements:** laptop CPU only: on the bench images both models find the bus (EfficientDet 0.91, YOLO 0.95, box IoU > 0.8), the vehicles in `autos` and the bench in `footpath`. No phone numbers yet.
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -117,3 +135,8 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-5.1 | Bundled clips play with no audible gap when stitched (overlay "Stitch" button; needs X-4.1 clips) | P5 | pending | | |
 | DT-5.2 | P0 interrupts a long answer within 100 ms (overlay "Long answer", then "P0 now"; read reflex play_start) | P5 | pending | | |
 | DT-5.3 | Playback follows the system volume | P5 | pending | | |
+| DT-6.1 | Benchmark both detectors: infer ms, total ms, det/s, GPU vs CPU (overlay switch); choose the default | P6 | pending | | |
+| DT-6.2 | Chair about 1.5 m ahead, airplane mode: announced < 100 ms after detection, correct direction (needs X-4.1 clips) | P6 | pending | | |
+| DT-6.3 | Facing one chair for 30 s → exactly one alert | P6 | pending | | |
+| DT-6.4 | Tune near/far thresholds while walking toward an object | P6 | pending | | |
+| DT-6.5 | Phone temperature and battery drain after 15 min of continuous use | P6 | pending | | |
