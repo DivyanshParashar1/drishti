@@ -1,0 +1,320 @@
+{
+  "obj.person": {
+    "hi-en": "Vyakti",
+    "hi": "व्यक्ति",
+    "en": "Person",
+    "ta": "ஒருவர்"
+  },
+  "obj.bicycle": {
+    "hi-en": "Cycle",
+    "hi": "साइकिल",
+    "en": "Bicycle",
+    "ta": "சைக்கிள்"
+  },
+  "obj.car": {
+    "hi-en": "Car",
+    "hi": "कार",
+    "en": "Car",
+    "ta": "கார்"
+  },
+  "obj.motorcycle": {
+    "hi-en": "Bike",
+    "hi": "बाइक",
+    "en": "Motorbike",
+    "ta": "பைக்"
+  },
+  "obj.bus": {
+    "hi-en": "Bus",
+    "hi": "बस",
+    "en": "Bus",
+    "ta": "பேருந்து"
+  },
+  "obj.truck": {
+    "hi-en": "Truck",
+    "hi": "ट्रक",
+    "en": "Truck",
+    "ta": "லாரி"
+  },
+  "obj.dog": {
+    "hi-en": "Kutta",
+    "hi": "कुत्ता",
+    "en": "Dog",
+    "ta": "நாய்"
+  },
+  "obj.cow": {
+    "hi-en": "Gaay",
+    "hi": "गाय",
+    "en": "Cow",
+    "ta": "மாடு"
+  },
+  "obj.chair": {
+    "hi-en": "Kursi",
+    "hi": "कुर्सी",
+    "en": "Chair",
+    "ta": "நாற்காலி"
+  },
+  "obj.bench": {
+    "hi-en": "Bench",
+    "hi": "बेंच",
+    "en": "Bench",
+    "ta": "பெஞ்ச்"
+  },
+  "obj.couch": {
+    "hi-en": "Sofa",
+    "hi": "सोफ़ा",
+    "en": "Sofa",
+    "ta": "சோபா"
+  },
+  "obj.dining_table": {
+    "hi-en": "Table",
+    "hi": "मेज़",
+    "en": "Table",
+    "ta": "மேசை"
+  },
+  "obj.potted_plant": {
+    "hi-en": "Gamla",
+    "hi": "गमला",
+    "en": "Plant pot",
+    "ta": "பூந்தொட்டி"
+  },
+  "obj.fire_hydrant": {
+    "hi-en": "Fire hydrant",
+    "hi": "फ़ायर हाइड्रेंट",
+    "en": "Fire hydrant",
+    "ta": "தீயணைப்புக் குழாய்"
+  },
+  "obj.stop_sign": {
+    "hi-en": "Stop sign",
+    "hi": "स्टॉप साइन",
+    "en": "Stop sign",
+    "ta": "நிறுத்தக் குறி"
+  },
+  "dir.left": {
+    "hi-en": "left mein",
+    "hi": "बाएँ",
+    "en": "on the left",
+    "ta": "இடது பக்கம்"
+  },
+  "dir.ahead": {
+    "hi-en": "aage",
+    "hi": "आगे",
+    "en": "ahead",
+    "ta": "முன்னால்"
+  },
+  "dir.right": {
+    "hi-en": "right mein",
+    "hi": "दाएँ",
+    "en": "on the right",
+    "ta": "வலது பக்கம்"
+  },
+  "dist.near": {
+    "hi-en": "paas",
+    "hi": "पास",
+    "en": "close",
+    "ta": "அருகில்"
+  },
+  "dist.far": {
+    "hi-en": "door",
+    "hi": "दूर",
+    "en": "far",
+    "ta": "தூரத்தில்"
+  },
+  "sys.welcome": {
+    "hi-en": "Namaste, main Drishti hoon. Main aapko aas-paas ki cheezein bataungi.",
+    "hi": "नमस्ते, मैं दृष्टि हूँ। मैं आपको आस-पास की चीज़ें बताऊँगी।",
+    "en": "Hello, I am Drishti. I will tell you what is around you.",
+    "ta": "வணக்கம், நான் திருஷ்டி. உங்களைச் சுற்றி இருப்பவற்றைச் சொல்வேன்."
+  },
+  "sys.cane": {
+    "hi-en": "Drishti aapki cane ke saath kaam karta hai, uski jagah nahi.",
+    "hi": "दृष्टि आपकी छड़ी के साथ काम करता है, उसकी जगह नहीं।",
+    "en": "Drishti works with your cane, not instead of it.",
+    "ta": "திருஷ்டி உங்கள் கைத்தடியுடன் சேர்ந்து வேலை செய்கிறது, அதற்குப் பதிலாக அல்ல."
+  },
+  "sys.tutorial_1": {
+    "hi-en": "Main aage ki cheezein apne aap bataungi, jaise car, kursi ya log.",
+    "hi": "मैं आगे की चीज़ें अपने आप बताऊँगी, जैसे कार, कुर्सी या लोग।",
+    "en": "I will announce things ahead on my own, like cars, chairs or people.",
+    "ta": "முன்னால் உள்ள கார், நாற்காலி, மனிதர்கள் போன்றவற்றை நானே சொல்வேன்."
+  },
+  "sys.tutorial_2": {
+    "hi-en": "Kuch poochna ho to screen dabaakar rakhiye, boliye, phir chhod dijiye.",
+    "hi": "कुछ पूछना हो तो स्क्रीन दबाकर रखिए, बोलिए, फिर छोड़ दीजिए।",
+    "en": "To ask something, press and hold the screen, speak, then let go.",
+    "ta": "ஏதாவது கேட்க, திரையை அழுத்திப் பிடித்துப் பேசுங்கள், பிறகு விடுங்கள்."
+  },
+  "sys.tutorial_3": {
+    "hi-en": "Jaise poochiye, saamne kya hai, ya ye padho.",
+    "hi": "जैसे पूछिए, सामने क्या है, या ये पढ़ो।",
+    "en": "For example, ask: what is ahead, or read this.",
+    "ta": "உதாரணமாக, முன்னால் என்ன இருக்கிறது, அல்லது இதைப் படி என்று கேளுங்கள்."
+  },
+  "sys.tutorial_4": {
+    "hi-en": "Kisi ko yaad rakhne ke liye boliye, isko Rahul ke naam se save karo.",
+    "hi": "किसी को याद रखने के लिए बोलिए, इसको राहुल के नाम से सेव करो।",
+    "en": "To remember someone, say: save this as Rahul.",
+    "ta": "ஒருவரை நினைவில் வைக்க, இவரை ராகுல் என்று சேமி என்று சொல்லுங்கள்."
+  },
+  "sys.tutorial_5": {
+    "hi-en": "Mujhe rokne ke liye boliye, ruko. Bhasha badalne ke liye boliye, English mein bolo.",
+    "hi": "मुझे रोकने के लिए बोलिए, रुको। भाषा बदलने के लिए बोलिए, इंग्लिश में बोलो।",
+    "en": "To stop me, say stop. To change language, say Hindi mein bolo, or Tamil mein bolo.",
+    "ta": "என்னை நிறுத்த, நிறுத்து என்று சொல்லுங்கள். மொழியை மாற்ற, இங்கிலீஷ் மே போலோ என்று சொல்லுங்கள்."
+  },
+  "sys.unknown_person": {
+    "hi-en": "Koi anjaan vyakti saamne hai",
+    "hi": "कोई अनजान व्यक्ति सामने है",
+    "en": "An unknown person is ahead",
+    "ta": "தெரியாத ஒருவர் முன்னால் இருக்கிறார்"
+  },
+  "sys.no_internet": {
+    "hi-en": "Internet nahi hai",
+    "hi": "इंटरनेट नहीं है",
+    "en": "No internet",
+    "ta": "இணையம் இல்லை"
+  },
+  "sys.internet_lost": {
+    "hi-en": "Internet chala gaya, alerts chalu hain",
+    "hi": "इंटरनेट चला गया, अलर्ट चालू हैं",
+    "en": "Internet lost. Alerts are still on.",
+    "ta": "இணையம் துண்டிக்கப்பட்டது, எச்சரிக்கைகள் இயங்குகின்றன"
+  },
+  "sys.internet_back": {
+    "hi-en": "Internet wapas aa gaya",
+    "hi": "इंटरनेट वापस आ गया",
+    "en": "Internet is back",
+    "ta": "இணையம் மீண்டும் வந்துவிட்டது"
+  },
+  "sys.camera_blocked": {
+    "hi-en": "Camera saaf nahi dikh raha",
+    "hi": "कैमरा साफ़ नहीं देख पा रहा",
+    "en": "The camera can't see clearly",
+    "ta": "கேமராவுக்குத் தெளிவாகத் தெரியவில்லை"
+  },
+  "sys.step_drop": {
+    "hi-en": "Aage seedhi ya girav",
+    "hi": "आगे सीढ़ी या गिरावट",
+    "en": "Step or drop ahead",
+    "ta": "முன்னால் படி அல்லது பள்ளம்"
+  },
+  "sys.looking": {
+    "hi-en": "Dekh rahi hoon",
+    "hi": "देख रही हूँ",
+    "en": "Let me look",
+    "ta": "பார்க்கிறேன்"
+  },
+  "sys.didnt_hear": {
+    "hi-en": "Samajh nahi aaya, dobara boliye",
+    "hi": "समझ नहीं आया, दोबारा बोलिए",
+    "en": "Sorry, I didn't catch that. Please say it again.",
+    "ta": "புரியவில்லை, மீண்டும் சொல்லுங்கள்"
+  },
+  "sys.answer_failed": {
+    "hi-en": "Abhi jawab nahi mil paaya, dobara poochiye",
+    "hi": "अभी जवाब नहीं मिल पाया, दोबारा पूछिए",
+    "en": "I couldn't get an answer. Please ask again.",
+    "ta": "இப்போது பதில் கிடைக்கவில்லை, மீண்டும் கேளுங்கள்"
+  },
+  "sys.nothing_to_repeat": {
+    "hi-en": "Dohrane ke liye kuch nahi hai",
+    "hi": "दोहराने के लिए कुछ नहीं है",
+    "en": "There is nothing to repeat",
+    "ta": "மீண்டும் சொல்ல எதுவும் இல்லை"
+  },
+  "sys.quiet_on": {
+    "hi-en": "Quiet mode chalu. Sirf gaadiyan aur paas ki cheezein bataungi.",
+    "hi": "शांत मोड चालू। सिर्फ़ गाड़ियाँ और पास की चीज़ें बताऊँगी।",
+    "en": "Quiet mode on. I'll only announce vehicles and things close by.",
+    "ta": "அமைதி முறை இயக்கப்பட்டது. வாகனங்களையும் அருகில் உள்ளவற்றையும் மட்டும் சொல்வேன்."
+  },
+  "sys.quiet_off": {
+    "hi-en": "Quiet mode band",
+    "hi": "शांत मोड बंद",
+    "en": "Quiet mode off",
+    "ta": "அமைதி முறை நிறுத்தப்பட்டது"
+  },
+  "sys.no_one_here": {
+    "hi-en": "Abhi koi pehchana hua vyakti nahi dikh raha",
+    "hi": "अभी कोई पहचाना हुआ व्यक्ति नहीं दिख रहा",
+    "en": "I don't see anyone you've saved right now",
+    "ta": "இப்போது தெரிந்தவர் யாரும் தெரியவில்லை"
+  },
+  "sys.ask_name": {
+    "hi-en": "Naam bataiye",
+    "hi": "नाम बताइए",
+    "en": "Please say the name",
+    "ta": "பெயரைச் சொல்லுங்கள்"
+  },
+  "sys.consent": {
+    "hi-en": "Kya aap save hone ke liye raazi hain?",
+    "hi": "क्या आप सेव होने के लिए राज़ी हैं?",
+    "en": "Do you agree to be saved?",
+    "ta": "நீங்கள் சேமிக்கப்பட சம்மதிக்கிறீர்களா?"
+  },
+  "sys.enroll_hold": {
+    "hi-en": "Teen second camera ki taraf dekhiye",
+    "hi": "तीन सेकंड कैमरे की तरफ़ देखिए",
+    "en": "Please face the camera for three seconds",
+    "ta": "மூன்று நொடிகள் கேமராவைப் பாருங்கள்"
+  },
+  "sys.enroll_no_face": {
+    "hi-en": "Chehra saaf nahi dikha, dobara koshish kijiye",
+    "hi": "चेहरा साफ़ नहीं दिखा, दोबारा कोशिश कीजिए",
+    "en": "I couldn't see the face clearly. Please try again.",
+    "ta": "முகம் தெளிவாகத் தெரியவில்லை, மீண்டும் முயற்சி செய்யுங்கள்"
+  },
+  "sys.enroll_cancelled": {
+    "hi-en": "Theek hai, save nahi kiya",
+    "hi": "ठीक है, सेव नहीं किया",
+    "en": "Okay, not saved",
+    "ta": "சரி, சேமிக்கவில்லை"
+  },
+  "sys.saved": {
+    "hi-en": "Save ho gaya",
+    "hi": "सेव हो गया",
+    "en": "Saved",
+    "ta": "சேமிக்கப்பட்டது"
+  },
+  "sys.deleted": {
+    "hi-en": "Delete ho gaya",
+    "hi": "डिलीट हो गया",
+    "en": "Deleted",
+    "ta": "நீக்கப்பட்டது"
+  },
+  "sys.name_not_found": {
+    "hi-en": "Ye naam saved nahi hai",
+    "hi": "यह नाम सेव नहीं है",
+    "en": "That name isn't saved",
+    "ta": "அந்தப் பெயர் சேமிக்கப்படவில்லை"
+  },
+  "sys.no_one_saved": {
+    "hi-en": "Abhi koi saved nahi hai",
+    "hi": "अभी कोई सेव नहीं है",
+    "en": "No one is saved yet",
+    "ta": "இதுவரை யாரும் சேமிக்கப்படவில்லை"
+  },
+  "sys.saved_list": {
+    "hi-en": "Saved log hain:",
+    "hi": "सेव किए गए लोग:",
+    "en": "Saved people:",
+    "ta": "சேமிக்கப்பட்டவர்கள்:"
+  },
+  "sys.no_text": {
+    "hi-en": "Koi text nahi dikh raha. Phone ko sthir rakhiye.",
+    "hi": "कोई टेक्स्ट नहीं दिख रहा। फ़ोन को स्थिर रखिए।",
+    "en": "I can't see any text. Hold the phone steady.",
+    "ta": "எந்த எழுத்தும் தெரியவில்லை. ஃபோனை அசையாமல் பிடியுங்கள்."
+  },
+  "sys.reading_done": {
+    "hi-en": "Bas itna hi likha hai",
+    "hi": "बस इतना ही लिखा है",
+    "en": "That's all the text",
+    "ta": "அவ்வளவுதான் எழுதியிருக்கிறது"
+  },
+  "sys.lang_switched": {
+    "hi-en": "Ab main Hinglish mein bolungi",
+    "hi": "अब मैं हिंदी में बोलूँगी",
+    "en": "I'll speak in English now",
+    "ta": "இனி நான் தமிழில் பேசுவேன்"
+  }
+}
