@@ -10,6 +10,7 @@ dependencies = [
     "websockets",
     "pydantic-settings",
     "python-multipart",
+    "google-genai>=3.0.0",
 ]
 
 [dependency-groups]

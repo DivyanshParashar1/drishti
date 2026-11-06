@@ -29,6 +29,13 @@ class Settings(BaseSettings):
     tts_retry_backoff_s: float = 0.4
     stt_final_timeout_s: float = 3.0
 
+    vlm_timeout_s: float = 15.0
+    vlm_reasoning_off: bool = True  # thinking adds latency and eats into the token budget
+    vlm_max_tokens: int = 80
+    vlm_temperature: float = 0.2
+    ask_max_image_bytes: int = 300_000
+    ask_max_image_px: int = 512
+
     @model_validator(mode="after")
     def _no_dev_token_in_production(self) -> "Settings":
         # Cloud Run sets K_SERVICE. Refuse to start there with a missing or default token.
