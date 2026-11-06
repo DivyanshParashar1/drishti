@@ -3,14 +3,20 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import Depends, FastAPI
 
+from app.gnani.stt import Connector, websockets_connector
 from app.gnani.tts import GnaniTts
 from app.logs import AccessLogMiddleware, configure_logging
 from app.ratelimit import RateLimiter, enforce_rate_limit
-from app.routes import tts
+from app.routes import stt, tts
 from app.settings import Settings, get_settings
 
 
-def create_app(settings: Settings | None = None, *, tts_client: GnaniTts | None = None) -> FastAPI:
+def create_app(
+    settings: Settings | None = None,
+    *,
+    tts_client: GnaniTts | None = None,
+    stt_connector: Connector | None = None,
+) -> FastAPI:
     """Build the app. Tests inject fake upstream clients; otherwise real ones are made at startup."""
     configure_logging()
     settings = settings or get_settings()
@@ -39,6 +45,7 @@ def create_app(settings: Settings | None = None, *, tts_client: GnaniTts | None 
     app.add_middleware(AccessLogMiddleware)
     app.state.settings = settings
     app.state.rate_limiter = RateLimiter(settings.rate_limit_per_min)
+    app.state.stt_connector = stt_connector or websockets_connector
     if tts_client is not None:
         app.state.tts = tts_client
 
@@ -47,6 +54,7 @@ def create_app(settings: Settings | None = None, *, tts_client: GnaniTts | None 
         return {"ok": True}
 
     app.include_router(tts.router)
+    app.include_router(stt.router)
     return app
 
 
