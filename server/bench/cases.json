@@ -1,0 +1,107 @@
+[
+  {
+    "id": "bus_number",
+    "image": "images/bus_number.jpg",
+    "lang": "hi-en",
+    "question": "Ye kaun si bus hai? Number kya hai?",
+    "detections": [
+      {
+        "cls": "bus",
+        "dir": "ahead",
+        "dist": "far"
+      }
+    ],
+    "names": []
+  },
+  {
+    "id": "autos",
+    "image": "images/autos.jpg",
+    "lang": "en",
+    "question": "Is it safe to walk ahead?",
+    "detections": [
+      {
+        "cls": "auto-rickshaw",
+        "dir": "ahead",
+        "dist": "near"
+      }
+    ],
+    "names": []
+  },
+  {
+    "id": "potholes",
+    "image": "images/potholes.jpg",
+    "lang": "hi",
+    "question": "आगे रास्ता कैसा है?",
+    "detections": [],
+    "names": []
+  },
+  {
+    "id": "stairs",
+    "image": "images/stairs.jpg",
+    "lang": "hi-en",
+    "question": "Saamne kya hai?",
+    "detections": [
+      {
+        "cls": "person",
+        "dir": "ahead",
+        "dist": "far"
+      }
+    ],
+    "names": []
+  },
+  {
+    "id": "drain",
+    "image": "images/drain.jpg",
+    "lang": "ta",
+    "question": "முன்னால் நடக்கலாமா?",
+    "detections": [
+      {
+        "cls": "person",
+        "dir": "right",
+        "dist": "far"
+      },
+      {
+        "cls": "motorcycle",
+        "dir": "ahead",
+        "dist": "far"
+      }
+    ],
+    "names": []
+  },
+  {
+    "id": "sign",
+    "image": "images/sign.jpg",
+    "lang": "en",
+    "question": "What does the sign say?",
+    "detections": [],
+    "names": []
+  },
+  {
+    "id": "market",
+    "image": "images/market.jpg",
+    "lang": "hi-en",
+    "question": "Yahan bheed hai kya?",
+    "detections": [
+      {
+        "cls": "person",
+        "dir": "ahead",
+        "dist": "near"
+      }
+    ],
+    "names": []
+  },
+  {
+    "id": "footpath",
+    "image": "images/footpath.jpg",
+    "lang": "ta",
+    "question": "இங்கே உட்கார இடம் இருக்கிறதா?",
+    "detections": [
+      {
+        "cls": "bench",
+        "dir": "left",
+        "dist": "near"
+      }
+    ],
+    "names": []
+  }
+]
