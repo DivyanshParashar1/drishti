@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { TfliteModel } from 'react-native-fast-tflite';
 import { NitroModules } from 'react-native-nitro-modules';
 import { HybridFrameConverter, useFrameOutput, type Frame } from 'react-native-vision-camera';
@@ -22,6 +22,9 @@ export type ModelState =
  * decode. Results go to `onResult` on the JS thread. Frames arrive upright
  * (enablePhysicalBufferRotation), so boxes are in portrait coordinates.
  */
+export const GRAB_MAX_SIDE = 512; // /ask frames: longest side ≤ 512 px (F6)
+const GRAB_TIMEOUT_MS = 1000;
+
 export function useReflexCamera(
   onResult: (r: FrameResult) => void,
   onError: (message: string) => void,
@@ -52,6 +55,31 @@ export function useReflexCamera(
   const boxedModel = useMemo(() => (model ? NitroModules.box(model) : null), [model]);
   const boxedConverter = useMemo(() => NitroModules.box(HybridFrameConverter), []);
   const counter = useMemo(() => createSynchronizable(0), []);
+  const grabRequested = useMemo(() => createSynchronizable(false), []);
+  const grabWaiter = useRef<((jpeg: ArrayBuffer | null) => void) | null>(null);
+  const onGrab = useCallback((jpeg: ArrayBuffer | null) => {
+    grabWaiter.current?.(jpeg);
+    grabWaiter.current = null;
+  }, []);
+
+  /** The next camera frame as a JPEG (quality 70, longest side 512), or null after 1 s. */
+  const grab = useCallback(
+    () =>
+      new Promise<ArrayBuffer | null>((resolve) => {
+        grabWaiter.current?.(null);
+        const timer = setTimeout(() => {
+          grabWaiter.current = null;
+          grabRequested.setBlocking(false);
+          resolve(null);
+        }, GRAB_TIMEOUT_MS);
+        grabWaiter.current = (jpeg) => {
+          clearTimeout(timer);
+          resolve(jpeg);
+        };
+        grabRequested.setBlocking(true);
+      }),
+    [grabRequested],
+  );
   const size = VISION.inputSize;
   const every = VISION.everyNthFrame;
   const minScore = VISION.minScore;
@@ -63,6 +91,18 @@ export function useReflexCamera(
       'worklet';
       const n = counter.getDirty();
       counter.setBlocking(n + 1);
+      if (grabRequested.getDirty()) {
+        grabRequested.setBlocking(false);
+        try {
+          const full = boxedConverter.unbox().convertFrameToImage(frame);
+          const k = GRAB_MAX_SIDE / Math.max(full.width, full.height);
+          const w = Math.round(full.width * Math.min(1, k));
+          const h = Math.round(full.height * Math.min(1, k));
+          scheduleOnRN(onGrab, full.resize(w, h).toEncodedImageData('jpg', 70).buffer);
+        } catch {
+          scheduleOnRN(onGrab, null);
+        }
+      }
       if (boxedModel === null || n % every !== 0) {
         frame.dispose();
         return;
@@ -99,7 +139,7 @@ export function useReflexCamera(
         scheduleOnRN(onError, String(e));
       }
     },
-    [boxedModel, boxedConverter, counter, detector, every, size, minScore, yoloIou, mask, onResult, onError],
+    [boxedModel, boxedConverter, counter, grabRequested, detector, every, size, minScore, yoloIou, mask, onResult, onError, onGrab],
   );
 
   const frameOutput = useFrameOutput({
@@ -110,5 +150,5 @@ export function useReflexCamera(
     onFrame,
   });
 
-  return { frameOutput, status };
+  return { frameOutput, status, grab };
 }

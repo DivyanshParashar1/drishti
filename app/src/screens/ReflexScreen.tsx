@@ -53,7 +53,12 @@ export function ReflexScreen({ services, detector, debug }: { services: Services
     [speakFailure],
   );
 
-  const { frameOutput, status } = useReflexCamera(onResult, onError, detector);
+  const { frameOutput, status, grab } = useReflexCamera(onResult, onError, detector);
+
+  useEffect(() => {
+    services.frames.set(grab);
+    return () => services.frames.set(null);
+  }, [services.frames, grab]);
 
   useEffect(() => {
     if (status.state === 'failed') speakFailure(); // §9: spoken error, no silent failure
