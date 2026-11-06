@@ -39,7 +39,8 @@ export function iou(a: Box, b: Box): number {
 
 /**
  * YOLO11n raw output [1, 84, n] (row-major: 4 box rows cx,cy,w,h normalised, then 80 class rows),
- * with greedy class-wise NMS. `allowed` (class indices) skips classes we never alert on before NMS.
+ * with greedy class-wise NMS. `allowed[c]` false skips class c before NMS (a plain array, not a Set,
+ * so it can be captured by a worklet).
  */
 export function decodeYolo(
   data: Num,
@@ -47,7 +48,7 @@ export function decodeYolo(
   minScore: number,
   iouThreshold = 0.45,
   maxDetections = 20,
-  allowed?: ReadonlySet<number>,
+  allowed?: readonly boolean[],
 ): Detection[] {
   'worklet';
   const cand: { cls: number; score: number; box: Box }[] = [];
@@ -55,7 +56,7 @@ export function decodeYolo(
     let best = -1;
     let score = minScore;
     for (let c = 0; c < 80; c++) {
-      if (allowed && !allowed.has(c)) continue;
+      if (allowed && !allowed[c]) continue;
       const s = data[(4 + c) * n + j];
       if (s >= score) {
         score = s;

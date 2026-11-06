@@ -30,3 +30,6 @@ export const isAlertClass = (label: string): label is AlertClass => label in ALE
 
 export const VEHICLES: ReadonlySet<AlertClass> = new Set(['car', 'motorcycle', 'bus', 'truck', 'bicycle']);
 export const ANIMALS: ReadonlySet<AlertClass> = new Set(['dog', 'cow']);
+
+/** YOLO class index → is an alert class (for decodeYolo's pre-NMS filter). */
+export const YOLO_ALERT_MASK: readonly boolean[] = YOLO_LABELS.map((l) => isAlertClass(l));

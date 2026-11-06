@@ -67,7 +67,7 @@ test('YOLO allowed-class filter skips other classes', () => {
   data[0] = 0.5; data[1] = 0.5; data[2] = 0.2; data[3] = 0.2;
   data[4 + 63] = 0.9; // laptop (YOLO 80-class index)
   data[4 + 56] = 0.6; // chair
-  expect(decodeYolo(data, n, 0.5, 0.45, 20, new Set([56]))[0].label).toBe('chair');
+  expect(decodeYolo(data, n, 0.5, 0.45, 20, Array.from({ length: 80 }, (_, c) => c === 56))[0].label).toBe('chair');
 });
 
 test('EfficientDet clamps boxes and ignores entries past count', () => {
