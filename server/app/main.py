@@ -1,10 +1,12 @@
 from fastapi import Depends, FastAPI
 
+from app.logs import AccessLogMiddleware, configure_logging
 from app.ratelimit import RateLimiter, enforce_rate_limit
 from app.settings import Settings, get_settings
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
+    configure_logging()
     settings = settings or get_settings()
     app = FastAPI(
         title="Drishti relay",
@@ -13,6 +15,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url=None,
         dependencies=[Depends(enforce_rate_limit)],
     )
+    app.add_middleware(AccessLogMiddleware)
     app.state.settings = settings
     app.state.rate_limiter = RateLimiter(settings.rate_limit_per_min)
 
