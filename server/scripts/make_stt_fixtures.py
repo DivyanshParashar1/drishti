@@ -45,6 +45,8 @@ async def main() -> None:
     async with httpx.AsyncClient() as http:
         tts = GnaniTts(http, s.gnani_api_key, s.gnani_tts_url, timeout_s=20)
         for name, item in sentences.items():
+            if name.startswith("_"):
+                continue
             path = FIX / f"{name}.wav"
             if path.exists():
                 print("skip", name)
@@ -54,4 +56,5 @@ async def main() -> None:
             print("wrote", path.name)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
