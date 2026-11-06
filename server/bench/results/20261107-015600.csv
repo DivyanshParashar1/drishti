@@ -1,0 +1,65 @@
+model,case,lang,run,code,ttft_ms,first_sentence_ms,total_ms,answer
+openrouter:google/gemini-2.5-flash-lite,bus_number,hi-en,0,ok,2090.9,2109.9,2109.9,Yeh ek BEST bus
+openrouter:google/gemini-2.5-flash-lite,autos,en,0,ok,2576.2,2579.3,2579.3,There are auto
+openrouter:google/gemini-2.5-flash-lite,potholes,hi,0,ok,2562.3,2566.0,2566.0,आगे रास्ते में एक
+openrouter:google/gemini-2.5-flash-lite,stairs,hi-en,0,ok,2374.9,2389.9,2390.0,Aage
+openrouter:google/gemini-2.5-flash-lite,drain,ta,0,ok,2775.2,2783.0,2783.0,முன்னால் பெரிய
+openrouter:google/gemini-2.5-flash-lite,sign,en,0,empty_answer,,,2539.2,
+openrouter:google/gemini-2.5-flash-lite,market,hi-en,0,ok,1993.0,2003.6,2003.7,"Yes, there is"
+openrouter:google/gemini-2.5-flash-lite,footpath,ta,0,ok,2904.1,2916.9,2916.9,இடதுபு
+openrouter:google/gemini-2.5-flash-lite,bus_number,hi-en,1,empty_answer,,,4173.6,
+openrouter:google/gemini-2.5-flash-lite,autos,en,1,ok,2833.0,2853.4,2853.5,There are auto
+openrouter:google/gemini-2.5-flash-lite,potholes,hi,1,ok,4183.3,4195.4,4195.4,आगे रास्ते में एक
+openrouter:google/gemini-2.5-flash-lite,stairs,hi-en,1,ok,4217.9,4228.5,4228.5,Aage
+openrouter:google/gemini-2.5-flash-lite,drain,ta,1,ok,2750.6,2779.4,2779.5,முன்னால்
+openrouter:google/gemini-2.5-flash-lite,sign,en,1,empty_answer,,,2658.8,
+openrouter:google/gemini-2.5-flash-lite,market,hi-en,1,ok,2594.9,2605.6,2605.6,"Yes,"
+openrouter:google/gemini-2.5-flash-lite,footpath,ta,1,ok,2551.6,2558.8,2558.8,இ
+openrouter:google/gemini-3.5-flash-lite,bus_number,hi-en,0,ok,1034.5,1159.7,1161.7,"Ye ek red aur yellow public bus hai, jiska number MH 01 L 9442 hai. 4-5 kadam aage road par ek bada vehicle khada hai."
+openrouter:google/gemini-3.5-flash-lite,autos,en,0,ok,1324.5,1350.5,1355.5,"No, it is not safe to walk ahead because an auto-rickshaw is right ahead about 2 steps away. There are multiple auto-rickshaws moving on the road all around you."
+openrouter:google/gemini-3.5-flash-lite,potholes,hi,0,ok,1643.0,1643.3,1678.7,एक बड़ा पानी का गड्ढा दो कदम आगे रास्ते पर है। आगे कच्चा रास्ता है और दोनों तरफ पेड़-पौधे हैं।
+openrouter:google/gemini-3.5-flash-lite,stairs,hi-en,0,ok,1092.7,1092.9,1172.6,Ek bahut badi stairs hain jo aage start hoti hain. Ek person upar chadh raha hai.
+openrouter:google/gemini-3.5-flash-lite,drain,ta,0,ok,1315.4,1315.6,1359.2,முன்னால் ஆழமான திறந்த சாக்கடை மற்றும் சேறு நிறைந்த பள்ளம் உள்ளது. நடப்பது பாதுகாப்பில்லை.
+openrouter:google/gemini-3.5-flash-lite,sign,en,0,ok,908.5,908.7,955.1,The sign ahead says women are equal partners of our society and to respect them. There are no hazards immediately ahead.
+openrouter:google/gemini-3.5-flash-lite,market,hi-en,0,ok,1123.1,1143.5,1251.8,"Haan, yahan bohot bheed hai. Ek aadmi 1 kadam aage hai aur chaaron taraf log hain."
+openrouter:google/gemini-3.5-flash-lite,footpath,ta,0,ok,1103.1,1273.8,1433.8,"ஆம், இடது பக்கம் மூன்று அடி தூரத்தில் ஒரு பச்சை நிற பெஞ்ச் அமர இருக்க onathu. முன்னால் வளைந்து செல்லும் நடைபாதை உள்ளது."
+openrouter:google/gemini-3.5-flash-lite,bus_number,hi-en,1,ok,960.7,1133.0,1199.7,"Ek red aur yellow bus aage 4-5 kadam par hai, jiska number MH 01 L 9442 hai. Koi stairs ya drop nahi dikh raha hai."
+openrouter:google/gemini-3.5-flash-lite,autos,en,1,ok,956.8,993.3,995.9,"An auto-rickshaw is moving ahead, about 3 to 4 steps away. There is a pothole on the road surface about 4 steps ahead."
+openrouter:google/gemini-3.5-flash-lite,potholes,hi,1,ok,1257.1,1257.2,1371.4,आगे दो-तीन कदम पर बड़ा कीचड़ भरा गड्ढा है। रास्ता कच्चा और असमान है।
+openrouter:google/gemini-3.5-flash-lite,stairs,hi-en,1,ok,1291.3,1291.7,1466.6,"Saamne bohot saari pathar ki seedhiyaan hain jo upar ja rahi hain, ek kadam aage se hi shuru hoti hain. Upar seedhiyon ke end par ek badi laal imarat ka gate hai aur ek vyakti wahan chal raha hai."
+openrouter:google/gemini-3.5-flash-lite,drain,ta,1,ok,1190.0,1190.1,1243.9,முன்னால் ஆழமான திறந்த சாக்கடை மற்றும் சேறு நிறைந்த பள்ளம் உள்ளது. அங்கு செல்வது பாதுகாப்பானது அல்ல.
+openrouter:google/gemini-3.5-flash-lite,sign,en,1,ok,1180.0,1180.5,1221.4,The path is clear ahead with no hazards. The sign says women are equal partners of our society and urges respect for them.
+openrouter:google/gemini-3.5-flash-lite,market,hi-en,1,ok,889.9,890.1,955.3,"Haan, yahan bohot bheed hai. Ek person 1 kadam aage hai aur raste mein kayi aur log chal rahe hain."
+openrouter:google/gemini-3.5-flash-lite,footpath,ta,1,ok,920.4,1050.7,1119.2,"ஆம், வலதுபுறம் ஐந்து அடி முன்னால் ஒரு பெஞ்ச் இருக்கிறது. செல்லும் வழியில் தடைகள் எதுவும் இல்லை."
+openrouter:openai/gpt-6-luna,bus_number,hi-en,0,ok,1628.0,1851.1,2447.4,"Aage bus hai; number plate par MH 01 L 9442 dikh raha hai. Bus number route display par saaf nahi dikh raha; aas-paas steps, kerb, gaddhe ya khula drain nazar nahi aa raha, aur koi vehicle paas mein nahi dikh raha."
+openrouter:openai/gpt-6-luna,autos,en,0,ok,1397.7,1524.1,1928.7,"No, auto-rickshaws are moving ahead, about 3 to 10 steps away. I don’t see stairs, kerbs, drops, poles, potholes or open drains ahead."
+openrouter:openai/gpt-6-luna,potholes,hi,0,ok,1926.7,2181.3,2430.2,"आगे बीच और बाईं ओर बड़ा पानी भरा गड्ढा है, करीब तीन-चार कदम दूर; दाईं ओर की पट्टी अपेक्षाकृत सूखी है। आसपास सीढ़ियाँ, खाई या वाहन दिखाई नहीं दे रहे।"
+openrouter:openai/gpt-6-luna,stairs,hi-en,0,ok,1241.6,1696.7,2098.7,"Aage ek badi laal imarat ka darwaza hai, us tak kai seedhiyan hain; ek vyakti lagbhag 15-20 kadam aage hai. Seedhiyan chadhte waqt savdhaan rahein; koi kerb, drop, pole, pothole, khula drain, geela floor ya vehicle nazar nahi aa raha"
+openrouter:openai/gpt-6-luna,drain,ta,0,ok,1211.0,1688.1,1946.1,"இல்லை, முன்னால் இரண்டு மூன்று அடி தூரத்தில் ஆழமான திறந்த சாக்கடை உள்ளது; அதன் குறுக்கே இருக்கும் பலகையை நம்பி நடக்க வேண்டாம், விலகிச் செல்ல உதவி கேளுங்கள். வலது ஓரத்தில் ஒருவர் தொலைவில், முன்னால் மோட்டார் சைக்கிள் தொலைவில் உள்ளன"
+openrouter:openai/gpt-6-luna,sign,en,0,ok,1345.2,1586.0,1679.0,"The sign says, “Women are the equal partners of our society. Never neglect or disrespect them.” It also says, “Earn respect for you. Respect women.”"
+openrouter:openai/gpt-6-luna,market,hi-en,0,ok,1637.1,1907.1,2315.8,"Haan, aage aur dono taraf kaafi bheed hai; log bilkul paas, 1-2 kadam par hain. Rasta tang dikh raha hai; koi stairs, kerb ya vehicle saaf nazar nahi aa raha."
+openrouter:openai/gpt-6-luna,footpath,ta,0,ok,1671.8,1915.1,2161.5,"ஆம், இடதுபுறம் இரண்டு மூன்று அடி தொலைவில் பச்சை இருக்கை உள்ளது. முன்னால் நடைபாதையின் ஓரம் தாழ்வாக உயர்ந்துள்ளது; அதைத் தாண்டும்போது கவனமாக இருங்கள்."
+openrouter:openai/gpt-6-luna,bus_number,hi-en,1,empty_answer,,,5512.5,
+openrouter:openai/gpt-6-luna,autos,en,1,ok,1293.5,1540.8,1845.8,"No, several auto-rickshaws are moving or stopped ahead, about 3 to 6 steps away. The road ahead looks clear of steps, kerbs, drops, poles, potholes, open drains and wet patches."
+openrouter:openai/gpt-6-luna,potholes,hi,1,ok,1266.8,1507.1,1984.6,"आगे रास्ते के बीच में पानी भरा बड़ा गड्ढा और कीचड़ है; इससे बचकर चलें। दोनों ओर घनी झाड़ियाँ हैं; कोई सीढ़ी, नाली, खंभा या वाहन साफ़ दिखाई नहीं दे रहा।"
+openrouter:openai/gpt-6-luna,stairs,hi-en,1,ok,1283.1,1769.6,2163.4,"Aage lagbhag 15-20 kadam par ek bada laal imarat ka darwaza hai; us tak jaati bahut saari seedhiyan hain, sambhal kar chadhiye. Seedhiyon par kuch log dikh rahe hain; gaadi, khula drain, paani, khamba ya gaddha nazar nahi aa raha"
+openrouter:openai/gpt-6-luna,drain,ta,1,ok,1286.5,1752.3,1983.7,"நடக்காதீர்கள்; முன்னால் ஒரு பெரிய திறந்த, சேறும் தண்ணீரும் நிறைந்த பள்ளம் உள்ளது, அதன் குறுக்கே குறுகிய பலகை மட்டும் இருக்கிறது. இன்னும் முன்னால் வலதுபுறம் மோட்டார் சைக்கிள்களும் உள்ளன; படிகள், கரைகள் அல்லது வாகனங்கள் அருகில் தெளிவாக"
+openrouter:openai/gpt-6-luna,sign,en,1,ok,2447.2,2687.3,4689.4,"The sign says, “Women are the equal partners of our society. Never neglect or disrespect them. Earn respect for you. Respect women.” I don’t see any stairs, kerbs, drops, poles, potholes, open drains, wet floors, or vehicles."
+openrouter:openai/gpt-6-luna,market,hi-en,1,ok,1734.9,1988.0,2462.7,"Haan, aage kaafi bheed hai, log bilkul paas hain; dheere chalna. Raasta bheed ki wajah se clear nahi dikh raha, aur koi seedhi, kerb, gaddha, khula drain ya gaadi saaf nazar nahi aa rahi."
+openrouter:openai/gpt-6-luna,footpath,ta,1,ok,1253.5,1498.4,1747.3,"ஆம், இடதுபுறம் சில அடியில் பச்சை இருக்கை உள்ளது. முன்னால் செங்கல் நடைபாதை வளைந்து செல்கிறது; தெரியும் படிகள், பள்ளங்கள் அல்லது வாகனங்கள் இல்லை."
+openrouter:meta-llama/llama-4-scout,bus_number,hi-en,0,ok,1001.2,1202.2,1263.2,"Bus aage hai, 2-3 kadam aage. Bus ka number 64C hai."
+openrouter:meta-llama/llama-4-scout,autos,en,0,ok,1732.7,2122.4,2293.1,"The auto-rickshaw ahead is near, about 2 to 3 steps ahead, so be cautious. There are no visible potholes or wet floors ahead, but be mindful of other vehicles."
+openrouter:meta-llama/llama-4-scout,potholes,hi,0,ok,1567.2,1818.0,1951.9,"आगे का रास्ता थोड़ा खराब है, जिसमें कई गहरे और बड़े गड्ढे हैं। आगे लगभग दस-बारह कदम दूरी पर बाईं ओर एक बड़ा पेड़ है।"
+openrouter:meta-llama/llama-4-scout,stairs,hi-en,0,ok,1788.6,1945.9,1987.7,"Aage ek bada sa gate hai, uske saamne kuch log hain. Aage kai saare steps hain."
+openrouter:meta-llama/llama-4-scout,drain,ta,0,ok,1312.1,2036.7,2268.3,"முன்னால் சற்று தூரத்தில் ஒரு மோட்டார் சைக்கிள் வருவதைக் காண்கிறேன், ஆனால் நடக்க முடியும். முன்னால் சாலையில் சற்று மண் ம"
+openrouter:meta-llama/llama-4-scout,sign,en,0,ok,793.9,989.6,1547.8,"The sign says, ""Women are the equal partners of our society. Never neglect or disrespect them."" It also says, ""Earn respect for you. Respect women."""
+openrouter:meta-llama/llama-4-scout,market,hi-en,0,ok,953.4,1123.7,1134.0,"Haan, yahan bheed hai. Aage ek aadmi hai."
+openrouter:meta-llama/llama-4-scout,footpath,ta,0,ok,1337.3,2073.4,2256.9,"இடது பக்கம் ஒரு பெஞ்ச் உள்ளது, அது சுமார் இரண்டு அடி தூரத்தில் உள்ளது. பாதை முழுவதும் சிமிட்டு கற்கள் அமைக்கப்பட்டுள்ளன."
+openrouter:meta-llama/llama-4-scout,bus_number,hi-en,1,ok,1237.6,1475.5,1496.3,"Bus aage hai, 2-3 kadam aage. Bus ka number 64C hai."
+openrouter:meta-llama/llama-4-scout,autos,en,1,ok,695.0,934.8,1001.1,"The auto-rickshaw ahead is near, about 2 to 3 steps ahead, so be cautious. There are no visible potholes or obstacles on the road ahead."
+openrouter:meta-llama/llama-4-scout,potholes,hi,1,ok,725.6,1368.9,1424.7,"आगे का रास्ता सीधा है, लेकिन बीच में कुछ बड़े-बड़े गड्ढे और पानी जमा है, जो लगभग दस-बारह कदम आगे तक है। बाएँ और दाएँ तरफ हरियाली है।"
+openrouter:meta-llama/llama-4-scout,stairs,hi-en,1,ok,1435.1,2437.7,2591.4,"Aage ek bada sa brown building hai, uske aage kai saare steps hain. Aage ek aadmi hai, wo bhi steps ke upar hai."
+openrouter:meta-llama/llama-4-scout,drain,ta,1,ok,1320.8,1573.0,2279.6,"இல்லை, முன்னால் செல்லாதீர். முன்னால் சுமார் இரண்டு மூன்று அடி தொலைவில் ஒரு புறம் பள்ளம், மறு புறம் தண்ணீர் நிற"
+openrouter:meta-llama/llama-4-scout,sign,en,1,ok,757.4,938.3,1401.5,"The sign says, ""Women are the equal partners of our society. Never neglect or disrespect them."" It also says, ""Earn respect for you. Respect women."""
+openrouter:meta-llama/llama-4-scout,market,hi-en,1,ok,948.1,1196.7,1652.3,"Haan, yahaan par bahut bheed hai. Aage ek aadmi hai, uske baad bahut log hain, 2-3 kadam aage dikh raha hai."
+openrouter:meta-llama/llama-4-scout,footpath,ta,1,ok,1892.1,3325.6,3456.9,"இடது பக்கம் ஒரு பச்சை நிற பெஞ்ச் உள்ளது, அது இரண்டு மூன்று அடி தூரத்தில் உள்ளது. பாதை முழுவதும் சிவப்பு மண் மற்றும் செங"

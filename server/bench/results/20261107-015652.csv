@@ -1,0 +1,17 @@
+model,case,lang,run,code,ttft_ms,first_sentence_ms,total_ms,answer
+openrouter:google/gemini-2.5-flash-lite,bus_number,hi-en,0,ok,1463.1,1697.9,1710.7,"Aage ek red bus hai, uske number plate par MH01 L9442 likha hai. Ek car left side mein 5-6 kadam door hai."
+openrouter:google/gemini-2.5-flash-lite,autos,en,0,ok,1507.1,1586.1,1608.8,"There is an auto-rickshaw ahead, 2 to 3 steps away. The road ahead appears to have some potholes."
+openrouter:google/gemini-2.5-flash-lite,potholes,hi,0,ok,1666.2,1734.9,1798.1,आगे सड़क पर एक बड़ा गड्ढा है जिसमें पानी भरा हुआ है। आपको सावधानी से आगे बढ़ना होगा।
+openrouter:google/gemini-2.5-flash-lite,stairs,hi-en,0,ok,1469.4,1716.0,1726.4,"Aage bahut saari seedhiyan hain, aur unke upar ek badi building dikh rahi hai. Ek aadmi seedhiyon se upar ja raha hai."
+openrouter:google/gemini-2.5-flash-lite,drain,ta,0,ok,1545.9,1677.1,1737.9,"முன்னால் பெரிய பள்ளங்கள் உள்ளன, கவனமாக செல்லவும். வலது புறம் ஒரு ஆட்டோ ரிக்‌ஷா உள்ளது."
+openrouter:google/gemini-2.5-flash-lite,sign,en,0,ok,3194.2,3241.5,3289.9,"The sign says ""Women are the equal partners of our society. Never neglect or disrespect them."" There is a sign ahead, about 2 to 3 steps away."
+openrouter:google/gemini-2.5-flash-lite,market,hi-en,0,ok,1525.9,1604.3,1613.3,"Yes, there is a crowd ahead. Be careful of people around you."
+openrouter:google/gemini-2.5-flash-lite,footpath,ta,0,ok,1521.6,1607.2,1629.5,இடதுபுறம் ஒரு பெஞ்ச் உள்ளது. பாதையில் கவனமாக செல்லவும்.
+openrouter:google/gemini-2.5-flash-lite,bus_number,hi-en,1,ok,1479.7,1703.5,1713.1,"Aage ek badi red bus hai, uske number plate par MH 01 L 9642 likha hai. Ek old car left side mein 5-6 kadam door hai."
+openrouter:google/gemini-2.5-flash-lite,autos,en,1,ok,1427.2,1467.7,1498.0,"There is an auto-rickshaw ahead, 2 to 3 steps away. The road ahead appears to have some potholes."
+openrouter:google/gemini-2.5-flash-lite,potholes,hi,1,ok,1477.7,1547.0,1567.5,आगे रास्ते में एक बड़ा गड्ढा है जिसमें पानी भरा हुआ है। आपको सावधानी से आगे बढ़ना होगा।
+openrouter:google/gemini-2.5-flash-lite,stairs,hi-en,1,ok,3074.1,3272.0,3290.9,"Aage bahut saari seedhiyan hain, aur unke upar ek badi building hai. Ek aadmi seedhiyan chad raha hai."
+openrouter:google/gemini-2.5-flash-lite,drain,ta,1,ok,1528.0,1593.4,1642.7,"முன்னால் பெரிய பள்ளங்கள் உள்ளன, கவனமாக செல்லவும். வலதுபுறம் ஒரு ஆட்டோ ரிக்‌ஷா உள்ளது."
+openrouter:google/gemini-2.5-flash-lite,sign,en,1,ok,1607.2,1654.2,1721.9,"The sign says ""Women are the equal partners of our society. Never neglect or disrespect them."" There is a poster ahead with three figures holding hands."
+openrouter:google/gemini-2.5-flash-lite,market,hi-en,1,ok,1561.8,1663.0,1670.3,"Yes, there is a crowd ahead. Be careful of people around you."
+openrouter:google/gemini-2.5-flash-lite,footpath,ta,1,ok,1478.7,1555.2,1597.9,இடதுபுறம் ஒரு பெஞ்ச் உள்ளது. பாதையில் கவனமாக செல்லவும்.

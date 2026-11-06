@@ -1,0 +1,2 @@
+model,ok,ttft_p50,ttft_p95,first_sentence_p50,first_sentence_p95,total_p50,total_p95
+openrouter:google/gemini-2.5-flash-lite,16/16,1524,3194,1659,3272,1690,3291
