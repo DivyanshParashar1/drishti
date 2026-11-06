@@ -73,12 +73,44 @@ export class SpeechScheduler {
   private pumping = false;
   private seq = 0;
   private idleListeners: (() => void)[] = [];
+  private listeners: SchedulerHooks[] = [];
+  private readonly hooks: Required<SchedulerHooks>;
 
   constructor(
     private readonly player: Player,
-    private readonly hooks: SchedulerHooks = {},
+    hooks: SchedulerHooks = {},
     private readonly clock: Clock = monotonic,
-  ) {}
+  ) {
+    this.listeners.push(hooks);
+    const each =
+      <K extends keyof SchedulerHooks>(k: K) =>
+      (...args: Parameters<Required<SchedulerHooks>[K]>) => {
+        for (const l of this.listeners) (l[k] as ((...a: typeof args) => void) | undefined)?.(...args);
+      };
+    this.hooks = { onStart: each('onStart'), onEnd: each('onEnd'), onDrop: each('onDrop') };
+  }
+
+  /** Add another set of hooks (e.g. the voice controller watching for interrupted answers). */
+  subscribe(hooks: SchedulerHooks): () => void {
+    this.listeners.push(hooks);
+    return () => {
+      this.listeners = this.listeners.filter((l) => l !== hooks);
+    };
+  }
+
+  /** Drop queued utterances matching `pred` (not the one playing). Returns how many. */
+  cancelWhere(pred: (u: Utterance) => boolean): number {
+    let n = 0;
+    this.queue = this.queue.filter((e) => {
+      const hit = e.members.some(pred);
+      if (hit) {
+        n++;
+        for (const m of e.members) this.hooks.onDrop(m, 'cleared');
+      }
+      return !hit;
+    });
+    return n;
+  }
 
   enqueue(u: Utterance): void {
     if (!this.coalesce(u)) this.queue.push({ members: [u], seq: ++this.seq });
@@ -92,7 +124,7 @@ export class SpeechScheduler {
 
   /** Clear the queue and stop the current utterance ("ruko"). */
   stopAll(): void {
-    for (const e of this.queue) for (const m of e.members) this.hooks.onDrop?.(m, 'cleared');
+    for (const e of this.queue) for (const m of e.members) this.hooks.onDrop(m, 'cleared');
     this.queue = [];
     if (this.current) void this.player.stop();
   }
@@ -126,9 +158,9 @@ export class SpeechScheduler {
       const worst = group.members.reduce((w, m) => (m.priority >= w.priority ? m : w));
       if (u.priority < worst.priority) {
         group.members = group.members.filter((m) => m !== worst).concat(u);
-        this.hooks.onDrop?.(worst, 'coalesced_out');
+        this.hooks.onDrop(worst, 'coalesced_out');
       } else {
-        this.hooks.onDrop?.(u, 'coalesced_out');
+        this.hooks.onDrop(u, 'coalesced_out');
       }
     }
     group.members.sort((a, b) => a.priority - b.priority);
@@ -146,7 +178,7 @@ export class SpeechScheduler {
       const now = this.clock();
       const fresh = next.members.filter((m) => {
         const stale = m.source === 'reflex' && now - m.createdAt > STALE_MS;
-        if (stale) this.hooks.onDrop?.(m, 'stale');
+        if (stale) this.hooks.onDrop(m, 'stale');
         return !stale;
       });
       if (fresh.length) return { ...next, members: fresh };
@@ -169,7 +201,7 @@ export class SpeechScheduler {
         this.current = entry;
         this.currentInterrupted = false;
         const at = this.clock();
-        for (const m of entry.members) this.hooks.onStart?.(m, at);
+        for (const m of entry.members) this.hooks.onStart(m, at);
         let reason: EndReason;
         try {
           const outcome = await this.player.play(this.partsOf(entry), entry.members[0].lang);
@@ -177,7 +209,7 @@ export class SpeechScheduler {
         } catch {
           reason = 'error';
         }
-        for (const m of entry.members) this.hooks.onEnd?.(m, reason);
+        for (const m of entry.members) this.hooks.onEnd(m, reason);
         this.current = null;
       }
     } finally {

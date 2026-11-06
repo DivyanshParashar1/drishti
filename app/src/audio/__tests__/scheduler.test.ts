@@ -272,3 +272,33 @@ test('a player error ends the utterance and the queue continues', async () => {
   await flush();
   expect(log).toEqual(['bad error', 'good done']);
 });
+
+test('cancelWhere drops matching queued utterances but not the playing one', async () => {
+  const { player, log, s } = setup();
+  s.enqueue(utt('a1', 3, 'answer', { id: 'ans' }));
+  s.enqueue(utt('a2', 3, 'answer', { id: 'ans' }));
+  s.enqueue(utt('other', 3, 'answer', { id: 'x' }));
+  await flush();
+  expect(s.cancelWhere((u) => u.id === 'ans')).toBe(1);
+  expect(log).toContain('drop a2 cleared');
+  expect(player.playing).toBe('a1');
+  player.finish();
+  await flush();
+  expect(player.playing).toBe('other');
+});
+
+test('subscribe adds listeners; unsubscribe removes them', async () => {
+  const { player, s } = setup();
+  const ends: string[] = [];
+  const off = s.subscribe({ onEnd: (u, r) => ends.push(`${u.id}:${r}`) });
+  s.enqueue(utt('one', 4, 'system', { id: 'u-one' }));
+  await flush();
+  player.finish();
+  await flush();
+  off();
+  s.enqueue(utt('two', 4, 'system', { id: 'u-two' }));
+  await flush();
+  player.finish();
+  await flush();
+  expect(ends).toEqual(['u-one:done']);
+});
