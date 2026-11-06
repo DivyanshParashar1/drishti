@@ -16,6 +16,8 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | F8/§7 Prisma settings for Hindi and Hinglish (found in P2) | Live tests showed realtime Prisma rejects language lists (`hi-IN,en-IN`), and `codemix` returns Devanagari even for English words. Hindi and Hinglish use `language_code=hi-IN` with `format=transliterate` (Latin output, e.g. "is ko rahul ke naam se save karo"). The command router matches romanised keywords only. |
 | §7 number-to-words helper (found in P2) | Dropped. Timbre normalises digits itself when `language` is explicit ("42" → "बयालीस"), per the Gnani text normalisation guide. |
 | §5 frame resizing and OCR (found in P0) | VisionCamera is now v5, and `vision-camera-resize-plugin` only supports v4. Frames are resized with `react-native-nitro-image` (`convertFrameToImage` → `resize`). No v5 OCR frame plugin exists, so F7 runs ML Kit (`@react-native-ml-kit/text-recognition`) on a captured photo. |
+| D16 / P3 benchmark (user, 2026-11-07) | Vertex testing and model benchmarking are paused until the app is complete. Then, benchmark models on OpenRouter, preferring open-source ones. Interim model: OpenRouter `google/gemini-3.5-flash-lite`. |
+| F6 prompt (found in P3) | Rules in English plus a per-language instruction (language, script, direction words), instead of the full prompt in each language. No "numbers as words" rule. |
 
 ## Phase gate (end of every phase)
 
@@ -341,7 +343,7 @@ Device checks:
 
 ## Still open (not blocking the plan)
 
-- Which VLM model to use. Benchmark with `bench_vlm.py` (P3) and DT-7.2 later.
+- Which VLM model to use. Once the app is complete, benchmark on OpenRouter (open-source preferred) with `bench_vlm.py` and DT-7.2. Interim: `google/gemini-3.5-flash-lite`.
 - Which detector is the default. Decided by DT-6.1.
 - The Gnani credit-to-minute rate. Estimated in P2 live checks, or ask on Gnani's Discord.
 - YOLO11n AGPL-3.0 in a public repo. Accepting it means the app code is effectively AGPL. If EfficientDet wins DT-6.1, drop the YOLO weights.
