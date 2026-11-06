@@ -17,9 +17,12 @@ __pycache__/
 .ruff_cache/
 *.egg-info/
 
-# Secrets
+# Secrets (any env-style file, including typos like .nev, except the example)
 .env
 .env.*
+*.env
+.nev
+.envrc
 !.env.example
 *.pem
 *.p12
