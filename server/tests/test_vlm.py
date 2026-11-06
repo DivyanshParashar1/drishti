@@ -9,7 +9,7 @@ from app.settings import Settings
 from app.vlm.base import VlmError
 from app.vlm.factory import make_vlm, make_vlm_for
 from app.vlm.openrouter import OpenRouterVlm
-from app.vlm.vertex import VertexVlm, thinking_off
+from app.vlm.vertex import VertexVlm, minimal_thinking
 
 JPEG = b"\xff\xd8\xff\xe0fake"
 ARGS = ("SYS", JPEG, "Question: hi", 80, 0.2)
@@ -56,7 +56,7 @@ async def test_openrouter_streams_deltas_and_sends_request():
         80,
         0.2,
     )
-    assert b["reasoning"] == {"enabled": False}
+    assert b["reasoning"] == {"effort": "minimal"}
     assert b["messages"][0] == {"role": "system", "content": "SYS"}
     image, text = b["messages"][1]["content"]
     assert image["image_url"]["url"].startswith("data:image/jpeg;base64,/9j/")
@@ -128,9 +128,9 @@ async def test_vertex_streams_and_configures():
     assert cfg.thinking_config.thinking_budget == 0
 
 
-def test_thinking_off_per_generation():
-    assert thinking_off("gemini-2.5-flash").thinking_budget == 0
-    assert thinking_off("gemini-3-flash").thinking_level.value.lower() == "minimal"
+def test_minimal_thinking_per_generation():
+    assert minimal_thinking("gemini-2.5-flash").thinking_budget == 0
+    assert minimal_thinking("gemini-3-flash").thinking_level.value.lower() == "minimal"
 
 
 @pytest.mark.parametrize("status,code", [(403, "vlm_auth"), (429, "vlm_rate_limited")])

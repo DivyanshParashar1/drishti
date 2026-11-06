@@ -148,13 +148,16 @@ async def main() -> int:
         w.writeheader()
         w.writerows(summary)
 
+    def pair(s: dict, key: str) -> str:
+        return f"{s[key + '_p50']}/{s[key + '_p95']}"
+
     print(
         f"\n{'model':45} {'ok':>5} {'ttft p50/p95':>14} {'first p50/p95':>14} {'total p50/p95':>14}"
     )
     for s in summary:
         print(
-            f"{s['model']:45} {s['ok']:>5} {s['ttft_p50']}/{s['ttft_p95']:>9} "
-            f"{s['first_sentence_p50']}/{s['first_sentence_p95']:>9} {s['total_p50']}/{s['total_p95']:>9}"
+            f"{s['model']:45} {s['ok']:>5} {pair(s, 'ttft'):>14} "
+            f"{pair(s, 'first_sentence'):>14} {pair(s, 'total'):>14}"
         )
     print(f"\nwrote {path.relative_to(SERVER_DIR)}")
     return 0

@@ -22,14 +22,14 @@ class OpenRouterVlm:
         *,
         url: str = URL,
         timeout_s: float = 15.0,
-        reasoning_off: bool = True,
+        min_reasoning: bool = True,
     ):
         self.client = client
         self.api_key = api_key
         self.model = model
         self.url = url
         self.timeout_s = timeout_s
-        self.reasoning_off = reasoning_off
+        self.min_reasoning = min_reasoning
 
     def build_body(
         self, system: str, image_jpeg: bytes, text: str, max_tokens: int, temperature: float
@@ -51,9 +51,10 @@ class OpenRouterVlm:
                 },
             ],
         }
-        if self.reasoning_off:
-            # Thinking tokens add latency and eat into max_tokens; answers here are 2 sentences.
-            body["reasoning"] = {"enabled": False}
+        if self.min_reasoning:
+            # Thinking adds latency and eats into max_tokens. "minimal" rather than
+            # {"enabled": false}: some models (gemini-3.5-flash-lite) reject turning it off.
+            body["reasoning"] = {"effort": "minimal"}
         return body
 
     async def stream(

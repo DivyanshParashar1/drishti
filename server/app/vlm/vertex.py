@@ -23,12 +23,12 @@ class VertexVlm:
         model: str,
         *,
         timeout_s: float = 15.0,
-        reasoning_off: bool = True,
+        min_reasoning: bool = True,
         client: genai.Client | None = None,
     ):
         self.model = model
         self.timeout_s = timeout_s
-        self.reasoning_off = reasoning_off
+        self.min_reasoning = min_reasoning
         self.client = client or genai.Client(vertexai=True, project=project, location=location)
 
     def build_config(self, system: str, max_tokens: int, temperature: float):
@@ -37,8 +37,8 @@ class VertexVlm:
             max_output_tokens=max_tokens,
             temperature=temperature,
         )
-        if self.reasoning_off:
-            cfg.thinking_config = thinking_off(self.model)
+        if self.min_reasoning:
+            cfg.thinking_config = minimal_thinking(self.model)
         return cfg
 
     async def stream(
@@ -64,7 +64,7 @@ class VertexVlm:
             raise VlmError("vlm_unreachable") from e
 
 
-def thinking_off(model: str) -> types.ThinkingConfig:
+def minimal_thinking(model: str) -> types.ThinkingConfig:
     """Gemini 2.x turns thinking off with budget 0; Gemini 3 has levels, "minimal" is the lowest."""
     if "gemini-2" in model:
         return types.ThinkingConfig(thinking_budget=0)

@@ -23,7 +23,7 @@ def make_vlm_for(
             settings.openrouter_api_key,
             model,
             timeout_s=settings.vlm_timeout_s,
-            reasoning_off=settings.vlm_reasoning_off,
+            min_reasoning=settings.vlm_min_reasoning,
         )
     if provider == "vertex":
         from app.vlm.vertex import VertexVlm
@@ -33,6 +33,6 @@ def make_vlm_for(
             settings.vertex_location,
             model,
             timeout_s=settings.vlm_timeout_s,
-            reasoning_off=settings.vlm_reasoning_off,
+            min_reasoning=settings.vlm_min_reasoning,
         )
     raise ValueError(f"unknown VLM provider: {provider!r}")

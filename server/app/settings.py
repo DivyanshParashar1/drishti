@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     stt_final_timeout_s: float = 3.0
 
     vlm_timeout_s: float = 15.0
-    vlm_reasoning_off: bool = True  # thinking adds latency and eats into the token budget
+    vlm_min_reasoning: bool = True  # lowest thinking the model allows: it adds latency, eats tokens
     vlm_max_tokens: int = 80
     vlm_temperature: float = 0.2
     ask_max_image_bytes: int = 300_000
