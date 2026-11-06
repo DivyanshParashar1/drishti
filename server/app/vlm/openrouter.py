@@ -52,9 +52,7 @@ class OpenRouterVlm:
             ],
         }
         if self.min_reasoning:
-            # Thinking adds latency and eats into max_tokens. "minimal" rather than
-            # {"enabled": false}: some models (gemini-3.5-flash-lite) reject turning it off.
-            body["reasoning"] = {"effort": "minimal"}
+            body["reasoning"] = minimal_reasoning(self.model)
         return body
 
     async def stream(
@@ -77,6 +75,18 @@ class OpenRouterVlm:
             raise VlmError("vlm_timeout") from e
         except httpx.HTTPError as e:
             raise VlmError("vlm_unreachable") from e
+
+
+def minimal_reasoning(model: str) -> dict:
+    """The least thinking a model accepts. Thinking adds latency and eats into max_tokens.
+
+    Live (2026-11-07): gemini-3.5-flash-lite rejects {"enabled": false} ("Reasoning is
+    mandatory"), so the default is effort "minimal". Gemini 2.x still thinks at "minimal" and
+    used up the 80-token budget (truncated or empty answers), so it gets reasoning turned off.
+    """
+    if "gemini-2" in model:
+        return {"enabled": False}
+    return {"effort": "minimal"}
 
 
 def _parse_line(line: str) -> str | None:

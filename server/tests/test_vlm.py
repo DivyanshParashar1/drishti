@@ -8,7 +8,7 @@ from google.genai import errors
 from app.settings import Settings
 from app.vlm.base import VlmError
 from app.vlm.factory import make_vlm, make_vlm_for
-from app.vlm.openrouter import OpenRouterVlm
+from app.vlm.openrouter import OpenRouterVlm, minimal_reasoning
 from app.vlm.vertex import VertexVlm, minimal_thinking
 
 JPEG = b"\xff\xd8\xff\xe0fake"
@@ -91,6 +91,12 @@ async def test_openrouter_timeout():
     with pytest.raises(VlmError) as e:
         await collect(openrouter(handler))
     assert e.value.code == "vlm_timeout"
+
+
+def test_openrouter_minimal_reasoning_per_model():
+    assert minimal_reasoning("google/gemini-2.5-flash-lite") == {"enabled": False}
+    assert minimal_reasoning("google/gemini-3.5-flash-lite") == {"effort": "minimal"}
+    assert minimal_reasoning("openai/gpt-6-luna") == {"effort": "minimal"}
 
 
 # --- Vertex ---
