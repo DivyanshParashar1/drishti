@@ -233,7 +233,7 @@ test('a stale member of a coalesced group is dropped, the fresh one plays', asyn
 });
 
 test('stopAll clears the queue and stops the current utterance', async () => {
-  const { player, log, s } = setup();
+  const { log, s } = setup();
   s.enqueue(utt('a1', 3, 'answer'));
   s.enqueue(utt('a2', 3, 'answer'));
   await flush();
