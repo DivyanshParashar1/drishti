@@ -7,8 +7,10 @@ from app.gnani.stt import Connector, websockets_connector
 from app.gnani.tts import GnaniTts
 from app.logs import AccessLogMiddleware, configure_logging
 from app.ratelimit import RateLimiter, enforce_rate_limit
-from app.routes import stt, tts
+from app.routes import ask, stt, tts
 from app.settings import Settings, get_settings
+from app.vlm.base import VlmClient
+from app.vlm.factory import make_vlm
 
 
 def create_app(
@@ -16,6 +18,7 @@ def create_app(
     *,
     tts_client: GnaniTts | None = None,
     stt_connector: Connector | None = None,
+    vlm_client: VlmClient | None = None,
 ) -> FastAPI:
     """Build the app. Tests inject fake upstream clients; otherwise real ones are made at startup."""
     configure_logging()
@@ -32,6 +35,9 @@ def create_app(
                 max_concurrency=settings.tts_max_concurrency,
                 retry_backoff_s=settings.tts_retry_backoff_s,
             )
+            # No model configured → /ask answers 503 vlm_not_configured; the rest still works.
+            if vlm_client is None and settings.vlm_model:
+                app.state.vlm = make_vlm(settings, http)
             yield
 
     app = FastAPI(
@@ -46,6 +52,7 @@ def create_app(
     app.state.settings = settings
     app.state.rate_limiter = RateLimiter(settings.rate_limit_per_min)
     app.state.stt_connector = stt_connector or websockets_connector
+    app.state.vlm = vlm_client
     if tts_client is not None:
         app.state.tts = tts_client
 
@@ -55,6 +62,7 @@ def create_app(
 
     app.include_router(tts.router)
     app.include_router(stt.router)
+    app.include_router(ask.router)
     return app
 
 
