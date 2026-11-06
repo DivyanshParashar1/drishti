@@ -13,6 +13,7 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | §5 detector "pick one" | Both **YOLO11n** and **EfficientDet-Lite0** are wired behind one `Detector` interface. Config picks one. The choice is made after the device benchmark (DT-6.1). |
 | F5 offline STT (stretch) | Optional last build phase (P13), after everything else works. |
 | Repo | Public git repo, initialised in P0. |
+| §5 frame resizing and OCR (found in P0) | VisionCamera is now v5, and `vision-camera-resize-plugin` only supports v4. Frames are resized with `react-native-nitro-image` (`convertFrameToImage` → `resize`). No v5 OCR frame plugin exists, so F7 runs ML Kit (`@react-native-ml-kit/text-recognition`) on a captured photo. |
 
 ## Phase gate (end of every phase)
 
