@@ -1,6 +1,7 @@
 import { ClipPlayer } from '../audio/clipPlayer';
 import { ExpoAudioBackend } from '../audio/expoBackend';
 import { SpeechScheduler } from '../audio/scheduler';
+import { ReflexLane } from '../vision/reflexLane';
 import { createConnectivityMonitor, type ConnectivityMonitor } from './connectivity';
 import { DEFAULT_LANG, type Lang } from './lang';
 import { Metrics } from './metrics';
@@ -11,6 +12,7 @@ export interface Services {
   player: ClipPlayer;
   scheduler: SpeechScheduler;
   connectivity: ConnectivityMonitor;
+  reflex: ReflexLane;
   lang: Lang;
 }
 
@@ -25,7 +27,8 @@ export function createServices(): Services {
     },
     onDrop: (u, reason) => metrics.note(u.id, `dropped_${reason}`),
   });
-  return { metrics, player, scheduler, connectivity: createConnectivityMonitor(), lang: DEFAULT_LANG };
+  const reflex = new ReflexLane(scheduler, metrics, DEFAULT_LANG);
+  return { metrics, player, scheduler, connectivity: createConnectivityMonitor(), reflex, lang: DEFAULT_LANG };
 }
 
 /** Audio mode, clip preloading and connectivity. Returns a cleanup function. */

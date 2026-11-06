@@ -5,12 +5,14 @@ import { View } from 'react-native';
 import { createServices, startServices } from './src/core/services';
 import { DebugOverlay } from './src/debug/DebugOverlay';
 import { createTapCounter } from './src/debug/tapCounter';
-import { BootScreen } from './src/screens/BootScreen';
+import { ReflexScreen } from './src/screens/ReflexScreen';
+import { VISION, type DetectorId } from './src/vision/config';
 
 export default function App() {
   useKeepAwake(); // the camera can't run in the background, so keep the screen on (F10)
   const services = useMemo(createServices, []);
   const [debug, setDebug] = useState(false);
+  const [detector, setDetector] = useState<DetectorId>(VISION.detector);
   const tap = useRef(createTapCounter()).current;
 
   useEffect(() => {
@@ -24,8 +26,14 @@ export default function App() {
   return (
     <View style={{ flex: 1 }} onTouchEnd={() => tap() && setDebug((d) => !d)}>
       <StatusBar style="light" />
-      <BootScreen />
-      {debug && <DebugOverlay services={services} />}
+      <ReflexScreen services={services} detector={detector} debug={debug} />
+      {debug && (
+        <DebugOverlay
+          services={services}
+          detector={detector}
+          onSwitchDetector={() => setDetector((d) => (d === 'yolo11n' ? 'efficientdet_lite0' : 'yolo11n'))}
+        />
+      )}
     </View>
   );
 }

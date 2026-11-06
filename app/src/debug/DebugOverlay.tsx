@@ -2,13 +2,22 @@ import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import type { Utterance } from '../audio/scheduler';
 import type { Services } from '../core/services';
+import type { DetectorId } from '../vision/config';
 
 /**
  * Debug overlay shell (F10): live p50/p95 per stage, metrics export, and the P5 device-check
  * buttons (DT-5.1 stitched clips, DT-5.2 P0 interrupting a long answer).
  */
-export function DebugOverlay({ services }: { services: Services }) {
-  const { metrics, scheduler, connectivity, lang } = services;
+export function DebugOverlay({
+  services,
+  detector,
+  onSwitchDetector,
+}: {
+  services: Services;
+  detector: DetectorId;
+  onSwitchDetector: () => void;
+}) {
+  const { metrics, scheduler, connectivity, lang, reflex } = services;
   const [, setTick] = useState(0);
 
   useEffect(() => {
@@ -91,6 +100,14 @@ export function DebugOverlay({ services }: { services: Services }) {
         <View style={styles.row}>
           <Button label="Stop all" onPress={() => scheduler.stopAll()} />
           <Button label="Export metrics" onPress={exportMetrics} />
+        </View>
+        <View style={styles.row}>
+          <Button label={`Detector: ${detector} (switch, DT-6.1)`} onPress={onSwitchDetector} />
+          <Button
+            label={`Quiet: ${reflex.quiet ? 'on' : 'off'}`}
+            onPress={() => reflex.setQuiet(!reflex.quiet)}
+          />
+          <Button label="Reset tracker" onPress={() => reflex.tracker.reset()} />
         </View>
       </ScrollView>
     </View>
