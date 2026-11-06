@@ -4,6 +4,7 @@
     uv run python scripts/gen_clips.py --langs hi-en,hi,en,ta   # all packs
     uv run python scripts/gen_clips.py --langs hi-en --force    # regenerate everything
     uv run python scripts/gen_clips.py --dry-run                # what would be generated
+    uv run python scripts/gen_clips.py --no-tts                 # earcons + TS map only, no credits
 
 Writes app/assets/clips/<lang>/<key>.mp3 + manifest.json, earcons (synthesised locally, no
 credits) to app/assets/clips/earcons/, and app/src/audio/clips.generated.ts, the static require()
@@ -197,6 +198,7 @@ async def main() -> int:
     ap.add_argument("--langs", default="hi-en", help="comma-separated (default hi-en)")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--no-tts", action="store_true", help="only write earcons and the TS map")
     args = ap.parse_args()
     langs = args.langs.split(",")
     if bad := [lang for lang in langs if lang not in LANGS]:
@@ -209,6 +211,12 @@ async def main() -> int:
             keys = todo(phrases, lang, lang_dir, load_manifest(lang_dir), args.force)
             chars = sum(len(phrases[k][lang]) for k in keys)
             print(f"{lang}: {len(keys)} clips to generate ({chars} chars)")
+        return 0
+
+    if args.no_tts:
+        write_earcons(CLIPS_DIR)
+        write_ts(phrases)
+        print(f"wrote earcons and {TS_PATH.relative_to(REPO)} (no clips generated)")
         return 0
 
     import httpx
