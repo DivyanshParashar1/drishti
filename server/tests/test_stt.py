@@ -131,3 +131,19 @@ def test_requires_token(settings):
     client = TestClient(create_app(settings, stt_connector=FakePrisma()))
     with pytest.raises(WebSocketDenialResponse), client.websocket_connect("/stt"):
         pass
+
+
+def test_slow_upstream_close_does_not_delay_the_final(settings):
+    import time
+
+    prisma = FakePrisma(
+        on_frames={1: [{"type": "speech_start"}]}, on_commit=[T("ruko")], close_delay=1.5
+    )
+    client = TestClient(create_app(settings, stt_connector=prisma))
+    with client.websocket_connect("/stt", headers=AUTH) as ws:
+        ws.send_text(json.dumps({"lang": "hi-en"}))
+        ws.send_bytes(CHUNK * 3)
+        t0 = time.perf_counter()
+        ws.send_text(json.dumps({"type": "end"}))
+        assert ws.receive_json()["text"] == "ruko"
+        assert time.perf_counter() - t0 < 0.7

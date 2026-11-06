@@ -49,15 +49,18 @@ async def stt(ws: WebSocket) -> None:
                     return
                 released = time.perf_counter()
                 state = await session.finish()
+                # Reply before leaving this block: closing the upstream socket waits for its
+                # close handshake (up to ~1 s), which must not delay the user's transcript.
+                await _deliver(ws, state, lang, started, released)
             finally:
                 await session.close()
     except UpstreamError as e:
         await _fail(ws, e.code, lang, started)
-        return
     except websockets.ConnectionClosed:
         await _fail(ws, "stt_error", lang, started)
-        return
 
+
+async def _deliver(ws: WebSocket, state, lang: str, started: float, released: float) -> None:
     if state.fatal and not state.segments:
         await _fail(ws, state.fatal, lang, started)
         return

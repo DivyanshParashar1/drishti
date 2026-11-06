@@ -24,12 +24,14 @@ class FakePrisma:
         handshake_error=None,
         commit_delay=0.0,
         close_after_frames=None,
+        close_delay=0.0,
     ):
         self.on_frames = on_frames or {}
         self.on_commit = on_commit if on_commit is not None else []
         self.handshake_error = handshake_error
         self.commit_delay = commit_delay
         self.close_after_frames = close_after_frames
+        self.close_delay = close_delay
         self.frames: list[bytes] = []
         self.texts: list[str] = []
         self.headers: dict | None = None
@@ -48,6 +50,7 @@ class FakePrisma:
             raise UpstreamError(self.handshake_error)
         await self._out.put(json.dumps({"type": "connected"}))
         yield self
+        await asyncio.sleep(self.close_delay)  # a slow upstream close handshake
 
     async def send(self, data):
         if self.closed:
