@@ -316,5 +316,11 @@
     "hi": "अब मैं हिंदी में बोलूँगी",
     "en": "I'll speak in English now",
     "ta": "இனி நான் தமிழில் பேசுவேன்"
+  },
+  "sys.detector_failed": {
+    "hi-en": "Rukaawat alerts shuru nahi ho paaye. App dobara kholiye.",
+    "hi": "रुकावट अलर्ट शुरू नहीं हो पाए। ऐप दोबारा खोलिए।",
+    "en": "Obstacle alerts could not start. Please reopen the app.",
+    "ta": "தடை எச்சரிக்கைகள் தொடங்கவில்லை. செயலியை மீண்டும் திறக்கவும்."
   }
 }

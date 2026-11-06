@@ -57,6 +57,7 @@ export type ClipKey =
   | "sys.no_text"
   | "sys.reading_done"
   | "sys.lang_switched"
+  | "sys.detector_failed"
 ;
 
 export interface Clip {
@@ -120,6 +121,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.no_text": { text: "कोई टेक्स्ट नहीं दिख रहा। फ़ोन को स्थिर रखिए।", en: "I can't see any text. Hold the phone steady.", asset: null },
     "sys.reading_done": { text: "बस इतना ही लिखा है", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "अब मैं हिंदी में बोलूँगी", en: "I'll speak in English now", asset: null },
+    "sys.detector_failed": { text: "रुकावट अलर्ट शुरू नहीं हो पाए। ऐप दोबारा खोलिए।", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
   },
   "hi-en": {
     "obj.person": { text: "Vyakti", en: "Person", asset: null },
@@ -175,6 +177,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.no_text": { text: "Koi text nahi dikh raha. Phone ko sthir rakhiye.", en: "I can't see any text. Hold the phone steady.", asset: null },
     "sys.reading_done": { text: "Bas itna hi likha hai", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "Ab main Hinglish mein bolungi", en: "I'll speak in English now", asset: null },
+    "sys.detector_failed": { text: "Rukaawat alerts shuru nahi ho paaye. App dobara kholiye.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
   },
   "en": {
     "obj.person": { text: "Person", en: "Person", asset: null },
@@ -230,6 +233,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.no_text": { text: "I can't see any text. Hold the phone steady.", en: "I can't see any text. Hold the phone steady.", asset: null },
     "sys.reading_done": { text: "That's all the text", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "I'll speak in English now", en: "I'll speak in English now", asset: null },
+    "sys.detector_failed": { text: "Obstacle alerts could not start. Please reopen the app.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
   },
   "ta": {
     "obj.person": { text: "ஒருவர்", en: "Person", asset: null },
@@ -285,6 +289,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.no_text": { text: "எந்த எழுத்தும் தெரியவில்லை. ஃபோனை அசையாமல் பிடியுங்கள்.", en: "I can't see any text. Hold the phone steady.", asset: null },
     "sys.reading_done": { text: "அவ்வளவுதான் எழுதியிருக்கிறது", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "இனி நான் தமிழில் பேசுவேன்", en: "I'll speak in English now", asset: null },
+    "sys.detector_failed": { text: "தடை எச்சரிக்கைகள் தொடங்கவில்லை. செயலியை மீண்டும் திறக்கவும்.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
   },
 };
 
