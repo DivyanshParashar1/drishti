@@ -52,6 +52,11 @@ export class ReflexLane {
     this.lang = lang;
   }
 
+  /** Quiet mode (F5): mute far non-vehicle alerts. Wired to a voice command in P7. */
+  setQuiet(on: boolean): void {
+    this.quiet = on;
+  }
+
   onUpdate(cb: () => void): () => void {
     this.listeners.push(cb);
     return () => {
