@@ -1,0 +1,33 @@
+model,case,lang,run,code,ttft_ms,first_sentence_ms,total_ms,answer
+vertex:gemini-3.5-flash-lite,bus_number,hi-en,0,ok,11861.6,11866.9,11870.4,"Yeh ek red aur yellow colour ki bus hai jiska number plate MH 01 L 9442 hai, aur destination board par 79 number likha hai. Ek pole right side mein 6-7 kadam door hai aur ek choti car left side mein 8-10 kadam door hai."
+vertex:gemini-3.5-flash-lite,autos,en,0,vlm_timeout,,,15019.0,
+vertex:gemini-3.5-flash-lite,potholes,hi,0,ok,1174.6,1175.3,1306.5,आगे दो-तीन कदम पर रास्ते पर पानी भरा हुआ बड़ा गड्ढा है। इसके आगे संकरी पक्की सड़क है और दोनों तरफ पेड़-पौधे हैं।
+vertex:gemini-3.5-flash-lite,stairs,hi-en,0,ok,1025.3,1185.1,1232.8,1 kadam aage bade stairs hain jo upar ek bade red stone gate ki taraf jaate hain. Ek vyakti aage upar stairs par chal raha hai.
+vertex:gemini-3.5-flash-lite,drain,ta,0,vlm_timeout,,,15007.4,
+vertex:gemini-3.5-flash-lite,sign,en,0,vlm_timeout,,,15006.9,
+vertex:gemini-3.5-flash-lite,market,hi-en,0,vlm_timeout,,,15009.1,
+vertex:gemini-3.5-flash-lite,footpath,ta,0,vlm_timeout,,,15005.4,
+vertex:gemini-3.5-flash-lite,bus_number,hi-en,1,vlm_timeout,,,15009.0,
+vertex:gemini-3.5-flash-lite,autos,en,1,vlm_timeout,,,15007.3,
+vertex:gemini-3.5-flash-lite,potholes,hi,1,vlm_timeout,,,15009.0,
+vertex:gemini-3.5-flash-lite,stairs,hi-en,1,vlm_timeout,,,15006.6,
+vertex:gemini-3.5-flash-lite,drain,ta,1,vlm_timeout,,,15008.2,
+vertex:gemini-3.5-flash-lite,sign,en,1,vlm_timeout,,,15009.5,
+vertex:gemini-3.5-flash-lite,market,hi-en,1,ok,13368.9,13532.5,13584.5,"Haan, yahan kafi bheed hai aur 1 kadam aage ek vyakti khada hai. Raste mein dhyan se chalein."
+vertex:gemini-3.5-flash-lite,footpath,ta,1,ok,11683.5,11683.6,11836.6,இடது பக்கத்தில் இரண்டு அடி தூரத்தில் ஒரு மர bench உட்கார இருக்கிறது. முன்னால் வளைந்து செல்லும் நடைபாதையும் மரங்களும் உள்ளன.
+vertex:gemini-2.5-flash,bus_number,hi-en,0,ok,827.8,828.5,892.2,"Aage ek red bus hai, 2-3 kadam door. Iska number MH 01 L 9442 hai."
+vertex:gemini-2.5-flash,autos,en,0,ok,745.0,745.7,941.1,"No, it is not safe to walk ahead. There are many auto-rickshaws and other vehicles moving ahead and to your left. There are also some potholes on the road ahead."
+vertex:gemini-2.5-flash,potholes,hi,0,ok,547.8,630.0,662.8,"आगे रास्ता खराब है, बीच में दो-तीन कदम आगे एक बड़ा गड्ढा है जिसमें पानी भरा है।"
+vertex:gemini-2.5-flash,stairs,hi-en,0,ok,825.2,909.0,909.0,"Aage bahut saari seedhiyan hain, jo upar ek bade darwaze ki taraf ja rahi hain."
+vertex:gemini-2.5-flash,drain,ta,0,ok,778.1,778.6,807.9,"முன்னால் ஒரு பெரிய பள்ளம் உள்ளது, அதில் தண்ணீர் தேங்கியுள்ளது. இரண்டு மூன்று அடி முன்னால் ஒரு மரப்பலகை உள்ளது, அதன் மீது கவனமாக நடக்கலாம்."
+vertex:gemini-2.5-flash,sign,en,0,ok,775.3,775.9,802.6,"The sign ahead says ""Women are the equal partners of our society. Never neglect or disrespect them. Earn respect for you. Respect women."""
+vertex:gemini-2.5-flash,market,hi-en,0,ok,760.8,761.7,836.4,"Haan, yahan kaafi bheed hai, log aage chal rahe hain. Aage 5-6 kadam par ek archway hai jahan se tez roshni aa rahi hai."
+vertex:gemini-2.5-flash,footpath,ta,0,ok,712.2,738.5,738.6,"ஆம், இடதுபுறம் இரண்டு அடி தூரத்தில் ஒரு பச்சை நிற பெஞ்ச் உள்ளது."
+vertex:gemini-2.5-flash,bus_number,hi-en,1,ok,688.0,873.4,873.4,"Aage ek red bus khadi hai, uspar 'MH 01 L 9442' number likha hai."
+vertex:gemini-2.5-flash,autos,en,1,ok,727.7,728.3,937.1,"No, it is not safe to walk ahead. There are many auto-rickshaws and other vehicles moving ahead of you. There are also some potholes on the road ahead."
+vertex:gemini-2.5-flash,potholes,hi,1,ok,667.0,667.4,780.7,आगे दो-तीन कदम पर सड़क पर एक बड़ा गड्ढा है जिसमें पानी भरा है। सड़क के दोनों ओर घनी झाड़ियाँ हैं।
+vertex:gemini-2.5-flash,stairs,hi-en,1,ok,885.6,888.0,916.6,"Aage bahut saari seedhiyan hain, jo upar ek bade darwaaze tak ja rahi hain. Ek aadmi seedhiyon par aage ja raha hai."
+vertex:gemini-2.5-flash,drain,ta,1,ok,750.4,751.0,782.2,"முன்னால் ஒரு பெரிய பள்ளம் உள்ளது, அதில் தண்ணீர் தேங்கியுள்ளது. பள்ளத்தின் குறுக்கே மரப்பலகைகள் போடப்பட்டுள்ளன, ஆனால் அவை நிலையாக இல்லை."
+vertex:gemini-2.5-flash,sign,en,1,ok,943.3,943.7,973.8,"There is a sign ahead that says ""Women are the equal partners of our society. Never neglect or disrespect them. Earn respect for you. Respect women."""
+vertex:gemini-2.5-flash,market,hi-en,1,ok,671.4,671.9,757.4,"Haan, yahan kaafi bheed hai, log aage chal rahe hain. Aage 5-6 kadam par ek archway hai jahan se tez roshni aa rahi hai."
+vertex:gemini-2.5-flash,footpath,ta,1,ok,593.1,717.0,717.0,"ஆம், இடதுபுறம் இரண்டு அடி தூரத்தில் ஒரு பச்சை நிற பெஞ்ச் உள்ளது."
