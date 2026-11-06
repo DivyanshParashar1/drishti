@@ -44,6 +44,25 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** the Timbre 429 retry path and Prisma's concurrent-session cap weren't hit live; Gnani's `x-idle-timeout-sec` and `x-min-silence-ms` values weren't tuned.
 - **Measurements:** Prisma transcription latency 62–102 ms per segment. `/stt` release→final 152–155 ms on all 8 fixtures (local server → Gnani). Timbre REST 471–948 ms. All 8 fixtures transcribed correctly in hi, hi-en, en and ta.
 
+## P3 — VLM services, /ask pipeline, benchmark script (2026-11-07)
+- **Status:** automated tests pass (pytest 182, plus 8 `live` deselected) | live checks: OpenRouter /ask ×1 done, OpenRouter bench done; Vertex /ask skipped and Vertex benchmarking paused (user, 2026-11-07); a single Vertex bench run had already finished and is kept as a record
+- **Limitations:**
+  - L3.1 First audio misses the ≤ 2 s target. Live /ask (OpenRouter gemini-3.5-flash-lite, laptop in India, `stairs` case): VLM first token 1,229 ms, first sentence 1,420 ms, first audio 2,434 ms, total 3,260 ms. STT (~150 ms) and the upload come on top of that. Timbre (~1,000 ms per sentence, L2.1) is the largest single stage. Plan: try Timbre SSE/WebSocket streaming and re-measure from Cloud Run Mumbai (P13); the model choice comes later (L3.3).
+  - L3.2 A sentence event is sent only once its audio is ready, so the app gets no text earlier. That's on purpose: events stay strictly in order, and if one sentence's TTS fails its event carries the text with `audio_b64: null` and `tts_error`, so the app can fall back to expo-speech (D12).
+  - L3.3 VLM model not chosen. Interim: `openrouter` + `google/gemini-3.5-flash-lite` (fastest and most accurate in the bench below), set in the local `.env` only. Plan (user, 2026-11-07): when the app is complete, benchmark models on OpenRouter, preferring open-source ones, using `bench_vlm.py` and DT-7.2.
+  - L3.4 Reasoning control differs by model. `{"enabled": false}` is rejected by gemini-3.5-flash-lite ("Reasoning is mandatory"); `{"effort": "minimal"}` is accepted by all the tested models, but Gemini 2.x still thinks at "minimal", which used up the 80-token budget (truncated or empty answers). The client sends `enabled: false` for `gemini-2*` and `effort: minimal` otherwise. A new model needs a check that it gives complete answers. On Vertex, Gemini 2.x uses `thinking_budget=0` and Gemini 3.x uses `thinking_level="minimal"`.
+  - L3.5 The bench images are 8 Wikimedia Commons photos (credits in `server/bench/CREDITS.md`), not frames from the phone camera. Quality was eyeballed, not scored. Llama 4 Scout invented a bus number ("64C"; the plate reads MH 01 L 9442), and gpt-6-luna returned one empty answer.
+  - L3.6 The splitter waits one character after a `.` to rule out decimals and abbreviations; `? ! ।` emit at once. When `?` and `!` arrive in separate deltas, the `!` is dropped (cosmetic).
+  - L3.7 The system prompt's rules are in English, with a per-language instruction for language, script and direction words. That replaces the spec's "prompt in the target language", which risks untested Tamil/Hindi prompt text. The "spell numbers as words" rule is dropped (Timbre normalises digits, P2).
+  - L3.8 `done`/`error` timings use `_ms`-suffixed keys (`vlm_first_token_ms`, `first_sentence_ms`, `first_audio_ms`, `total_ms`).
+  - L3.9 `google-genai` pulls in `httpx2`, whose logger prints full request URLs at INFO. It's now silenced with `httpx`. The existing log-privacy test caught this.
+  - L3.10 Vertex `asia-south1` (project screenify-497419) serves gemini-2.5-flash, gemini-3.5-flash-lite and gemini-3.5-flash, but not gemini-2.5-flash-lite or gemini-3.1-flash-lite. In one run, gemini-3.5-flash-lite timed out on 11 of 16 calls (> 15 s) while gemini-2.5-flash answered all 16 at a p50 of 756 ms to the first sentence. Not investigated (paused). Possibly capacity for a new model in that region.
+- **Unverified assumptions:** the Vertex /ask path wasn't run through the server (only the client, via the bench). OpenRouter's provider routing and region for each model is unknown, so the laptop numbers include that hop.
+- **Measurements** (laptop in India, 8 cases × 2 runs, first sentence p50/p95 ms; `server/bench/results/`):
+  - OpenRouter: gemini-3.5-flash-lite 1,170/1,643 (16/16 ok); gemini-2.5-flash-lite 1,659/3,272 (16/16, rerun after the L3.4 fix; the first run's rows for it are invalid); llama-4-scout 1,524/3,326 (16/16); gpt-6-luna 1,752/2,687 (15/16).
+  - Vertex asia-south1: gemini-2.5-flash 756/944 (16/16); gemini-3.5-flash-lite 5/16 ok (see L3.10).
+  - Live /ask: first audio 2,434 ms against the ≤ 2 s target (L3.1).
+
 ## Pending device tests
 
 | ID | Check | Phase | Result | Date | Notes |
