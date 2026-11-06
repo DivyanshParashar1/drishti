@@ -63,6 +63,33 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
   - Vertex asia-south1: gemini-2.5-flash 756/944 (16/16); gemini-3.5-flash-lite 5/16 ok (see L3.10).
   - Live /ask: first audio 2,434 ms against the ≤ 2 s target (L3.1).
 
+## P4 — Clip packs (2026-11-07)
+- **Status:** automated tests pass (pytest 195, plus 8 `live` deselected and 4 skipped until the packs exist) | live checks: deferred to the end (user, 2026-11-07); no clips generated yet
+- **Limitations:**
+  - L4.1 No MP3 clips exist yet. `clips.generated.ts` has `asset: null` for every clip, so the app must speak each clip's `text` with expo-speech until the packs are generated. Fixed-phrase latency and voice consistency (D12) are therefore not met yet. Plan: `uv run python scripts/gen_clips.py --langs hi-en,hi,en,ta` at the end (about 1,100–1,500 characters per pack, ≤ ~100 credits each by the P2 estimate).
+  - L4.2 The Tamil and Hindi phrase text was written without a native-speaker check. Plan: listen through and fix when the packs are generated.
+  - L4.3 The tutorial's Tamil command examples ("இவரை ராகுல் என்று சேமி", "இங்கிலீஷ் மே போலோ") must match the phrasings the command router accepts (P7/P11).
+  - L4.4 Leading and trailing silence in Timbre MP3s hasn't been measured. Stitched alerts ("Car" + "left mein" + "paas") will sound gappy if each clip carries silence. Plan: measure with ffprobe once clips exist, and trim with ffmpeg in gen_clips if it's over ~80 ms.
+  - L4.5 The earcons are synthesised sine tones (WAV, 24 kHz): listen_start, listen_stop, error. Not yet heard on the phone.
+  - L4.6 First-person lines use feminine forms to match the female voices (Poorvi, Shivani). The spec's cane line keeps "karta hai".
+- **Unverified assumptions:** Timbre speaks one-word clips ("aage", "paas") cleanly; Metro bundles `.mp3`/`.wav` with the default asset extensions.
+- **Measurements:** none yet.
+
+## Deferred tests and checks (run at the end)
+
+Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
+
+| ID | Phase | What | Command / how | Why deferred |
+| --- | --- | --- | --- | --- |
+| X-3.1 | P3 | Vertex /ask through the server (one call) | `VLM_PROVIDER=vertex VLM_MODEL=gemini-2.5-flash uvicorn …` + `scripts/ask_probe.py --case stairs` | Vertex paused (user) |
+| X-3.2 | P3 | Investigate the Vertex gemini-3.5-flash-lite timeouts in asia-south1 (L3.10) | bench on Vertex | Vertex paused (user) |
+| X-3.3 | P3 | Model benchmark, open-source models on OpenRouter preferred; pick D16 | `scripts/bench_vlm.py --runs 2 openrouter:<model> …` | after the app is complete (user) |
+| X-3.4 | P3 | Timbre SSE/WebSocket streaming for faster first audio (L2.1, L3.1) | prototype + `ask_probe.py` | first audio is over target; with P13 re-measure |
+| X-4.1 | P4 | Generate the hi-en pack and listen to 10 random clips; note mispronunciations | `scripts/gen_clips.py --langs hi-en` | deferred (user) |
+| X-4.2 | P4 | Generate the hi, en and ta packs; native-speaker check of the Hindi and Tamil text | `scripts/gen_clips.py --langs hi,en,ta` | deferred (user) |
+| X-4.3 | P4 | Measure clip leading/trailing silence; trim if needed (L4.4) | ffprobe / ffmpeg | needs X-4.1 |
+| X-4.4 | P4 | Re-check Gnani credits used after the packs (L2.9) | Gnani dashboard | needs X-4.1/X-4.2 |
+
 ## Pending device tests
 
 | ID | Check | Phase | Result | Date | Notes |
