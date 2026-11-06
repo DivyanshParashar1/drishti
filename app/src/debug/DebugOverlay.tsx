@@ -3,6 +3,7 @@ import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-nati
 import type { Utterance } from '../audio/scheduler';
 import type { Services } from '../core/services';
 import type { DetectorId } from '../vision/config';
+import type { VoiceController } from '../voice/voiceController';
 
 /**
  * Debug overlay shell (F10): live p50/p95 per stage, metrics export, and the P5 device-check
@@ -10,10 +11,12 @@ import type { DetectorId } from '../vision/config';
  */
 export function DebugOverlay({
   services,
+  voice,
   detector,
   onSwitchDetector,
 }: {
   services: Services;
+  voice: VoiceController;
   detector: DetectorId;
   onSwitchDetector: () => void;
 }) {
@@ -82,6 +85,10 @@ export function DebugOverlay({
         <Text style={styles.title}>
           Debug · {lang} · {connectivity.online === null ? 'checking…' : connectivity.online ? 'Online' : 'OFFLINE'} ·
           queue {scheduler.pending.length}
+        </Text>
+        <Text style={styles.text}>
+          voice: {voice.state}
+          {voice.lastTranscript ? ` · heard "${voice.lastTranscript}" → ${voice.lastCommand}` : ''}
         </Text>
         {Object.entries(summary).map(([kind, stages]) => (
           <Text key={kind} style={styles.text}>

@@ -7,6 +7,8 @@ import { DebugOverlay } from './src/debug/DebugOverlay';
 import { createTapCounter } from './src/debug/tapCounter';
 import { ReflexScreen } from './src/screens/ReflexScreen';
 import { VISION, type DetectorId } from './src/vision/config';
+import { TalkSurface } from './src/voice/TalkSurface';
+import { useVoiceController } from './src/voice/useVoiceController';
 
 export default function App() {
   useKeepAwake(); // the camera can't run in the background, so keep the screen on (F10)
@@ -14,6 +16,7 @@ export default function App() {
   const [debug, setDebug] = useState(false);
   const [detector, setDetector] = useState<DetectorId>(VISION.detector);
   const tap = useRef(createTapCounter()).current;
+  const voice = useVoiceController(services);
 
   useEffect(() => {
     let cleanup: (() => void) | undefined;
@@ -27,9 +30,11 @@ export default function App() {
     <View style={{ flex: 1 }} onTouchEnd={() => tap() && setDebug((d) => !d)}>
       <StatusBar style="light" />
       <ReflexScreen services={services} detector={detector} debug={debug} />
+      <TalkSurface voice={voice} />
       {debug && (
         <DebugOverlay
           services={services}
+          voice={voice}
           detector={detector}
           onSwitchDetector={() => setDetector((d) => (d === 'yolo11n' ? 'efficientdet_lite0' : 'yolo11n'))}
         />
