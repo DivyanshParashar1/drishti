@@ -1,10 +1,43 @@
 {
-  "hi-en_question": {"lang": "hi-en", "text": "Saamne kya hai?"},
-  "hi-en_save": {"lang": "hi-en", "text": "Isko Rahul ke naam se save karo"},
-  "hi-en_read": {"lang": "hi-en", "text": "Ye padho"},
-  "hi_question": {"lang": "hi", "text": "सामने क्या है?"},
-  "hi_color": {"lang": "hi", "text": "शर्ट का रंग क्या है?"},
-  "en_question": {"lang": "en", "text": "Is this bus number forty two?"},
-  "en_command": {"lang": "en", "text": "Who is saved?"},
-  "ta_question": {"lang": "ta", "text": "முன்னால் என்ன இருக்கிறது?"}
+  "_note": "Clips are Timbre-synthesised (scripts/make_stt_fixtures.py). 'prisma' is the real Prisma v3 output recorded on 2026-11-06 via /stt.",
+  "hi-en_question": {
+    "lang": "hi-en",
+    "text": "Saamne kya hai?",
+    "prisma": "Samne kya hai?"
+  },
+  "hi-en_save": {
+    "lang": "hi-en",
+    "text": "Isko Rahul ke naam se save karo",
+    "prisma": "is ko rahul ke naam se save karo."
+  },
+  "hi-en_read": {
+    "lang": "hi-en",
+    "text": "Ye padho",
+    "prisma": "ye padho"
+  },
+  "hi_question": {
+    "lang": "hi",
+    "text": "सामने क्या है?",
+    "prisma": "Samne kya hai"
+  },
+  "hi_color": {
+    "lang": "hi",
+    "text": "शर्ट का रंग क्या है?",
+    "prisma": "shirt ka rang kya hai?"
+  },
+  "en_question": {
+    "lang": "en",
+    "text": "Is this bus number forty two?",
+    "prisma": "Is this bus number forty two?"
+  },
+  "en_command": {
+    "lang": "en",
+    "text": "Who is saved?",
+    "prisma": "Who is saved"
+  },
+  "ta_question": {
+    "lang": "ta",
+    "text": "முன்னால் என்ன இருக்கிறது?",
+    "prisma": "முன்னால் என்ன இருக்கிறது"
+  }
 }
