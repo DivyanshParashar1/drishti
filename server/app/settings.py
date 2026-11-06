@@ -22,6 +22,13 @@ class Settings(BaseSettings):
     vertex_location: str = "asia-south1"
     rate_limit_per_min: int = 30
 
+    gnani_tts_url: str = "https://api.vachana.ai/api/v1/tts/inference"
+    gnani_stt_url: str = "wss://api.vachana.ai/stt/v3/stream"
+    tts_timeout_s: float = 10.0
+    tts_max_concurrency: int = 1  # some Gnani accounts allow one active request at a time
+    tts_retry_backoff_s: float = 0.4
+    stt_final_timeout_s: float = 3.0
+
     @model_validator(mode="after")
     def _no_dev_token_in_production(self) -> "Settings":
         # Cloud Run sets K_SERVICE. Refuse to start there with a missing or default token.
