@@ -15,7 +15,7 @@ logger = logging.getLogger("drishti")
 def configure_logging() -> None:
     """Our logger at INFO; silence third-party loggers that print full URLs or payloads."""
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
-    for noisy in ("httpx", "httpcore", "websockets", "uvicorn.access"):
+    for noisy in ("httpx", "httpx2", "httpcore", "websockets", "uvicorn.access"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
 
