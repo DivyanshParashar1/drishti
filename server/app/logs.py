@@ -56,6 +56,8 @@ class AccessLogMiddleware:
                 status = message["status"]
             elif t == "websocket.accept":
                 status = 101
+            elif t == "websocket.close" and status == "-":
+                status = 403  # closed before accept: the server's handshake rejection
             await send(message)
 
         try:

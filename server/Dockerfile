@@ -5,4 +5,4 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 COPY app ./app
 ENV PATH="/srv/.venv/bin:$PATH" PORT=8080
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --no-access-log"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --no-access-log --ws websockets"]

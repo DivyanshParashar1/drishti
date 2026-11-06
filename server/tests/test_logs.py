@@ -51,3 +51,15 @@ def test_access_log_records_rejections(client, caplog):
     with caplog.at_level(logging.INFO, logger="drishti"):
         client.get("/health")
     assert "path=/health status=401" in caplog.text
+
+
+def test_access_log_websocket_to_unknown_route(client, caplog):
+    from starlette.websockets import WebSocketDisconnect
+
+    with (
+        caplog.at_level(logging.INFO, logger="drishti"),
+        pytest.raises(WebSocketDisconnect),
+        client.websocket_connect("/nope", headers=AUTH),
+    ):
+        pass
+    assert "path=/nope status=403" in caplog.text
