@@ -109,6 +109,23 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** `toRawPixelData()` on the resized image returns a tightly packed 4-byte format (all nitro-image formats are handled, including row padding); fast-tflite's `runSync` returns outputs in model order (boxes, classes, scores, count for EfficientDet); `performance.now()` exists in the VisionCamera worklet runtime (falls back to `Date.now()`).
 - **Measurements:** laptop CPU only: on the bench images both models find the bus (EfficientDet 0.91, YOLO 0.95, box IoU > 0.8), the vehicles in `autos` and the bench in `footpath`. No phone numbers yet.
 
+## P7 — Push-to-talk, command router, scene questions (2026-11-07)
+- **Status:** automated tests pass (Jest 200, pytest 195; `tsc` and `expo lint` clean; Android export bundles, 936 modules) | live checks: none in this phase | device checks DT-7.1–7.4 pending. **Mic, /stt, /ask and frame grab have not run on the phone.**
+- **Limitations:**
+  - L7.1 Streaming `/ask` uses React Native's XHR with `onprogress` (incremental `responseText`) instead of `expo/fetch`: it's core RN and handles `FormData` file parts. Whether chunks really arrive incrementally on Android (rather than all at the end) is unverified, and it decides whether sentence 1 plays early. Plan: watch `first_sentence_rx` vs the server's `first_sentence_ms` in DT-7.2. Fallback: `expo/fetch` streaming.
+  - L7.2 The mic is audio-studio `startRecording` (16 kHz, 16-bit mono, 40 ms chunks, base64 decoded in JS, no file written). The PCM format on the device is unverified (P0 assumption). The first chunks may miss speech that starts within ~100 ms of the press.
+  - L7.3 Pressing the talk surface stops all speech, alerts included (`stopAll`). Presses under 300 ms are treated as taps (no STT; the debug triple-tap still works). With TalkBack on, hold is double-tap-and-hold (P12 accessibility pass).
+  - L7.4 Router: keyword rules on normalised text (lower case, no punctuation, "is ko" → "isko", "what's" → "what is"). "Stop" words count only in utterances of ≤ 3 words, and "bas" only on its own (Prisma spells "bus" as "bas"). "Read" matches anywhere ("can you read the bus number" → OCR, not the VLM). Tamil coverage is a few phrasings (language switch, stop, read, who, describe); a full Tamil table comes in P11.
+  - L7.5 Save/delete/list (P9), read (P10) and language (P11) say "Ye abhi uplabdh nahi hai". "Who is here" says nobody is recognised until P8.
+  - L7.6 F6 no-resume: when a hazard interrupts an answer sentence, that answer's queued sentences are dropped and any still streaming are skipped. "Repeat" replays the last full answer.
+  - L7.7 "Dekh rahi hoon" plays while waiting, at the answer's priority (FIFO), and is dropped if still queued when sentence 1 arrives. If it's already playing, sentence 1 waits for it to finish (≤ ~1 s). This may cost first-audio time; drop it if DT-7.2 is tight.
+  - L7.8 Offline: no STT session starts. Release says "Internet nahi hai"; alerts are unaffected. "Offline" is ConnectivityMonitor's view (network lost, or 2 failed pings), so a server that just died is noticed only through STT errors, which give "Samajh nahi aaya".
+  - L7.9 The /ask frame is the next camera frame after STT finishes, grabbed in the worklet as a JPEG (longest side 512, quality 70), with a 1 s timeout. That adds up to one frame interval plus encode time to `ask_sent` (unmeasured).
+  - L7.10 Answer audio goes to rotating cache files (`ans-0..29.mp3`, `ask-0..3.jpg`). After 30 sentences a file still queued could be overwritten (unlikely with 2-sentence answers).
+  - L7.11 Answer metrics: `ptt_release`, `stt_final`, `ask_sent`, `first_sentence_rx`, `play_start` (by the scheduler, first sentence), plus the server's `done` timings. Transcripts appear only on the debug overlay, never in metrics or logs.
+- **Unverified assumptions:** RN WebSocket's third-argument `headers` reaches the `/stt` handshake on Android; `toEncodedImageData('jpg', 70)` works from the worklet; expo-audio earcon players replay after `seekTo(0)`.
+- **Measurements:** none yet (device checks pending).
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -122,6 +139,7 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | X-4.1 | P4 | Generate the hi-en pack and listen to 10 random clips; note mispronunciations | `scripts/gen_clips.py --langs hi-en` | deferred (user) |
 | X-4.2 | P4 | Generate the hi, en and ta packs; native-speaker check of the Hindi and Tamil text | `scripts/gen_clips.py --langs hi,en,ta` | deferred (user) |
 | X-4.3 | P4 | Measure clip leading/trailing silence; trim if needed (L4.4) | ffprobe / ffmpeg | needs X-4.1 |
+| X-7.1 | P7 | Run DT-7.2 once per VLM provider (OpenRouter now; Vertex when unpaused) | device + `VLM_PROVIDER` switch | Vertex paused (user) |
 | X-4.4 | P4 | Re-check Gnani credits used after the packs (L2.9) | Gnani dashboard | needs X-4.1/X-4.2 |
 
 ## Pending device tests
@@ -140,3 +158,7 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-6.3 | Facing one chair for 30 s → exactly one alert | P6 | pending | | |
 | DT-6.4 | Tune near/far thresholds while walking toward an object | P6 | pending | | |
 | DT-6.5 | Phone temperature and battery drain after 15 min of continuous use | P6 | pending | | |
+| DT-7.1 | Each fixed command works with 2 phrasings (overlay shows transcript → command) | P7 | pending | | |
+| DT-7.2 | Median release → first audio ≤ 2 s over 20 questions, on Wi-Fi and on 4G (overlay describe play_start p50) | P7 | pending | | |
+| DT-7.3 | A car alert interrupts a long answer within 100 ms, and the answer does not resume | P7 | pending | | |
+| DT-7.4 | Airplane mode: a question gets "Internet nahi hai"; alerts keep working | P7 | pending | | |
