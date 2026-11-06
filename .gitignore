@@ -1,0 +1,35 @@
+# Node / Expo
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+app/android/
+app/ios/
+*.apk
+*.aab
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.jks
+*.keystore
+credentials*.json
+service-account*.json
+gcp-key*.json
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
