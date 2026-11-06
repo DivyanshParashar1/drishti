@@ -75,6 +75,22 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** Timbre speaks one-word clips ("aage", "paas") cleanly; Metro bundles `.mp3`/`.wav` with the default asset extensions.
 - **Measurements:** none yet.
 
+## P5 — App core: metrics, speech scheduler, audio (2026-11-07)
+- **Status:** automated tests pass (Jest 41; `tsc` and `expo lint` clean; `expo export` bundles Android, 860 modules) | live checks: none in this phase | device checks DT-5.1–5.3 pending
+- **Limitations:**
+  - L5.1 No clip packs yet (L4.1), so every clip goes through expo-speech, which adds Android TTS start-up latency. DT-5.1 (no gap when stitching) and the < 100 ms alert target can only be judged after X-4.1.
+  - L5.2 Fallback speech merges neighbouring spoken pieces into one TTS call, and a coalescing pause becomes a comma. Hinglish is spoken with the `en-IN` system voice; how good that sounds is unverified.
+  - L5.3 A P0 does not interrupt another P0; the second one waits (and may go stale after 500 ms). An interrupted utterance is dropped, never resumed (F6). Reading (P3) is interrupted the same way. F7 "aage" / "repeat" will need to re-queue it (P7/P10).
+  - L5.4 Stale drops apply per member of a coalesced group, using the scheduler's clock when the group reaches the head of the queue. Answers, reading and system lines are never dropped.
+  - L5.5 One shared expo-audio player uses `replace()` per clip. Gapless stitching relies on `preload()`, which hasn't been measured on the device. If there are gaps, plan: one player per clip in the pack.
+  - L5.6 Each expo-audio clip has a 30 s fallback timeout in case `didJustFinish` never fires.
+  - L5.7 Connectivity: network loss means offline at once; with a network, two failed `/health` pings in a row (30 s apart) mean offline, so a dead server is noticed within about 60 s. `online` starts unknown. The spoken internet lost/back announcements are wired in P12.
+  - L5.8 The debug overlay is a shell: it shows stage p50/p95, queue length and online state, with export and DT-5 test buttons. Boxes, track IDs and the F12 latency readout come in P6/P12. Triple-tap is detected on the root view, so taps on overlay buttons count too.
+  - L5.9 Metrics export goes through React Native's `Share` (text message), not a file, so no new native package was needed. Very long sessions may exceed share-intent size limits; the rolling window caps it at 200 events.
+  - L5.10 `expo lint` was set up on first use (eslint 9.39.5, eslint-config-expo 58.0.4, pinned); `require()` is allowed only in the asset map files.
+- **Unverified assumptions:** expo-audio `preload()` makes `replace()` + `play()` near-instant on Android; `player.pause()` + resolving at once meets the ≤ 50 ms stop; expo-speech `onStopped` fires on `Speech.stop()`.
+- **Measurements:** none yet (device checks pending).
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -98,3 +114,6 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-0.2 | Camera preview shows after permission grant | P0 | pending | | |
 | DT-0.3 | Both detector models load; note load ms and whether delegate shows `android-gpu` | P0 | pending | | |
 | DT-0.4 | `npx expo start --dev-client` hot-reloads a text change | P0 | pending | | |
+| DT-5.1 | Bundled clips play with no audible gap when stitched (overlay "Stitch" button; needs X-4.1 clips) | P5 | pending | | |
+| DT-5.2 | P0 interrupts a long answer within 100 ms (overlay "Long answer", then "P0 now"; read reflex play_start) | P5 | pending | | |
+| DT-5.3 | Playback follows the system volume | P5 | pending | | |
