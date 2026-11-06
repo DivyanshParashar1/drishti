@@ -28,6 +28,22 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** Cloud Run passes the `Authorization` header and WebSocket upgrade through unchanged (P13).
 - **Measurements:** none (no latency-relevant code yet).
 
+## P2 — Gnani relay: /tts and /stt (2026-11-06)
+- **Status:** automated tests pass (pytest 93, plus 8 `live` deselected) | live checks done: TTS ×4 languages, STT ×8 fixtures through `/stt`, one `-m live` test, a numbers round trip
+- **Limitations:**
+  - L2.1 Timbre REST takes 470–950 ms per short line from a laptop in India (hi 948, hi-en 873/471, ta 774, en 530 ms). The spec estimated 150–300 ms. Impact: the ≤ 2 s answer target (P3) and enrollment name clips. Plan: in P3, try Timbre SSE streaming for a faster first audio chunk, and re-measure from Cloud Run Mumbai (P13).
+  - L2.2 Realtime Prisma rejects language lists (`hi-IN,en-IN`: "exactly one locale is required") although the docs allow them. Each language sends a single locale.
+  - L2.3 Hindi and Hinglish use `format=transliterate` (Latin output), not the spec's `codemix`. The command router (P7) must match romanised words and handle split forms ("is ko" vs "isko"). Hindi numbers transcribe poorly in this mode: Timbre's "बस 42 आ रही है" came back as "Bas biali saari hai". Impact: questions with Hindi numbers ("kya ye bus 42 hai") may reach the VLM garbled. Plan: test real voices in DT-7.1/7.2, and try `codemix` for the `hi` language if it's bad.
+  - L2.4 `detected_language_code` is null in transliterate mode, as the docs say.
+  - L2.5 The STT fixtures are Timbre-synthesised speech, not real voices. Real-voice accuracy (accents, street noise, the phone mic) is untested. Plan: DT-7.1/7.2.
+  - L2.6 After commit, the relay waits 150 ms for a late `speech_start`. That's the floor of release→final when the transcript is already in. Accepted.
+  - L2.7 The relay forwards frames as they fill rather than strictly every 32 ms. Network jitter can bunch frames, which Gnani says degrades VAD. We commit on release, so VAD timing matters less. Accepted; watch DT-7.1.
+  - L2.8 Prisma's `connected` config shows undocumented interim results (`partials_enabled: false`, `partial_interval_ms: 450`). They aren't used. They could show live captions later.
+  - L2.9 The credit cost of these calls is unknown. The Gnani dashboard (app.gnani.ai) shows usage; record it to estimate credits per minute (open question §11).
+  - L2.10 Hinglish TTS (Poorvi, Timbre v2.5) says digits in English ("forty two"). Natural for Hinglish; accepted.
+- **Unverified assumptions:** the Timbre 429 retry path and Prisma's concurrent-session cap weren't hit live; Gnani's `x-idle-timeout-sec` and `x-min-silence-ms` values weren't tuned.
+- **Measurements:** Prisma transcription latency 62–102 ms per segment. `/stt` release→final 152–155 ms on all 8 fixtures (local server → Gnani). Timbre REST 471–948 ms. All 8 fixtures transcribed correctly in hi, hi-en, en and ta.
+
 ## Pending device tests
 
 | ID | Check | Phase | Result | Date | Notes |
