@@ -58,6 +58,7 @@ export type ClipKey =
   | "sys.reading_done"
   | "sys.lang_switched"
   | "sys.detector_failed"
+  | "sys.not_available"
 ;
 
 export interface Clip {
@@ -122,6 +123,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.reading_done": { text: "बस इतना ही लिखा है", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "अब मैं हिंदी में बोलूँगी", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "रुकावट अलर्ट शुरू नहीं हो पाए। ऐप दोबारा खोलिए।", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
+    "sys.not_available": { text: "यह अभी उपलब्ध नहीं है", en: "That isn't available yet", asset: null },
   },
   "hi-en": {
     "obj.person": { text: "Vyakti", en: "Person", asset: null },
@@ -178,6 +180,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.reading_done": { text: "Bas itna hi likha hai", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "Ab main Hinglish mein bolungi", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "Rukaawat alerts shuru nahi ho paaye. App dobara kholiye.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
+    "sys.not_available": { text: "Ye abhi uplabdh nahi hai", en: "That isn't available yet", asset: null },
   },
   "en": {
     "obj.person": { text: "Person", en: "Person", asset: null },
@@ -234,6 +237,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.reading_done": { text: "That's all the text", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "I'll speak in English now", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "Obstacle alerts could not start. Please reopen the app.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
+    "sys.not_available": { text: "That isn't available yet", en: "That isn't available yet", asset: null },
   },
   "ta": {
     "obj.person": { text: "ஒருவர்", en: "Person", asset: null },
@@ -290,6 +294,7 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.reading_done": { text: "அவ்வளவுதான் எழுதியிருக்கிறது", en: "That's all the text", asset: null },
     "sys.lang_switched": { text: "இனி நான் தமிழில் பேசுவேன்", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "தடை எச்சரிக்கைகள் தொடங்கவில்லை. செயலியை மீண்டும் திறக்கவும்.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
+    "sys.not_available": { text: "இது இன்னும் கிடைக்கவில்லை", en: "That isn't available yet", asset: null },
   },
 };
 

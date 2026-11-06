@@ -322,5 +322,11 @@
     "hi": "रुकावट अलर्ट शुरू नहीं हो पाए। ऐप दोबारा खोलिए।",
     "en": "Obstacle alerts could not start. Please reopen the app.",
     "ta": "தடை எச்சரிக்கைகள் தொடங்கவில்லை. செயலியை மீண்டும் திறக்கவும்."
+  },
+  "sys.not_available": {
+    "hi-en": "Ye abhi uplabdh nahi hai",
+    "hi": "यह अभी उपलब्ध नहीं है",
+    "en": "That isn't available yet",
+    "ta": "இது இன்னும் கிடைக்கவில்லை"
   }
 }
