@@ -55,7 +55,10 @@ const LANG_WORDS: [RegExp, Lang][] = [
 /** Clean a captured name: drop filler words, title-case. Null if nothing usable is left. */
 export function cleanName(raw: string | undefined): string | null {
   if (!raw) return null;
-  const filler = new Set(['naam', 'name', 'se', 'the', 'this', 'isko', 'usko', 'inko', 'as', 'ko', 'mera', 'my', 'friend', 'dost']);
+  const filler = new Set([
+    ...['naam', 'name', 'se', 'the', 'this', 'isko', 'usko', 'inko', 'as', 'ko', 'mera', 'my', 'friend', 'dost', 'hai', 'is', 'karo', 'kar', 'kijiye'],
+    ...['इसको', 'इसे', 'उसको', 'नाम', 'से', 'को', 'मेरा', 'है', 'करो'],
+  ]);
   const parts = raw.split(' ').filter((w) => w && !filler.has(w));
   if (parts.length === 0 || parts.length > 3) return null;
   return parts.map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');
@@ -85,15 +88,23 @@ export function route(transcript: string): Command {
     t.match(/^save (?:this|him|her|them)? ?as (.+)$/) ??
     t.match(/^(?:isko|usko|inko) (.+?) naam do$/) ??
     t.match(/^remember (?:this|him|her) as (.+)$/);
+  m ??=
+    t.match(/^(?:इसको |इसे |उसको )?(.+?) के नाम से (?:सेव|याद) (?:करो|कर दो|कीजिए|कर लो)$/) ??
+    t.match(/^(?:इसको|इसे|उसको) (.+?) नाम दो$/);
   if (m) return { kind: 'save', name: cleanName(m[1]) };
-  if (has(t, 'save karo', 'save this', 'save him', 'save her', 'yaad rakho')) return { kind: 'save', name: null };
+  if (has(t, 'save karo', 'save this', 'save him', 'save her', 'yaad rakho', 'सेव करो', 'याद रखो')) return { kind: 'save', name: null };
 
   // delete: "rahul ko delete karo", "delete rahul", "rahul ko hatao", "forget rahul"
-  m = t.match(/^(.+?) ko (?:delete|hatao|hata do|bhool jao)(?: karo| kar do)?$/) ?? t.match(/^(?:delete|remove|forget) (.+)$/);
+  m =
+    t.match(/^(.+?) ko (?:delete|hatao|hata do|bhool jao)(?: karo| kar do)?$/) ??
+    t.match(/^(?:delete|remove|forget) (.+)$/) ??
+    t.match(/^(.+?) को (?:डिलीट|हटाओ|हटा दो|भूल जाओ)(?: करो| कर दो)?$/);
   if (m) return { kind: 'delete', name: cleanName(m[1]) };
+  if (has(t, 'delete karo', 'delete', 'डिलीट करो')) return { kind: 'delete', name: null };
 
   // list: "kaun kaun saved hai", "who is saved", "saved log"
   if (/\bsaved?\b/.test(t) && /\b(kaun|kis|who|list|log|people)\b/.test(t)) return { kind: 'list' };
+  if (/सेव/.test(t) && /(कौन|किस|लोग)/.test(t)) return { kind: 'list' };
 
   // quiet mode
   if (/\b(quiet|shant|shaant)\b/.test(t) || has(t, 'kam bolo', 'be quiet')) {
@@ -123,4 +134,25 @@ export function route(transcript: string): Command {
   }
 
   return { kind: 'question', question: transcript.trim() };
+}
+
+/**
+ * F4 "Naam bataiye" reply → a name: "Rahul", "mera naam Rahul hai", "his name is Anil Kumar",
+ * "राहुल". Null if nothing usable (empty, or more than 3 words left).
+ */
+export function spokenName(transcript: string): string | null {
+  const t = normalize(transcript)
+    .replace(/^(?:(?:mera|iska|inka|unka|uska|my|his|her|their) )?(?:naam|name)(?: is)? /, '')
+    .replace(/^(?:मेरा|इसका|इनका|उनका) नाम /, '')
+    .replace(/ (?:hai|है)$/, '');
+  return cleanName(t);
+}
+
+/** F4 consent: yes only on a clear yes; any no-word wins ("haan nahi" → no). */
+export function consentAnswer(transcript: string): 'yes' | 'no' {
+  const t = normalize(transcript);
+  if (has(t, 'nahi', 'nahin', 'na', 'no', 'mat', 'nope', 'नहीं', 'ना', 'மாட்டேன்', 'இல்லை', 'வேண்டாம்')) return 'no';
+  return has(t, 'haan', 'haa', 'ha', 'han', 'haanji', 'ji', 'ji haan', 'yes', 'yeah', 'yep', 'ok', 'okay', 'theek hai', 'thik hai', 'sure', 'हाँ', 'हां', 'जी', 'ठीक है', 'ஆம்', 'சரி')
+    ? 'yes'
+    : 'no';
 }

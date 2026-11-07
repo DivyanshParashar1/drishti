@@ -1,4 +1,4 @@
-import { cleanName, normalize, route } from '../router';
+import { cleanName, consentAnswer, normalize, route, spokenName } from '../router';
 
 const kind = (t: string) => route(t).kind;
 
@@ -33,6 +33,10 @@ test.each([
   ['save as anil kumar', 'Anil Kumar'],
   ['isko Meena naam do', 'Meena'],
   ['remember him as Ravi', 'Ravi'],
+  ['isko rahul kumar sharma ke naam se save karo', 'Rahul Kumar Sharma'],
+  ['इसको राहुल के नाम से सेव करो', 'राहुल'],
+  ['इसे सुनीता देवी के नाम से याद करो', 'सुनीता देवी'],
+  ['इसको मीना नाम दो', 'मीना'],
 ])('save: "%s" → %s', (p, name) => {
   expect(route(p)).toEqual({ kind: 'save', name });
 });
@@ -40,6 +44,8 @@ test.each([
 test('save without a usable name asks for it later', () => {
   expect(route('isko save karo')).toEqual({ kind: 'save', name: null });
   expect(route('save this')).toEqual({ kind: 'save', name: null });
+  expect(route('सेव करो')).toEqual({ kind: 'save', name: null });
+  expect(route('isko a b c d ke naam se save karo')).toEqual({ kind: 'save', name: null }); // > 3 words
 });
 
 test.each([
@@ -47,6 +53,8 @@ test.each([
   ['delete Priya', 'Priya'],
   ['rahul ko hatao', 'Rahul'],
   ['forget anil kumar', 'Anil Kumar'],
+  ['राहुल को डिलीट करो', 'राहुल'],
+  ['सुनीता देवी को हटाओ', 'सुनीता देवी'],
 ])('delete: "%s" → %s', (p, name) => {
   expect(route(p)).toEqual({ kind: 'delete', name });
 });
@@ -93,4 +101,39 @@ test('cleanName drops filler and rejects long captures', () => {
   expect(cleanName('mera dost rahul')).toBe('Rahul');
   expect(cleanName('the')).toBeNull();
   expect(cleanName('a b c d')).toBeNull();
+});
+
+test('delete without a name asks for it later; Hindi-script list', () => {
+  expect(route('delete karo')).toEqual({ kind: 'delete', name: null });
+  expect(route('कौन कौन सेव है')).toEqual({ kind: 'list' });
+});
+
+test.each([
+  ['Rahul', 'Rahul'],
+  ['mera naam Rahul hai', 'Rahul'],
+  ['iska naam anil kumar hai', 'Anil Kumar'],
+  ['His name is Ravi.', 'Ravi'],
+  ['राहुल', 'राहुल'],
+  ['मेरा नाम सुनीता देवी है', 'सुनीता देवी'],
+  ['', null],
+  ['one two three four', null],
+])('spokenName("%s") → %s', (t, name) => {
+  expect(spokenName(t)).toBe(name);
+});
+
+test.each([
+  ['Haan', 'yes'],
+  ['haan ji', 'yes'],
+  ['Yes, sure.', 'yes'],
+  ['theek hai', 'yes'],
+  ['हाँ', 'yes'],
+  ['ஆம்', 'yes'],
+  ['nahi', 'no'],
+  ['haan nahi', 'no'],
+  ['no thanks', 'no'],
+  ['नहीं', 'no'],
+  ['kya?', 'no'],
+  ['', 'no'],
+])('consentAnswer("%s") → %s', (t, a) => {
+  expect(consentAnswer(t)).toBe(a);
 });
