@@ -32,6 +32,8 @@ export interface VoiceDeps {
   ask(req: AskRequest, onEvent: (e: AskEvent) => void): Promise<void>;
   /** Write base64 MP3 to a local file and return its uri. */
   writeAudio(b64: string): Promise<string>;
+  /** F8: switch the app language (persisted). */
+  setLanguage(lang: Lang): Promise<void>;
   /** F4 save/delete/list dialog; while it waits for an answer, transcripts go to it. */
   dialog: Pick<EnrollmentDialog, 'wantsTranscript' | 'onTranscript' | 'save' | 'delete' | 'list'>;
   /** Recognised people in view now (F3), with where they are. */
@@ -182,7 +184,8 @@ export class VoiceController {
       case 'next': // "aage" outside reading: a question about what's ahead
         return this.askQuestion(this.lastTranscript || 'aage', id);
       case 'language':
-        return this.say('sys.not_available'); // P11
+        await this.d.setLanguage(cmd.lang);
+        return this.say('sys.lang_switched'); // said in the new language
       case 'describe':
       case 'question':
         return this.askQuestion(cmd.question, id);

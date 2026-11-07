@@ -146,3 +146,35 @@ test('"aage" inside a longer question is not next', () => {
   expect(kind('aage kya hai')).toBe('describe');
   expect(kind('aage seedhi hai kya')).toBe('question');
 });
+
+describe('Tamil (Prisma returns Tamil script)', () => {
+  test.each([
+    ['இவரை ராகுல் என்று சேமி', { kind: 'save', name: 'ராகுல்' }],
+    ['ப்ரியா பெயரில் சேமிக்கவும்', { kind: 'save', name: 'ப்ரியா' }],
+    ['சேமி', { kind: 'save', name: null }],
+    ['ராகுல் பெயரை நீக்கு', { kind: 'delete', name: 'ராகுல்' }],
+    ['நீக்கு', { kind: 'delete', name: null }],
+    ['யார் யார் சேமிக்கப்பட்டுள்ளனர்', { kind: 'list' }],
+    ['அமைதி முறை', { kind: 'quiet', on: true }],
+    ['அமைதி முறை வேண்டாம்', { kind: 'quiet', on: false }],
+    ['அமைதி முறை நிறுத்து', { kind: 'quiet', on: false }],
+    ['நிறுத்து', { kind: 'stop' }],
+    ['மீண்டும் சொல்', { kind: 'repeat' }],
+    ['இதைப் படி', { kind: 'read' }],
+    ['இது யார்', { kind: 'who' }],
+    ['தமிழில் பேசு', { kind: 'language', lang: 'ta' }],
+    ['ஆங்கிலத்தில் பேசு', { kind: 'language', lang: 'en' }],
+    ['அடுத்து', { kind: 'next' }],
+  ])('"%s"', (p, cmd) => {
+    expect(route(p)).toEqual(cmd);
+  });
+  test('describe keeps the question text', () => {
+    expect(route('என்ன தெரிகிறது')).toEqual({ kind: 'describe', question: 'என்ன தெரிகிறது' });
+  });
+  test('Tamil name replies and consent', () => {
+    expect(spokenName('என் பெயர் ராகுல்')).toBe('ராகுல்');
+    expect(spokenName('இவர் பெயர் ப்ரியா')).toBe('ப்ரியா');
+    expect(consentAnswer('ஆம்')).toBe('yes');
+    expect(consentAnswer('வேண்டாம்')).toBe('no');
+  });
+});

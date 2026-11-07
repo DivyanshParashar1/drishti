@@ -1,3 +1,4 @@
+import type { Lang } from '../../core/lang';
 import type { SchedulerHooks, Utterance } from '../../audio/scheduler';
 import { Metrics } from '../../core/metrics';
 import type { AskEvent, AskRequest } from '../../net/askClient';
@@ -27,6 +28,7 @@ function setup(
   const asks: AskRequest[] = [];
   const log: string[] = [];
   let online = opts.online === undefined ? true : opts.online;
+  let lang: Lang = 'hi-en';
   const metrics = new Metrics(200, () => now);
   const reflex = {
     visible: [{ label: 'chair', dir: 'ahead', dist: 'near' } as Track],
@@ -83,7 +85,11 @@ function setup(
       },
     },
     metrics,
-    lang: () => 'hi-en',
+    lang: () => lang,
+    setLanguage: async (l) => {
+      log.push(`lang:${l}`);
+      lang = l;
+    },
     online: () => online,
     reflex,
     startStt: () => ({
@@ -216,8 +222,7 @@ test('commands: stop, quiet, repeat, who, and stubs for later phases', async () 
   await run('isko Rahul ke naam se save karo');
   await run('Priya ko delete karo');
   await run('kaun kaun saved hai');
-  await run('Tamil mein bolo');
-  expect(t.said()).toEqual(['sys.quiet_on', 'sys.nothing_to_repeat', 'sys.no_one_here', 'sys.not_available']);
+  expect(t.said()).toEqual(['sys.quiet_on', 'sys.nothing_to_repeat', 'sys.no_one_here']);
   expect(t.log.filter((l) => /^(save|delete|list)/.test(l))).toEqual(['save:Rahul', 'delete:Priya', 'list']);
 });
 
@@ -344,4 +349,23 @@ describe('reading (F7)', () => {
     await t.talk();
     expect(t.asks[0].question).toBe('aage');
   });
+});
+
+test('"Tamil mein bolo" switches language; the confirmation and every later call use ta', async () => {
+  const t = setup({ askEvents: SENTENCES });
+  const sttLangs: string[] = [];
+  const d = (t.vc as unknown as { d: VoiceDeps }).d;
+  const startStt = d.startStt;
+  d.startStt = (l) => {
+    sttLangs.push(l);
+    return startStt(l);
+  };
+  await t.vc.handle(route('Tamil mein bolo'), 'id');
+  expect(t.log).toContain('lang:ta');
+  expect(t.queue.at(-1)).toMatchObject({ lang: 'ta', parts: [{ kind: 'clip', key: 'sys.lang_switched' }] });
+  t.queue.length = 0;
+  await t.talk();
+  expect(sttLangs).toEqual(['ta']);
+  expect(t.asks[0].lang).toBe('ta');
+  expect(t.queue.every((u) => u.lang === 'ta')).toBe(true);
 });

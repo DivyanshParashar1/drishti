@@ -59,6 +59,7 @@ export function cleanName(raw: string | undefined): string | null {
   const filler = new Set([
     ...['naam', 'name', 'se', 'the', 'this', 'isko', 'usko', 'inko', 'as', 'ko', 'mera', 'my', 'friend', 'dost', 'hai', 'is', 'karo', 'kar', 'kijiye'],
     ...['इसको', 'इसे', 'उसको', 'नाम', 'से', 'को', 'मेरा', 'है', 'करो'],
+    ...['இவரை', 'இவனை', 'இவளை', 'பெயர்', 'என்', 'இவர்'],
   ]);
   const parts = raw.split(' ').filter((w) => w && !filler.has(w));
   if (parts.length === 0 || parts.length > 3) return null;
@@ -73,7 +74,7 @@ export function route(transcript: string): Command {
   // Prisma also spells "bus" as "bas" ("ye bas hai").
   if (
     ['bas', 'bas karo', 'bas bas'].includes(t) ||
-    (words(t) <= 3 && has(t, 'ruko', 'ruk jao', 'stop', 'chup', 'chup ho jao', 'band karo', 'நிறுத்து'))
+    (words(t) <= 3 && !/அமைதி/.test(t) && has(t, 'ruko', 'ruk jao', 'stop', 'chup', 'chup ho jao', 'band karo', 'நிறுத்து'))
   ) {
     return { kind: 'stop' };
   }
@@ -97,21 +98,25 @@ export function route(transcript: string): Command {
     t.match(/^remember (?:this|him|her) as (.+)$/);
   m ??=
     t.match(/^(?:इसको |इसे |उसको )?(.+?) के नाम से (?:सेव|याद) (?:करो|कर दो|कीजिए|कर लो)$/) ??
-    t.match(/^(?:इसको|इसे|उसको) (.+?) नाम दो$/);
+    t.match(/^(?:इसको|इसे|उसको) (.+?) नाम दो$/) ??
+    t.match(/^(?:இவரை |இவனை |இவளை )?(.+?) என்று (?:சேமி|சேமிக்கவும்|சேமித்து வை|சேவ் செய்)$/) ??
+    t.match(/^(?:இவரை |இவனை |இவளை )?(.+?) பெயரில் (?:சேமி|சேமிக்கவும்|சேவ் செய்)$/);
   if (m) return { kind: 'save', name: cleanName(m[1]) };
-  if (has(t, 'save karo', 'save this', 'save him', 'save her', 'yaad rakho', 'सेव करो', 'याद रखो')) return { kind: 'save', name: null };
+  if (has(t, 'save karo', 'save this', 'save him', 'save her', 'yaad rakho', 'सेव करो', 'याद रखो', 'சேமி', 'இவரை சேமி')) return { kind: 'save', name: null };
 
   // delete: "rahul ko delete karo", "delete rahul", "rahul ko hatao", "forget rahul"
   m =
     t.match(/^(.+?) ko (?:delete|hatao|hata do|bhool jao)(?: karo| kar do)?$/) ??
     t.match(/^(?:delete|remove|forget) (.+)$/) ??
-    t.match(/^(.+?) को (?:डिलीट|हटाओ|हटा दो|भूल जाओ)(?: करो| कर दो)?$/);
+    t.match(/^(.+?) को (?:डिलीट|हटाओ|हटा दो|भूल जाओ)(?: करो| कर दो)?$/) ??
+    t.match(/^(.+?) (?:பெயரை|என்ற பெயரை) (?:நீக்கு|அழி|டெலீட் செய்)$/);
   if (m) return { kind: 'delete', name: cleanName(m[1]) };
-  if (has(t, 'delete karo', 'delete', 'डिलीट करो')) return { kind: 'delete', name: null };
+  if (has(t, 'delete karo', 'delete', 'डिलीट करो', 'நீக்கு')) return { kind: 'delete', name: null };
 
   // list: "kaun kaun saved hai", "who is saved", "saved log"
   if (/\bsaved?\b/.test(t) && /\b(kaun|kis|who|list|log|people)\b/.test(t)) return { kind: 'list' };
   if (/सेव/.test(t) && /(कौन|किस|लोग)/.test(t)) return { kind: 'list' };
+  if (/சேமி/.test(t) && /(யார்|பட்டியல்)/.test(t)) return { kind: 'list' };
 
   // quiet mode
   if (/\b(quiet|shant|shaant)\b/.test(t) || has(t, 'kam bolo', 'be quiet')) {
@@ -119,9 +124,10 @@ export function route(transcript: string): Command {
     return { kind: 'quiet', on: !off };
   }
   if (t === 'sab batao' || t === 'normal mode') return { kind: 'quiet', on: false };
+  if (/அமைதி/.test(t)) return { kind: 'quiet', on: !/(நிறுத்து|வேண்டாம்|ஆஃப்)/.test(t) };
 
   // repeat
-  if (has(t, 'repeat', 'phir se bolo', 'dobara bolo', 'fir se bolo', 'say again', 'say that again', 'kya bola', 'phir se')) {
+  if (has(t, 'repeat', 'phir se bolo', 'dobara bolo', 'fir se bolo', 'say again', 'say that again', 'kya bola', 'phir se', 'மீண்டும் சொல்', 'திரும்ப சொல்', 'மறுபடி சொல்')) {
     return { kind: 'repeat' };
   }
 
@@ -136,7 +142,7 @@ export function route(transcript: string): Command {
   }
 
   // describe: routed to /ask, like a question
-  if (has(t, 'saamne kya hai', 'aage kya hai', 'kya dikh raha hai', 'describe', 'what is ahead', 'what is in front', 'what do you see', 'முன்னால் என்ன இருக்கிறது')) {
+  if (has(t, 'saamne kya hai', 'aage kya hai', 'kya dikh raha hai', 'describe', 'what is ahead', 'what is in front', 'what do you see', 'முன்னால் என்ன இருக்கிறது', 'என்ன தெரிகிறது', 'முன்னால் என்ன')) {
     return { kind: 'describe', question: transcript.trim() };
   }
 
@@ -151,6 +157,7 @@ export function spokenName(transcript: string): string | null {
   const t = normalize(transcript)
     .replace(/^(?:(?:mera|iska|inka|unka|uska|my|his|her|their) )?(?:naam|name)(?: is)? /, '')
     .replace(/^(?:मेरा|इसका|इनका|उनका) नाम /, '')
+    .replace(/^(?:என் |இவர் |இவன் |இவள் |அவர் )?பெயர் /, '')
     .replace(/ (?:hai|है)$/, '');
   return cleanName(t);
 }

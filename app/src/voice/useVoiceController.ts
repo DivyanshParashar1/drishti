@@ -81,6 +81,7 @@ export function useVoiceController(services: Services): VoiceController {
       },
       present: () => services.faces.presentPeople(),
       dialog: services.enrollment,
+      setLanguage: (lang) => services.setLanguage(lang),
       haptic: () => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
       earcon: (name) => {
         const p = earcons[name];
