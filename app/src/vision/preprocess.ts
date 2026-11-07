@@ -1,7 +1,7 @@
 import type { DetectorId } from './config';
 
 /** Where R, G, B sit in each pixel, and bytes per pixel, for nitro-image's raw pixel formats. */
-const LAYOUT: Record<string, { r: number; g: number; b: number; bpp: number }> = {
+export const PIXEL_LAYOUT: Record<string, { r: number; g: number; b: number; bpp: number }> = {
   RGBA: { r: 0, g: 1, b: 2, bpp: 4 },
   RGBX: { r: 0, g: 1, b: 2, bpp: 4 },
   BGRA: { r: 2, g: 1, b: 0, bpp: 4 },
@@ -14,7 +14,7 @@ const LAYOUT: Record<string, { r: number; g: number; b: number; bpp: number }> =
   BGR: { r: 2, g: 1, b: 0, bpp: 3 },
 };
 
-export const supportedPixelFormat = (f: string) => f in LAYOUT;
+export const supportedPixelFormat = (f: string) => f in PIXEL_LAYOUT;
 
 /**
  * Raw pixels (already resized to size×size) → the detector's input tensor.
@@ -29,7 +29,7 @@ export function toInputTensor(
   detector: DetectorId,
 ): ArrayBuffer {
   'worklet';
-  const L = LAYOUT[format];
+  const L = PIXEL_LAYOUT[format];
   if (!L) throw new Error(`unsupported pixel format ${format}`);
   const stride = Math.floor(pixels.length / size);
   const n = size * size;
