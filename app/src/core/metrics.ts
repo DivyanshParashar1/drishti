@@ -7,7 +7,7 @@ import { monotonic, type Clock } from './clock';
  * later mark is stored as ms since that start, so durations never mix clocks. Server timings from
  * /ask `done` are attached as-is under `server`.
  */
-export type EventKind = 'reflex' | 'name' | 'describe' | 'system';
+export type EventKind = 'reflex' | 'name' | 'describe' | 'reading' | 'system';
 
 export interface MetricEvent {
   id: string;
