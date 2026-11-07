@@ -95,3 +95,16 @@ test('faces go to the face sink with the visible tracks, after the alerts; face 
   expect(calls[1].n).toBe(0);
   expect(lane.stats.lastFaceMs).toBe(18);
 });
+
+test('a dark frame stream for 2 s → "Camera saaf nahi dikh raha" at P1, repeated every 20 s', () => {
+  const { lane, enqueued, frame, advance } = setup();
+  for (let i = 0; i < 25; i++) {
+    lane.handle({ ...frame([], i + 1), luma: 0.01 });
+    advance(100);
+  }
+  const warns = enqueued.filter((u) => u.parts[0].kind === 'clip' && u.parts[0].key === 'sys.camera_blocked');
+  expect(warns).toHaveLength(1);
+  expect(warns[0]).toMatchObject({ priority: 1, source: 'system' });
+  lane.handle({ ...frame([], 99), luma: 0.6 });
+  expect(lane.blocked.blocked).toBe(false);
+});

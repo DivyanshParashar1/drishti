@@ -11,7 +11,7 @@ import { VISION, type DetectorId } from './config';
 import { decodeEfficientDet, decodeYolo } from './decode';
 import { embedFaces, type MlFace } from './faceWorklet';
 import { YOLO_ALERT_MASK } from './labels';
-import { toInputTensor } from './preprocess';
+import { meanLuma, toInputTensor } from './preprocess';
 import type { FrameResult } from './reflexLane';
 
 export type ModelState =
@@ -176,7 +176,9 @@ export function useReflexCamera(
       try {
         const image = boxedConverter.unbox().convertFrameToImage(frame);
         const raw = image.resize(size, size).toRawPixelData();
-        const input = toInputTensor(new Uint8Array(raw.buffer), raw.pixelFormat, size, detector);
+        const pixels = new Uint8Array(raw.buffer);
+        const luma = meanLuma(pixels, raw.pixelFormat, size); // F10 dark / blocked camera
+        const input = toInputTensor(pixels, raw.pixelFormat, size, detector);
         const t1 = now();
         const outs = boxedModel.unbox().runSync([input]);
         const t2 = now();
@@ -200,6 +202,7 @@ export function useReflexCamera(
           frameNo: n,
           detections,
           faces,
+          luma,
           frameWidth: image.width,
           frameHeight: image.height,
           preprocessMs: t1 - t0,

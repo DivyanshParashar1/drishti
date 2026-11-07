@@ -61,3 +61,25 @@ export function toInputTensor(
   }
   return out.buffer;
 }
+
+/**
+ * Mean luminance (Rec. 601, 0–1) of size×size raw pixels, sampling every `step`th pixel in each
+ * direction. For the dark / blocked camera warning (F10).
+ */
+export function meanLuma(pixels: Uint8Array, format: string, size: number, step = 8): number {
+  'worklet';
+  const L = PIXEL_LAYOUT[format];
+  if (!L) return 1;
+  const stride = Math.floor(pixels.length / size);
+  let sum = 0;
+  let n = 0;
+  for (let y = 0; y < size; y += step) {
+    const row = y * stride;
+    for (let x = 0; x < size; x += step) {
+      const s = row + x * L.bpp;
+      sum += 0.299 * pixels[s + L.r] + 0.587 * pixels[s + L.g] + 0.114 * pixels[s + L.b];
+      n++;
+    }
+  }
+  return n ? sum / n / 255 : 1;
+}

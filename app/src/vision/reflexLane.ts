@@ -3,6 +3,7 @@ import { monotonic, type Clock } from '../core/clock';
 import type { Lang } from '../core/lang';
 import type { Metrics } from '../core/metrics';
 import { buildAlertUtterances } from './alerts';
+import { CameraBlockedMonitor } from './cameraBlocked';
 import { VISION } from './config';
 import { filterDetections } from './geometry';
 import { Tracker, type Track } from './tracker';
@@ -14,6 +15,7 @@ export interface FrameResult {
   frameNo: number;
   detections: Detection[]; // decoded, unfiltered
   faces?: FaceObs[]; // F3: only on frames with a person while faces are on
+  luma?: number; // mean luminance 0–1 of the detector input (F10 dark / blocked camera)
   frameWidth: number; // upright frame size, for drawing boxes
   frameHeight: number;
   preprocessMs: number; // convert + resize + tensor
@@ -52,6 +54,7 @@ export class ReflexLane {
   stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, lastFaceMs: -1, faces: 0, detectionsPerSec: 0 };
   faces?: FaceSink;
   lastFaces: FaceObs[] = []; // for the debug overlay
+  readonly blocked = new CameraBlockedMonitor();
   private frameTimes: number[] = [];
   private listeners: (() => void)[] = [];
 
@@ -96,6 +99,12 @@ export class ReflexLane {
     for (const u of utterances) {
       this.metrics.mark(u.id, 'enqueued');
       this.scheduler.enqueue(u);
+    }
+    if (r.luma !== undefined && this.blocked.update(r.luma, now)) {
+      // F10: P1 system line (never dropped as stale): the user must know alerts can't see.
+      const id = this.metrics.start('system', 'enqueued', now);
+      this.metrics.note(id, 'camera_blocked');
+      this.scheduler.enqueue({ id, priority: 1, source: 'system', lang: this.lang, createdAt: now, parts: [{ kind: 'clip', key: 'sys.camera_blocked' }] });
     }
     // After the hazard alerts, so a P1 name never queues ahead of this frame's alerts.
     this.faces?.update(r.faces ?? [], visible, { frameId: r.frameNo, frameTs }, now);
