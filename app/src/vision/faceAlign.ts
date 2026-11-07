@@ -10,10 +10,12 @@ import { PIXEL_LAYOUT } from './preprocess';
 export const FACE_SIZE = 112;
 
 /**
- * foamliu/MobileFaceNet `get_reference_facial_points((112, 112), inner_padding_factor=0.25,
- * default_square=True)`: the 96×112 MTCNN template padded to square (+8 px in x), then padded by
- * 25% on each side (+28 px) and scaled from 168 to 112. Order: eye, eye, nose tip, mouth corner,
- * mouth corner, image-left first.
+ * The InsightFace/MS1M 112×112 template: the 96×112 MTCNN template padded to square (+8 px in x),
+ * no inner padding. Order: eye, eye, nose tip, mouth corner, mouth corner, image-left first.
+ *
+ * Checked on the laptop (P8, real photos through this code and the shipped model): with this
+ * template the same person scored 0.82 and three different people 0.06–0.14. Qualcomm's demo
+ * template (25% inner padding) gave 0.81 vs 0.21–0.63, i.e. impostors above the threshold.
  */
 const TEMPLATE_96x112 = [
   [30.29459953, 51.69630051],
@@ -22,7 +24,7 @@ const TEMPLATE_96x112 = [
   [33.54930115, 92.3655014],
   [62.72990036, 92.20410156],
 ];
-export const REFERENCE_112 = TEMPLATE_96x112.map(([x, y]) => [((x + 8 + 28) * 2) / 3, ((y + 28) * 2) / 3]);
+export const REFERENCE_112 = TEMPLATE_96x112.map(([x, y]) => [x + 8, y]);
 
 export interface Point {
   x: number;
@@ -124,8 +126,8 @@ export interface CropPlan {
 }
 
 /**
- * Crop a square around the face, big enough to hold the aligned window (the template pads the
- * face by 25% per side, about 2× the ML Kit box width), clamp it to the image, and express the
+ * Crop a square around the face, big enough to hold the aligned window (about 1.4× the ML Kit
+ * box width; 2.2× leaves room for rotation and box jitter), clamp it to the image, and express the
  * landmark fit in the resized crop's pixels. Falls back to the box (eyes-free) when landmarks are
  * missing: the box is mapped to the template's inner face area.
  */
@@ -164,8 +166,8 @@ export function planFaceCrop(
     // Box corners → the template's eye-to-mouth span widened to the face (rough, no rotation).
     src = [toCrop([box.x, box.y]), toCrop([box.x + box.width, box.y + box.height])];
     dst = [
-      [REFERENCE_112[0][0] - 12, REFERENCE_112[0][1] - 22],
-      [REFERENCE_112[4][0] + 12, REFERENCE_112[4][1] + 14],
+      [REFERENCE_112[0][0] - 18, REFERENCE_112[0][1] - 33],
+      [REFERENCE_112[4][0] + 18, REFERENCE_112[4][1] + 21],
     ];
   }
   return { rect: [x1, y1, x2, y2], width, height, toFace: fitSimilarity(src, dst) };

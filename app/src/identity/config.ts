@@ -2,9 +2,10 @@
  * Person identification tunables (F3). Calibrate on device: DT-8.1 (threshold), DT-8.2/8.4.
  *
  * Threshold: the spec starts at cosine 0.65, but that number isn't tied to a model. The shipped
- * MobileFaceNet's LFW verification threshold is 74.18° (cosine ≈ 0.27, Qualcomm AI Hub), so 0.65
- * would reject most genuine matches. 0.5 is a start that still leans hard toward "unknown"; DT-8.1
- * picks the real value from logged similarity distributions.
+ * MobileFaceNet's LFW verification threshold is 74.18° (cosine ≈ 0.27, Qualcomm AI Hub). A laptop
+ * check through our alignment gave 0.82 for the same person and 0.06–0.14 between different
+ * people (P8, 4 photos), so 0.5 sits well clear of both and still leans toward "unknown". DT-8.1
+ * picks the real value from on-device similarity distributions.
  */
 export const IDENTITY = {
   threshold: 0.5,

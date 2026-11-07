@@ -11,11 +11,12 @@ import {
 
 const close = (a: number, b: number, eps = 1e-6) => expect(Math.abs(a - b)).toBeLessThan(eps);
 
-test('reference points match foamliu get_reference_facial_points((112,112), 0.25, square)', () => {
-  close(REFERENCE_112[0][0], 44.1964, 1e-3);
-  close(REFERENCE_112[0][1], 53.1309, 1e-3);
-  close(REFERENCE_112[4][0], 65.8199, 1e-3);
-  close(REFERENCE_112[4][1], 80.1361, 1e-3);
+test('reference points are the InsightFace 112×112 template (arcface_dst)', () => {
+  close(REFERENCE_112[0][0], 38.2946, 1e-3);
+  close(REFERENCE_112[0][1], 51.6963, 1e-3);
+  close(REFERENCE_112[2][0], 56.0252, 1e-3);
+  close(REFERENCE_112[4][0], 70.7299, 1e-3);
+  close(REFERENCE_112[4][1], 92.2041, 1e-3);
 });
 
 test('fitSimilarity recovers a known rotation + scale + shift exactly', () => {
