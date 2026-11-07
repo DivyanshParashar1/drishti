@@ -53,6 +53,7 @@ function createMlKitFaceDetector(): { detector: FaceDetectorLike | null; error: 
  * arrive upright (enablePhysicalBufferRotation), so boxes are in portrait coordinates.
  */
 export const GRAB_MAX_SIDE = 512; // /ask frames: longest side ≤ 512 px (F6)
+export type GrabMode = 'ask' | 'full'; // full: OCR (F7), no resize, quality 90
 const GRAB_TIMEOUT_MS = 1000;
 const FACE_CFG = { minFacePx: IDENTITY.minFacePx, maxFacesPerFrame: IDENTITY.maxFacesPerFrame, cropScale: IDENTITY.cropScale };
 
@@ -111,28 +112,28 @@ export function useReflexCamera(
   const boxedModel = useMemo(() => (model ? NitroModules.box(model) : null), [model]);
   const boxedConverter = useMemo(() => NitroModules.box(HybridFrameConverter), []);
   const counter = useMemo(() => createSynchronizable(0), []);
-  const grabRequested = useMemo(() => createSynchronizable(false), []);
+  const grabRequested = useMemo(() => createSynchronizable(0), []); // 0 none, 1 ask, 2 full
   const grabWaiter = useRef<((jpeg: ArrayBuffer | null) => void) | null>(null);
   const onGrab = useCallback((jpeg: ArrayBuffer | null) => {
     grabWaiter.current?.(jpeg);
     grabWaiter.current = null;
   }, []);
 
-  /** The next camera frame as a JPEG (quality 70, longest side 512), or null after 1 s. */
+  /** The next camera frame as a JPEG ('ask': quality 70, longest side 512; 'full': quality 90), or null after 1 s. */
   const grab = useCallback(
-    () =>
+    (mode: GrabMode = 'ask') =>
       new Promise<ArrayBuffer | null>((resolve) => {
         grabWaiter.current?.(null);
         const timer = setTimeout(() => {
           grabWaiter.current = null;
-          grabRequested.setBlocking(false);
+          grabRequested.setBlocking(0);
           resolve(null);
         }, GRAB_TIMEOUT_MS);
         grabWaiter.current = (jpeg) => {
           clearTimeout(timer);
           resolve(jpeg);
         };
-        grabRequested.setBlocking(true);
+        grabRequested.setBlocking(mode === 'full' ? 2 : 1);
       }),
     [grabRequested],
   );
@@ -148,14 +149,19 @@ export function useReflexCamera(
       'worklet';
       const n = counter.getDirty();
       counter.setBlocking(n + 1);
-      if (grabRequested.getDirty()) {
-        grabRequested.setBlocking(false);
+      const grabMode = grabRequested.getDirty();
+      if (grabMode !== 0) {
+        grabRequested.setBlocking(0);
         try {
           const full = boxedConverter.unbox().convertFrameToImage(frame);
-          const k = GRAB_MAX_SIDE / Math.max(full.width, full.height);
-          const w = Math.round(full.width * Math.min(1, k));
-          const h = Math.round(full.height * Math.min(1, k));
-          scheduleOnRN(onGrab, full.resize(w, h).toEncodedImageData('jpg', 70).buffer);
+          if (grabMode === 2) {
+            scheduleOnRN(onGrab, full.toEncodedImageData('jpg', 90).buffer);
+          } else {
+            const k = GRAB_MAX_SIDE / Math.max(full.width, full.height);
+            const w = Math.round(full.width * Math.min(1, k));
+            const h = Math.round(full.height * Math.min(1, k));
+            scheduleOnRN(onGrab, full.resize(w, h).toEncodedImageData('jpg', 70).buffer);
+          }
         } catch {
           scheduleOnRN(onGrab, null);
         }

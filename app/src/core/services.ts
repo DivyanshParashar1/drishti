@@ -8,6 +8,8 @@ import { EnrollmentDialog } from '../identity/enrollment';
 import { FaceIdentifier } from '../identity/identifier';
 import { NameClipSync } from '../identity/nameClips';
 import { fetchTts } from '../net/ttsClient';
+import { Reader } from '../reading/reader';
+import { File, Paths } from 'expo-file-system';
 import { IdentityStore, type SqlDb } from '../identity/store';
 import { ReflexLane } from '../vision/reflexLane';
 import { createConnectivityMonitor, type ConnectivityMonitor } from './connectivity';
@@ -27,6 +29,7 @@ export interface Services {
   faces: FaceIdentifier;
   nameClips: NameClipSync;
   enrollment: EnrollmentDialog;
+  reader: Reader;
   lang: Lang;
 }
 
@@ -73,6 +76,19 @@ export function createServices(): Services {
     deleteFiles,
     setEnrolling: (on) => (faces.suppressUnknown = on),
   });
+  let readN = 0;
+  const reader = new Reader({
+    scheduler,
+    metrics,
+    lang: () => services.lang,
+    online: () => connectivity.online,
+    tts: fetchTts,
+    writeAudio: async (mp3) => {
+      const f = new File(Paths.cache, `read-${readN++ % 6}.mp3`); // current + prefetched, with margin
+      await f.write(new Uint8Array(mp3));
+      return f.uri;
+    },
+  });
   return Object.assign(services, {
     metrics,
     player,
@@ -84,6 +100,7 @@ export function createServices(): Services {
     faces,
     nameClips,
     enrollment,
+    reader,
     lang: DEFAULT_LANG,
   });
 }

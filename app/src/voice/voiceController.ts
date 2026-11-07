@@ -9,6 +9,7 @@ import type { SttResult } from '../net/sttClient';
 import type { Track } from '../vision/tracker';
 import type { Direction } from '../vision/types';
 import type { EnrollmentDialog } from '../identity/enrollment';
+import type { Reader } from '../reading/reader';
 import { route, type Command } from './router';
 
 /** Everything the controller touches, injected so the whole flow is testable with fakes. */
@@ -23,8 +24,11 @@ export interface VoiceDeps {
   /** Start the mic; chunks are 16 kHz 16-bit mono PCM. */
   startMic(onChunk: (pcm: ArrayBuffer) => void): Promise<void>;
   stopMic(): Promise<void>;
-  /** Latest camera frame as a local JPEG (≤ 512 px), or null if none could be captured. */
-  grabFrame(): Promise<string | null>;
+  /** Latest camera frame as a local JPEG ('ask': ≤ 512 px; 'full': full resolution for OCR), or null. */
+  grabFrame(mode?: 'ask' | 'full'): Promise<string | null>;
+  /** On-device OCR (F7) → paragraphs in reading order. */
+  ocr(uri: string): Promise<string[]>;
+  reading: Pick<Reader, 'state' | 'start' | 'pause' | 'resume' | 'next' | 'stop'>;
   ask(req: AskRequest, onEvent: (e: AskEvent) => void): Promise<void>;
   /** Write base64 MP3 to a local file and return its uri. */
   writeAudio(b64: string): Promise<string>;
@@ -75,6 +79,7 @@ export class VoiceController {
   async pressIn(): Promise<void> {
     if (this.state === 'listening') return;
     this.d.haptic();
+    this.d.reading.pause(); // F7: the next command decides (aage / ruko / anything else)
     this.d.scheduler.stopAll(); // the user is about to talk: stop speaking
     this.d.earcon('listen_start');
     this.pressedAt = this.clock();
@@ -102,13 +107,17 @@ export class VoiceController {
     this.changed();
     try {
       await this.d.stopMic().catch(() => undefined);
+      const reading = this.d.reading.state === 'paused';
       if (held < MIN_HOLD_MS) {
         session?.cancel();
+        if (reading) this.d.reading.resume(); // a tap: carry on reading
         return;
       }
       if (this.d.online() === false || !session) {
         session?.cancel();
+        if (reading && this.d.online() === false) return this.d.reading.stop(); // no STT offline: holding = stop
         this.say(this.d.online() === false ? 'sys.no_internet' : 'sys.didnt_hear');
+        if (reading) this.d.reading.resume();
         return;
       }
       const id = this.d.metrics.start('describe', 'ptt_release');
@@ -117,6 +126,7 @@ export class VoiceController {
       if (!result.ok) {
         this.d.metrics.note(id, result.code);
         this.say(this.d.online() === false ? 'sys.no_internet' : 'sys.didnt_hear');
+        if (reading) this.d.reading.resume();
         return;
       }
       this.lastTranscript = result.text;
@@ -126,7 +136,13 @@ export class VoiceController {
         await this.d.dialog.onTranscript(result.text);
         return;
       }
-      await this.handle(route(result.text), id);
+      const cmd = route(result.text);
+      if (reading) {
+        if (cmd.kind === 'next') return this.d.reading.next();
+        this.d.reading.stop(); // "ruko" or any other command ends reading
+        if (cmd.kind === 'stop') return;
+      }
+      await this.handle(cmd, id);
     } finally {
       this.state = 'idle';
       this.changed();
@@ -162,8 +178,11 @@ export class VoiceController {
       case 'list':
         return this.d.dialog.list();
       case 'read':
+        return this.readText(id);
+      case 'next': // "aage" outside reading: a question about what's ahead
+        return this.askQuestion(this.lastTranscript || 'aage', id);
       case 'language':
-        return this.say('sys.not_available'); // P10 / P11
+        return this.say('sys.not_available'); // P11
       case 'describe':
       case 'question':
         return this.askQuestion(cmd.question, id);
@@ -212,6 +231,22 @@ export class VoiceController {
     });
     await chain;
     if (answer.length) this.lastAnswer = answer;
+  }
+
+  /** F7: full-resolution frame → on-device OCR → Reader. Works offline (speech instead of Timbre). */
+  private async readText(id: string): Promise<void> {
+    this.d.metrics.note(id, 'read');
+    const uri = await this.d.grabFrame('full');
+    if (!uri) return this.say('sys.no_text');
+    let paragraphs: string[] = [];
+    try {
+      paragraphs = await this.d.ocr(uri);
+    } catch {
+      paragraphs = [];
+    }
+    this.d.metrics.mark(id, 'ocr_done');
+    if (paragraphs.length === 0) return this.say('sys.no_text');
+    this.d.reading.start(paragraphs, id);
   }
 
   private say(key: ClipKey): void {

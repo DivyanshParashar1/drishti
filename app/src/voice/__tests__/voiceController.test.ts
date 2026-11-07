@@ -9,7 +9,14 @@ import { VoiceController, type VoiceDeps } from '../voiceController';
 const flush = () => new Promise<void>((r) => setImmediate(() => r()));
 
 function setup(
-  opts: { online?: boolean | null; stt?: SttResult; askEvents?: AskEvent[]; frame?: string | null; present?: ReturnType<VoiceDeps['present']> } = {},
+  opts: {
+    online?: boolean | null;
+    stt?: SttResult;
+    askEvents?: AskEvent[];
+    frame?: string | null;
+    present?: ReturnType<VoiceDeps['present']>;
+    ocr?: string[] | Error;
+  } = {},
 ) {
   let now = 0;
   const queue: Utterance[] = [];
@@ -35,6 +42,28 @@ function setup(
     save: (name: string | null) => void log.push(`save:${name}`),
     delete: async (name: string | null) => void log.push(`delete:${name}`),
     list: () => void log.push('list'),
+  };
+  const reading = {
+    state: 'idle' as 'idle' | 'playing' | 'paused',
+    start: (p: string[], id: string) => {
+      log.push(`read.start ${p.length} ${id}`);
+      reading.state = 'playing';
+    },
+    pause: () => {
+      if (reading.state === 'playing') reading.state = 'paused';
+    },
+    resume: () => {
+      log.push('read.resume');
+      reading.state = 'playing';
+    },
+    next: () => {
+      log.push('read.next');
+      reading.state = 'playing';
+    },
+    stop: () => {
+      log.push('read.stop');
+      reading.state = 'idle';
+    },
   };
   const deps: VoiceDeps = {
     scheduler: {
@@ -70,7 +99,15 @@ function setup(
       log.push('mic.start');
     },
     stopMic: async () => void log.push('mic.stop'),
-    grabFrame: async () => (opts.frame === undefined ? 'file:///ask.jpg' : opts.frame),
+    grabFrame: async (mode) => {
+      log.push(`grab:${mode ?? 'ask'}`);
+      return opts.frame === undefined ? `file:///${mode ?? 'ask'}.jpg` : opts.frame;
+    },
+    ocr: async () => {
+      if (opts.ocr instanceof Error) throw opts.ocr;
+      return opts.ocr ?? [];
+    },
+    reading,
     ask: async (req, onEvent) => {
       asks.push(req);
       for (const e of opts.askEvents ?? []) onEvent(e);
@@ -90,7 +127,8 @@ function setup(
     await flush();
   };
   const said = () => queue.map((u) => u.parts.map((p) => (p.kind === 'clip' ? p.key : p.kind === 'file' ? p.uri : p.kind === 'speak' ? `speak:${p.text}` : '')).join(' '));
-  return { vc, dialog, queue, all, cancelled, hooks, pushed, asks, log, metrics, reflex, talk, said, setOnline: (v: boolean | null) => (online = v), advance: (ms: number) => (now += ms) };
+  const setStt = (r: SttResult) => (opts.stt = r);
+  return { vc, dialog, reading, setStt, queue, all, cancelled, hooks, pushed, asks, log, metrics, reflex, talk, said, setOnline: (v: boolean | null) => (online = v), advance: (ms: number) => (now += ms) };
 }
 
 const SENTENCES: AskEvent[] = [
@@ -102,7 +140,7 @@ const SENTENCES: AskEvent[] = [
 test('press and release: haptics, earcons, mic → stt, then the answer is queued in order', async () => {
   const t = setup({ askEvents: SENTENCES });
   await t.talk();
-  expect(t.log).toEqual(['haptic', 'stopAll', 'earcon:listen_start', 'mic.start', 'haptic', 'earcon:listen_stop', 'mic.stop']);
+  expect(t.log).toEqual(['haptic', 'stopAll', 'earcon:listen_start', 'mic.start', 'haptic', 'earcon:listen_stop', 'mic.stop', 'grab:ask']);
   expect(t.pushed).toEqual([1280, 1280, 1280]);
   expect(t.asks[0]).toMatchObject({ question: 'Saamne kya hai?', lang: 'hi-en', imageUri: 'file:///ask.jpg', detections: [{ cls: 'chair', dir: 'ahead', dist: 'near' }] });
   // the "looking" cue was queued, then cancelled when sentence 1 arrived (fake queue never plays)
@@ -178,9 +216,8 @@ test('commands: stop, quiet, repeat, who, and stubs for later phases', async () 
   await run('isko Rahul ke naam se save karo');
   await run('Priya ko delete karo');
   await run('kaun kaun saved hai');
-  await run('ye padho');
   await run('Tamil mein bolo');
-  expect(t.said()).toEqual(['sys.quiet_on', 'sys.nothing_to_repeat', 'sys.no_one_here', 'sys.not_available', 'sys.not_available']);
+  expect(t.said()).toEqual(['sys.quiet_on', 'sys.nothing_to_repeat', 'sys.no_one_here', 'sys.not_available']);
   expect(t.log.filter((l) => /^(save|delete|list)/.test(l))).toEqual(['save:Rahul', 'delete:Priya', 'list']);
 });
 
@@ -239,4 +276,72 @@ test('while the enrollment dialog waits, the transcript is its answer, not a com
   expect(t.log).toContain('dialog:saamne kya hai');
   expect(t.asks).toEqual([]);
   expect(t.vc.lastCommand).toBe('dialog');
+});
+
+describe('reading (F7)', () => {
+  test('"ye padho": full-resolution frame → OCR → reader; no text or no frame → "Koi text nahi dikh raha"', async () => {
+    const t = setup({ ocr: ['Notice.', 'Closed on Sunday.'] });
+    await t.vc.handle(route('ye padho'), 'r1');
+    expect(t.log).toEqual(['grab:full', 'read.start 2 r1']);
+    expect(t.metrics.get('r1')).toBeUndefined(); // id from the caller; marks are ignored for unknown ids
+
+    for (const o of [{ ocr: [] as string[] }, { frame: null }, { ocr: new Error('mlkit') }]) {
+      const u = setup(o);
+      await u.vc.handle(route('read this'), 'r2');
+      expect(u.said()).toEqual(['sys.no_text']);
+    }
+  });
+
+  const reading = () => {
+    const t = setup({ ocr: ['Notice.'] });
+    t.reading.state = 'playing';
+    return t;
+  };
+
+  test('"aage" while reading skips to the next paragraph, and is not sent to /ask', async () => {
+    const t = reading();
+    t.setStt({ ok: true, text: 'aage' });
+    await t.talk();
+    expect(t.log).toContain('read.next');
+    expect(t.asks).toEqual([]);
+  });
+
+  test('"ruko" while reading stops it; any other command stops it and runs', async () => {
+    const t = reading();
+    t.setStt({ ok: true, text: 'ruko' });
+    await t.talk();
+    expect(t.log.filter((l) => l.startsWith('read.'))).toEqual(['read.stop']);
+
+    const u = reading();
+    u.setStt({ ok: true, text: 'saamne kya hai' });
+    await u.talk();
+    expect(u.log).toContain('read.stop');
+    expect(u.asks).toHaveLength(1);
+  });
+
+  test('a tap, or an STT failure, resumes reading', async () => {
+    const t = reading();
+    await t.talk(100);
+    expect(t.log.at(-1)).toBe('read.resume');
+
+    const u = reading();
+    u.setStt({ ok: false, code: 'timeout' });
+    await u.talk();
+    expect(u.said()).toEqual(['sys.didnt_hear']);
+    expect(u.log.at(-1)).toBe('read.resume');
+  });
+
+  test('offline (no STT): holding the button stops reading, without "no internet"', async () => {
+    const t = reading();
+    t.setOnline(false);
+    await t.talk();
+    expect(t.log).toContain('read.stop');
+    expect(t.said()).toEqual([]);
+  });
+
+  test('"aage" when nothing is being read is a question for /ask', async () => {
+    const t = setup({ stt: { ok: true, text: 'aage' } });
+    await t.talk();
+    expect(t.asks[0].question).toBe('aage');
+  });
 });

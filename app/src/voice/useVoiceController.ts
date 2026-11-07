@@ -8,6 +8,8 @@ import type { Services } from '../core/services';
 import { ask, xhrTransport } from '../net/askClient';
 import { base64ToBytes } from '../net/base64';
 import { rnWebSocketFactory, SttSession } from '../net/sttClient';
+import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-kit/text-recognition';
+import { readImage } from '../reading/ocr';
 import { VoiceController } from './voiceController';
 
 const MIC = { sampleRate: 16000, channels: 1, encoding: 'pcm_16bit', interval: 40 } as const;
@@ -68,7 +70,9 @@ export function useVoiceController(services: Services): VoiceController {
       stopMic: async () => {
         await mic.get().stopRecording();
       },
-      grabFrame: () => services.frames.grabToFile(),
+      grabFrame: (mode) => services.frames.grabToFile(mode),
+      ocr: async (uri) => (await readImage(uri, (u, script) => TextRecognition.recognize(u, script as TextRecognitionScript))).paragraphs,
+      reading: services.reader,
       ask: (req, onEvent) => ask(transport, req, onEvent),
       writeAudio: async (b64) => {
         const file = new File(Paths.cache, `ans-${audioN++ % 30}.mp3`);

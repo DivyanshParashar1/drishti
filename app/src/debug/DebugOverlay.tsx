@@ -133,6 +133,12 @@ export function DebugOverlay({
           {` · dialog ${services.enrollment.phase}`}
           {services.nameClips.lastError ? ` · clip error ${services.nameClips.lastError}` : ''}
         </Text>
+        <Text style={styles.text}>
+          reading: {services.reader.state}
+          {services.reader.state !== 'idle'
+            ? ` · chunk ${services.reader.progress.chunk + 1}/${services.reader.progress.chunks} · para ${services.reader.progress.block + 1}`
+            : ''}
+        </Text>
       </ScrollView>
     </View>
   );
