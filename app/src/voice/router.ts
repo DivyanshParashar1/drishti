@@ -27,6 +27,7 @@ export type Command =
 /** Lower-case, drop punctuation, join split forms Prisma produces ("is ko" → "isko"). */
 export function normalize(transcript: string): string {
   let t = transcript
+    .normalize('NFC') // "ढ़" arrives precomposed or as ढ + nukta
     .toLowerCase()
     .replace(/\b(what|who|where|it|that)['’]s\b/g, '$1 is')
     .replace(/[.,!?।"“”'’:;]/g, ' ')
@@ -44,7 +45,8 @@ export function normalize(transcript: string): string {
   return t;
 }
 
-const has = (t: string, ...phrases: string[]) => phrases.some((p) => new RegExp(`(^|\\s)${p}($|\\s)`).test(t));
+const has = (t: string, ...phrases: string[]) =>
+  phrases.some((p) => new RegExp(`(^|\\s)${p.normalize('NFC')}($|\\s)`).test(t));
 const words = (t: string) => (t ? t.split(' ').length : 0);
 
 const LANG_WORDS: [RegExp, Lang][] = [
@@ -74,8 +76,10 @@ export function route(transcript: string): Command {
   // stop: short utterances only, so "stop sign kya hai" stays a question. "bas" only on its own:
   // Prisma also spells "bus" as "bas" ("ye bas hai").
   if (
-    ['bas', 'bas karo', 'bas bas'].includes(t) ||
-    (words(t) <= 3 && !/அமைதி/.test(t) && has(t, 'ruko', 'ruk jao', 'stop', 'chup', 'chup ho jao', 'band karo', 'நிறுத்து'))
+    ['bas', 'bas karo', 'bas bas', 'बस', 'बस करो'].includes(t) ||
+    (words(t) <= 3 &&
+      !/அமைதி/.test(t) &&
+      has(t, 'ruko', 'ruk jao', 'stop', 'chup', 'chup ho jao', 'band karo', 'நிறுத்து', 'रुको', 'रुक जाओ', 'चुप', 'बंद करो'))
   ) {
     return { kind: 'stop' };
   }
@@ -130,25 +134,26 @@ export function route(transcript: string): Command {
     return { kind: 'quiet', on: !off };
   }
   if (t === 'sab batao' || t === 'normal mode') return { kind: 'quiet', on: false };
+  if (/(शांत|क्वाइट|क्वायट)/.test(t)) return { kind: 'quiet', on: !/(बंद|ऑफ|हटाओ)/.test(t) };
   if (/அமைதி/.test(t)) return { kind: 'quiet', on: !/(நிறுத்து|வேண்டாம்|ஆஃப்)/.test(t) };
 
   // repeat
-  if (has(t, 'repeat', 'phir se bolo', 'dobara bolo', 'fir se bolo', 'say again', 'say that again', 'kya bola', 'phir se', 'மீண்டும் சொல்', 'திரும்ப சொல்', 'மறுபடி சொல்')) {
+  if (has(t, 'repeat', 'phir se bolo', 'dobara bolo', 'fir se bolo', 'say again', 'say that again', 'kya bola', 'phir se', 'மீண்டும் சொல்', 'திரும்ப சொல்', 'மறுபடி சொல்', 'फिर से बोलो', 'दोबारा बोलो', 'फिर से')) {
     return { kind: 'repeat' };
   }
 
   // read text (F7)
-  if (has(t, 'yeh padho', 'padho', 'padh do', 'read this', 'read it', 'read', 'kya likha hai', 'what does it say', 'what is written', 'இதைப் படி', 'படி')) {
+  if (has(t, 'yeh padho', 'padho', 'padh do', 'read this', 'read it', 'read', 'kya likha hai', 'what does it say', 'what is written', 'இதைப் படி', 'படி', 'पढ़ो', 'ये पढ़ो', 'यह पढ़ो', 'पढ़ दो', 'क्या लिखा है')) {
     return { kind: 'read' };
   }
 
   // who is here (re-announce identities, F3)
-  if (has(t, 'kaun hai', 'kaun kaun hai', 'yeh kaun hai', 'who is here', 'who is this', 'who is there', 'who is in front', 'யார் இருக்கிறார்கள்', 'இது யார்')) {
+  if (has(t, 'kaun hai', 'kaun kaun hai', 'yeh kaun hai', 'who is here', 'who is this', 'who is there', 'who is in front', 'யார் இருக்கிறார்கள்', 'இது யார்', 'कौन है', 'ये कौन है', 'यह कौन है')) {
     return { kind: 'who' };
   }
 
   // describe: routed to /ask, like a question
-  if (has(t, 'saamne kya hai', 'aage kya hai', 'kya dikh raha hai', 'describe', 'what is ahead', 'what is in front', 'what do you see', 'முன்னால் என்ன இருக்கிறது', 'என்ன தெரிகிறது', 'முன்னால் என்ன')) {
+  if (has(t, 'saamne kya hai', 'aage kya hai', 'kya dikh raha hai', 'describe', 'what is ahead', 'what is in front', 'what do you see', 'முன்னால் என்ன இருக்கிறது', 'என்ன தெரிகிறது', 'முன்னால் என்ன', 'सामने क्या है', 'आगे क्या है', 'क्या दिख रहा है')) {
     return { kind: 'describe', question: transcript.trim() };
   }
 

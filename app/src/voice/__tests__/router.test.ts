@@ -186,3 +186,24 @@ test.each(['Help', 'madad', 'tutorial', 'kaise use karein', 'मदद', 'உத
 test('"help me cross the road safely please" is a question', () => {
   expect(kind('help me cross the road safely please')).toBe('question');
 });
+
+describe('Devanagari commands (on-device Hindi recognition offline, P14)', () => {
+  test.each([
+    ['रुको', 'stop'],
+    ['बस', 'stop'],
+    ['ये पढ़ो', 'read'],
+    ['ये पढ़ो'.normalize('NFD'), 'read'], // ढ + nukta
+    ['क्या लिखा है', 'read'],
+    ['क्वाइट मोड चालू', 'quiet'],
+    ['फिर से बोलो', 'repeat'],
+    ['कौन है', 'who'],
+    ['सामने क्या है', 'describe'],
+    ['आगे', 'next'],
+    ['मदद', 'help'],
+  ])('"%s" → %s', (p, k) => {
+    expect(kind(p)).toBe(k);
+  });
+  test('quiet off', () => {
+    expect(route('क्वाइट मोड बंद')).toEqual({ kind: 'quiet', on: false });
+  });
+});
