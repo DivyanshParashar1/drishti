@@ -102,6 +102,12 @@ export class VoiceController {
     }
   }
 
+  /** TalkBack's double-tap: start listening, or send what was said. */
+  async toggle(): Promise<void> {
+    if (this.state === 'listening') return this.pressOut();
+    if (this.state === 'idle') return this.pressIn();
+  }
+
   async pressOut(): Promise<void> {
     if (this.state !== 'listening') return;
     this.d.haptic();

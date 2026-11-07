@@ -379,3 +379,14 @@ test('"madad" replays the tutorial; failure lines come with the error earcon', a
   expect(t.said()).toEqual(['sys.didnt_hear']);
   expect(t.log.at(-1)).toBe('earcon:error');
 });
+
+test('TalkBack toggle: first activate listens, second sends (same flow as a hold)', async () => {
+  const t = setup({ askEvents: SENTENCES });
+  await t.vc.toggle();
+  expect(t.vc.state).toBe('listening');
+  t.advance(1500);
+  await t.vc.toggle();
+  for (let i = 0; i < 5; i++) await new Promise<void>((r) => setImmediate(() => r()));
+  expect(t.asks).toHaveLength(1);
+  expect(t.vc.state).toBe('idle');
+});
