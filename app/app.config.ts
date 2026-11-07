@@ -38,6 +38,8 @@ const config: ExpoConfig = {
     ],
     ['expo-audio', { microphonePermission: false }],
     'expo-sqlite',
+    // P14: on-device recognition for offline commands (Android 13+ on-device recognizer).
+    ['expo-speech-recognition', { androidSpeechServicePackages: ['com.google.android.as', 'com.google.android.googlequicksearchbox'] }],
     ['expo-build-properties', { android: { minSdkVersion: 26 } }],
   ],
   owner: 'divyanshdp1212',

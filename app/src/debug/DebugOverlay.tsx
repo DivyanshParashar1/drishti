@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import type { Utterance } from '../audio/scheduler';
 import type { Services } from '../core/services';
+import { downloadOfflineModel, onDeviceRecognizer } from '../net/offlineStt';
 import type { DetectorId } from '../vision/config';
 import type { VoiceController } from '../voice/voiceController';
 
@@ -27,6 +28,7 @@ export function DebugOverlay({
 }) {
   const { metrics, scheduler, connectivity, lang, reflex, faces, identities } = services;
   const [, setTick] = useState(0);
+  const [offlineModel, setOfflineModel] = useState(onDeviceRecognizer() ? 'download (P14)' : 'unavailable');
 
   useEffect(() => {
     const t = setInterval(() => setTick((n) => n + 1), 500);
@@ -127,6 +129,13 @@ export function DebugOverlay({
         <View style={styles.row}>
           <Button label={`Faces: ${facesOn ? 'on' : 'off'}`} onPress={onToggleFaces} />
           <Button label="Export face log (DT-8.1)" onPress={exportFaceLog} />
+          <Button
+            label={`Offline speech model: ${offlineModel}`}
+            onPress={() => {
+              setOfflineModel('…');
+              void downloadOfflineModel(lang).then(setOfflineModel);
+            }}
+          />
         </View>
         <Text style={styles.text}>
           saved: {identities.people.map((p) => `${p.name}(${p.embeddings.length}${p.clips[lang] ? ' ♪' : ''})`).join(', ') || 'nobody'}

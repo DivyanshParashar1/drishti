@@ -21,6 +21,11 @@ export interface VoiceDeps {
   reflex: { visible: readonly Track[]; quiet: boolean; setQuiet(on: boolean): void };
   /** Open an /stt session; PCM is pushed into it while the button is held. */
   startStt(lang: Lang): { push(chunk: ArrayBuffer): void; finish(): Promise<SttResult>; cancel(): void };
+  /**
+   * P14: on-device recognition while offline (commands only), or null if unavailable. It owns the
+   * mic itself, so startMic isn't called for it.
+   */
+  startOfflineStt?(lang: Lang): { push(chunk: ArrayBuffer): void; finish(): Promise<SttResult>; cancel(): void } | null;
   /** Start the mic; chunks are 16 kHz 16-bit mono PCM. */
   startMic(onChunk: (pcm: ArrayBuffer) => void): Promise<void>;
   stopMic(): Promise<void>;
@@ -44,6 +49,9 @@ export interface VoiceDeps {
   earcon(name: 'listen_start' | 'listen_stop' | 'error'): void;
 }
 
+/** Commands that need the server; offline recognition handles everything else. */
+const OFFLINE_NEEDS_NET = new Set<Command['kind']>(['question', 'describe', 'next']);
+
 const ERROR_LINES = new Set<ClipKey>(['sys.didnt_hear', 'sys.answer_failed', 'sys.no_internet']);
 
 export const MIN_HOLD_MS = 300; // shorter presses are taps (e.g. the debug triple-tap), not speech
@@ -54,7 +62,8 @@ export class VoiceController {
   state: State = 'idle';
   lastTranscript = '';
   lastCommand: Command['kind'] | 'dialog' | null = null;
-  private session: ReturnType<VoiceDeps['startStt']> | null = null;
+  private session: { push(chunk: ArrayBuffer): void; finish(): Promise<SttResult>; cancel(): void } | null = null;
+  private offlineSession = false;
   private pressedAt = 0;
   private lastAnswer: AudioPart[][] = [];
   private interrupted = new Set<string>();
@@ -91,7 +100,13 @@ export class VoiceController {
     this.pressedAt = this.clock();
     this.state = 'listening';
     this.changed();
-    if (this.d.online() === false) return; // no STT offline; release says "no internet"
+    this.offlineSession = false;
+    if (this.d.online() === false) {
+      // P14: fixed commands still work offline with on-device recognition, if the phone has it.
+      this.session = this.d.startOfflineStt?.(this.d.lang()) ?? null;
+      this.offlineSession = this.session !== null;
+      return; // without it, release says "no internet"
+    }
     const session = this.d.startStt(this.d.lang());
     this.session = session;
     try {
@@ -125,7 +140,7 @@ export class VoiceController {
         if (reading) this.d.reading.resume(); // a tap: carry on reading
         return;
       }
-      if (this.d.online() === false || !session) {
+      if (!session || (this.d.online() === false && !this.offlineSession)) {
         session?.cancel();
         if (reading && this.d.online() === false) return this.d.reading.stop(); // no STT offline: holding = stop
         this.say(this.d.online() === false ? 'sys.no_internet' : 'sys.didnt_hear');
@@ -137,7 +152,7 @@ export class VoiceController {
       this.d.metrics.mark(id, 'stt_final');
       if (!result.ok) {
         this.d.metrics.note(id, result.code);
-        this.say(this.d.online() === false ? 'sys.no_internet' : 'sys.didnt_hear');
+        this.say(this.d.online() === false && !this.offlineSession ? 'sys.no_internet' : 'sys.didnt_hear');
         if (reading) this.d.reading.resume();
         return;
       }
@@ -149,6 +164,12 @@ export class VoiceController {
         return;
       }
       const cmd = route(result.text);
+      if (this.offlineSession && OFFLINE_NEEDS_NET.has(cmd.kind) && !(reading && cmd.kind === 'next')) {
+        this.d.metrics.note(id, 'offline_question');
+        this.say('sys.no_internet'); // P14: questions still need the VLM
+        if (reading) this.d.reading.resume();
+        return;
+      }
       if (reading) {
         if (cmd.kind === 'next') return this.d.reading.next();
         this.d.reading.stop(); // "ruko" or any other command ends reading

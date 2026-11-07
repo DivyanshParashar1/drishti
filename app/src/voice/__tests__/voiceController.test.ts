@@ -390,3 +390,59 @@ test('TalkBack toggle: first activate listens, second sends (same flow as a hold
   expect(t.asks).toHaveLength(1);
   expect(t.vc.state).toBe('idle');
 });
+
+describe('offline commands (P14)', () => {
+  const offline = (text: string | null) => {
+    const t = setup({ online: false, ocr: ['Notice.'] });
+    const d = (t.vc as unknown as { d: VoiceDeps }).d;
+    d.startOfflineStt = (l) => {
+      t.log.push(`offline-stt ${l}`);
+      return {
+        push: () => {},
+        finish: async () => (text === null ? { ok: false as const, code: 'empty' } : { ok: true as const, text }),
+        cancel: () => void t.log.push('offline.cancel'),
+      };
+    };
+    return t;
+  };
+
+  test('fixed commands work offline through on-device recognition (no mic stream, no /stt)', async () => {
+    const t = offline('रुको');
+    await t.talk();
+    expect(t.log).toContain('offline-stt hi-en');
+    expect(t.log).not.toContain('mic.start');
+    expect(t.vc.lastCommand).toBe('stop');
+
+    const r = offline('ye padho');
+    await r.talk();
+    expect(r.log).toContain('read.start 1 d1');
+  });
+
+  test('questions offline still get "Internet nahi hai"', async () => {
+    const t = offline('saamne kya hai');
+    await t.talk();
+    expect(t.said()).toEqual(['sys.no_internet']);
+    expect(t.asks).toEqual([]);
+  });
+
+  test('nothing recognised offline → "Samajh nahi aaya", not "no internet"', async () => {
+    const t = offline(null);
+    await t.talk();
+    expect(t.said()).toEqual(['sys.didnt_hear']);
+  });
+
+  test('"aage" while reading works offline', async () => {
+    const t = offline('aage');
+    t.reading.state = 'playing';
+    await t.talk();
+    expect(t.log).toContain('read.next');
+  });
+
+  test('no on-device recognizer: the old behaviour ("Internet nahi hai")', async () => {
+    const t = setup({ online: false });
+    const d = (t.vc as unknown as { d: VoiceDeps }).d;
+    d.startOfflineStt = () => null;
+    await t.talk();
+    expect(t.said()).toEqual(['sys.no_internet']);
+  });
+});

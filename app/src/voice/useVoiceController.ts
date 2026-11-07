@@ -7,6 +7,7 @@ import { EARCONS, type EarconName } from '../audio/clips.generated';
 import type { Services } from '../core/services';
 import { ask, xhrTransport } from '../net/askClient';
 import { base64ToBytes } from '../net/base64';
+import { OfflineSttSession, onDeviceRecognizer } from '../net/offlineStt';
 import { rnWebSocketFactory, SttSession } from '../net/sttClient';
 import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-kit/text-recognition';
 import { readImage } from '../reading/ocr';
@@ -55,6 +56,10 @@ export function useVoiceController(services: Services): VoiceController {
       online: () => services.connectivity.online,
       reflex: services.reflex,
       startStt: (lang) => new SttSession(rnWebSocketFactory, lang),
+      startOfflineStt: (lang) => {
+        const rec = onDeviceRecognizer();
+        return rec ? new OfflineSttSession(rec, lang) : null;
+      },
       startMic: async (onChunk) => {
         await mic.get().startRecording({
           ...MIC,
