@@ -77,3 +77,21 @@ test('stats track frames per second and the last timings; listeners are told', (
   expect(cb).toHaveBeenCalledTimes(11);
   expect(lane.frameSize).toEqual({ width: 480, height: 640 });
 });
+
+test('faces go to the face sink with the visible tracks, after the alerts; face stats update', () => {
+  const { lane, enqueued, frame } = setup();
+  const person: Detection = { label: 'person', score: 0.9, box: [0.3, 0.1, 0.7, 0.9] };
+  const calls: { n: number; tracks: string[]; frameId: number; frameTs: number; alertsBefore: number }[] = [];
+  lane.faces = {
+    update: (faces, visible, f) =>
+      calls.push({ n: faces.length, tracks: visible.map((t) => t.label), ...f, alertsBefore: enqueued.length }),
+  };
+  const face = { box: [0.45, 0.15, 0.55, 0.25] as [number, number, number, number], widthPx: 100, embedding: null };
+  lane.handle({ ...frame([person]), faces: [face], faceMs: 18 });
+  expect(calls).toEqual([{ n: 1, tracks: ['person'], frameId: 1, frameTs: 960, alertsBefore: 1 }]);
+  expect(lane.stats.lastFaceMs).toBe(18);
+  expect(lane.stats.faces).toBe(1);
+  lane.handle({ ...frame([person], 2), faceMs: -1 }); // face step skipped: stats keep the last run
+  expect(calls[1].n).toBe(0);
+  expect(lane.stats.lastFaceMs).toBe(18);
+});

@@ -6,24 +6,34 @@ import { buildAlertUtterances } from './alerts';
 import { VISION } from './config';
 import { filterDetections } from './geometry';
 import { Tracker, type Track } from './tracker';
+import type { FaceObs } from '../identity/identifier';
 import type { Detection } from './types';
 
 /** What the frame worklet reports for one processed frame. */
 export interface FrameResult {
   frameNo: number;
   detections: Detection[]; // decoded, unfiltered
+  faces?: FaceObs[]; // F3: only on frames with a person while faces are on
   frameWidth: number; // upright frame size, for drawing boxes
   frameHeight: number;
   preprocessMs: number; // convert + resize + tensor
   inferMs: number;
-  totalMs: number; // whole worklet, frame callback → decoded
+  faceMs?: number; // ML Kit + crop/align/embed; −1 when the face step didn't run
+  totalMs: number; // whole worklet, frame callback → decoded (and faces)
 }
 
 export interface LaneStats {
   frames: number;
   lastInferMs: number;
   lastTotalMs: number;
+  lastFaceMs: number; // last frame the face step ran (−1: not yet)
+  faces: number; // faces on the last frame the face step ran
   detectionsPerSec: number;
+}
+
+/** F3 hook: sees every frame's faces with the visible tracks (see FaceIdentifier.update). */
+export interface FaceSink {
+  update(faces: FaceObs[], visible: readonly Track[], frame: { frameId: number; frameTs: number }, now: number): void;
 }
 
 /**
@@ -39,7 +49,8 @@ export class ReflexLane {
   lang: Lang;
   visible: Track[] = [];
   frameSize = { width: 0, height: 0 };
-  stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, detectionsPerSec: 0 };
+  stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, lastFaceMs: -1, faces: 0, detectionsPerSec: 0 };
+  faces?: FaceSink;
   private frameTimes: number[] = [];
   private listeners: (() => void)[] = [];
 
@@ -84,6 +95,8 @@ export class ReflexLane {
       this.metrics.mark(u.id, 'enqueued');
       this.scheduler.enqueue(u);
     }
+    // After the hazard alerts, so a P1 name never queues ahead of this frame's alerts.
+    this.faces?.update(r.faces ?? [], visible, { frameId: r.frameNo, frameTs }, now);
     for (const l of this.listeners) l();
   }
 
@@ -91,10 +104,13 @@ export class ReflexLane {
     this.frameTimes.push(now);
     while (this.frameTimes.length && now - this.frameTimes[0] > 2000) this.frameTimes.shift();
     const span = (now - this.frameTimes[0]) / 1000;
+    const ran = r.faceMs !== undefined && r.faceMs >= 0;
     this.stats = {
       frames: this.stats.frames + 1,
       lastInferMs: r.inferMs,
       lastTotalMs: r.totalMs,
+      lastFaceMs: ran ? r.faceMs! : this.stats.lastFaceMs,
+      faces: ran ? (r.faces?.length ?? 0) : this.stats.faces,
       detectionsPerSec: span > 0 ? (this.frameTimes.length - 1) / span : 0,
     };
   }
