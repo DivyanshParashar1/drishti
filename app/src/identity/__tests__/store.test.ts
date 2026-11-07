@@ -81,3 +81,10 @@ test('data survives a reopen (init reloads the cache); listeners fire on change'
   await s2.init(); // CREATE IF NOT EXISTS is idempotent
   expect(s2.people.map((p) => p.name)).toEqual(['Rahul']);
 });
+
+test('addEmbeddings appends to an existing person', async () => {
+  const s = await newStore();
+  const p = await s.add('Rahul', [BASIS[0]]);
+  await s.addEmbeddings(p.id, [BASIS[1], BASIS[2]]);
+  expect(s.find('rahul')!.embeddings).toHaveLength(3);
+});

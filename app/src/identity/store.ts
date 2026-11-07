@@ -83,6 +83,12 @@ export class IdentityStore {
     return this.cache.find((p) => p.id === id)!;
   }
 
+  /** Add embeddings to an existing person (re-enrolling a saved name improves recognition). */
+  async addEmbeddings(personId: number, embeddings: ArrayLike<number>[]): Promise<void> {
+    for (const e of embeddings) await this.db.runAsync('INSERT INTO embeddings (person_id, vec) VALUES (?, ?)', [personId, toBlob(e)]);
+    await this.reload();
+  }
+
   async setClip(personId: number, lang: Lang, uri: string): Promise<void> {
     await this.db.runAsync('INSERT OR REPLACE INTO name_clips (person_id, lang, uri) VALUES (?, ?, ?)', [personId, lang, uri]);
     await this.reload();
