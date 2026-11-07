@@ -19,6 +19,11 @@ export const IDENTITY = {
   maxFacesPerFrame: 2, // the embedder takes two faces per call
   mlkitMinFaceSize: 0.08, // ML Kit minFaceSize (head width / image width)
   cropScale: 2.2, // crop side / face box side (holds the aligned window)
-  seedFrames: 5, // dev seed: embeddings captured per seeded person
+  // F4 enrollment capture: 5–10 frames over about 3 s with exactly one face ≥ 100 px.
+  enrollMinPx: 100,
+  enrollMaxFrames: 10,
+  enrollMinFrames: 5,
+  enrollCaptureMs: 4000, // starts with the "face the camera" prompt, so a bit over 3 s
+  dialogTimeoutMs: 30_000, // waiting for a name or a yes/no
 };
 export type IdentityConfig = typeof IDENTITY;

@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from 'react-native';
 import type { Utterance } from '../audio/scheduler';
 import type { Services } from '../core/services';
-import { IDENTITY } from '../identity/config';
 import type { DetectorId } from '../vision/config';
 import type { VoiceController } from '../voice/voiceController';
 
 /**
  * Debug overlay shell (F10): live p50/p95 per stage, metrics export, the P5 device-check buttons
- * (DT-5.1 stitched clips, DT-5.2 P0 interrupting a long answer), and the P8 face tools: faces
- * on/off, the similarity log export (DT-8.1) and a dev-only seed (removed in P9).
+ * (DT-5.1 stitched clips, DT-5.2 P0 interrupting a long answer), and the face tools: faces
+ * on/off, the saved people, and the similarity log export (DT-8.1).
  */
 export function DebugOverlay({
   services,
@@ -28,7 +27,6 @@ export function DebugOverlay({
 }) {
   const { metrics, scheduler, connectivity, lang, reflex, faces, identities } = services;
   const [, setTick] = useState(0);
-  const [seedMsg, setSeedMsg] = useState('');
 
   useEffect(() => {
     const t = setInterval(() => setTick((n) => n + 1), 500);
@@ -87,24 +85,6 @@ export function DebugOverlay({
   // DT-8.1: per embedded face, best candidate, its similarity and the runner-up's. Stays on the
   // phone unless the tester shares it.
   const exportFaceLog = () => void Share.share({ title: 'Drishti face log', message: JSON.stringify(faces.log) });
-  // Dev-only seed until voice enrollment (P9): the largest face in the next 5 frames → "Test N".
-  const seed = async () => {
-    setSeedMsg('look at the camera…');
-    try {
-      const embs = await faces.captureFaces(IDENTITY.seedFrames, 5000);
-      let k = identities.people.length + 1;
-      while (identities.find(`Test ${k}`)) k++;
-      await identities.add(`Test ${k}`, embs);
-      setSeedMsg(`saved Test ${k} (${embs.length} embeddings)`);
-    } catch (e) {
-      setSeedMsg(String(e));
-    }
-  };
-  const clearSeeds = async () => {
-    for (const p of [...identities.people]) if (/^Test \d+$/.test(p.name)) await identities.remove(p.name);
-    faces.reset();
-    setSeedMsg('seeds deleted');
-  };
 
   const summary = metrics.summary();
   return (
@@ -147,12 +127,9 @@ export function DebugOverlay({
         <View style={styles.row}>
           <Button label={`Faces: ${facesOn ? 'on' : 'off'}`} onPress={onToggleFaces} />
           <Button label="Export face log (DT-8.1)" onPress={exportFaceLog} />
-          {__DEV__ && <Button label="Seed face (dev)" onPress={() => void seed()} />}
-          {__DEV__ && <Button label="Delete seeds" onPress={() => void clearSeeds()} />}
         </View>
         <Text style={styles.text}>
           saved: {identities.people.map((p) => `${p.name}(${p.embeddings.length})`).join(', ') || 'nobody'}
-          {seedMsg ? ` · ${seedMsg}` : ''}
         </Text>
       </ScrollView>
     </View>

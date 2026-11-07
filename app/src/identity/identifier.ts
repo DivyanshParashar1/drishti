@@ -59,6 +59,18 @@ export function nameParts(p: NamedPerson, lang: Lang, dir: Direction): AudioPart
 
 const LOG_MAX = 1000;
 
+export interface CaptureResult {
+  embeddings: number[][];
+  multiFaceFrames: number;
+}
+
+interface Capture {
+  opts: { max: number; durationMs: number; minPx: number };
+  got: number[][];
+  multiFace: number;
+  finish: () => void;
+}
+
 /**
  * F3 decision layer, fed once per processed frame with the faces and the visible person tracks.
  *
@@ -76,7 +88,9 @@ export class FaceIdentifier {
   private ids = new Map<number, IdentityState>();
   private lastUnknownAt = -Infinity;
   private present: { person: NamedPerson; dir: Direction }[] = [];
-  private capture: { n: number; got: number[][]; done: (e: number[][]) => void } | null = null;
+  private capture: Capture | null = null;
+  /** While enrolling (F4), "unknown person" is not announced: that person is being saved. */
+  suppressUnknown = false;
   /** Similarity log for threshold calibration (DT-8.1). Names stay on the device. */
   readonly log: FaceLogEntry[] = [];
 
@@ -111,25 +125,25 @@ export class FaceIdentifier {
   }
 
   /**
-   * Collect embeddings of the largest qualifying face from the next `n` frames that have one
-   * (dev seed in P8; enrollment in P9). Rejects after `timeoutMs`.
+   * F4 capture: embeddings from frames where exactly one face is big enough to embed and it is
+   * ≥ `minPx` wide (frames with two such faces are skipped and counted). Resolves with what it got
+   * after `durationMs`, or as soon as it has `max`.
    */
-  captureFaces(n: number, timeoutMs: number): Promise<number[][]> {
-    this.capture?.done([]);
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        this.capture = null;
-        reject(new Error('capture timed out'));
-      }, timeoutMs);
-      this.capture = {
-        n,
+  captureFaces(opts: { max: number; durationMs: number; minPx: number }): Promise<CaptureResult> {
+    this.capture?.finish();
+    return new Promise((resolve) => {
+      const c: Capture = {
+        opts,
         got: [],
-        done: (e) => {
+        multiFace: 0,
+        finish: () => {
           clearTimeout(timer);
-          this.capture = null;
-          resolve(e);
+          if (this.capture === c) this.capture = null;
+          resolve({ embeddings: c.got, multiFaceFrames: c.multiFace });
         },
       };
+      const timer = setTimeout(() => c.finish(), opts.durationMs);
+      this.capture = c;
     });
   }
 
@@ -144,9 +158,11 @@ export class FaceIdentifier {
     for (const id of this.tracks.keys()) if (!alive.has(id)) this.tracks.delete(id);
 
     if (this.capture) {
-      const f = faces.filter((x) => x.embedding && x.widthPx >= this.cfg.minFacePx).sort((a, b) => b.widthPx - a.widthPx)[0];
-      if (f) this.capture.got.push(f.embedding!);
-      if (this.capture.got.length >= this.capture.n) this.capture.done(this.capture.got);
+      const c = this.capture;
+      const big = faces.filter((x) => x.embedding && x.widthPx >= this.cfg.minFacePx);
+      if (big.length > 1) c.multiFace++;
+      else if (big.length === 1 && big[0].widthPx >= c.opts.minPx) c.got.push(big[0].embedding!);
+      if (c.got.length >= c.opts.max) c.finish();
     }
 
     const people = this.d.people();
@@ -179,7 +195,7 @@ export class FaceIdentifier {
         }
         present.push({ person, dir: t.dir });
         this.seen(person, t, frame, now);
-      } else if (!s.unknownSaid) {
+      } else if (!s.unknownSaid && !this.suppressUnknown) {
         s.unknownSaid = true;
         if (now - this.lastUnknownAt >= this.cfg.unknownCooldownMs) {
           this.lastUnknownAt = now;

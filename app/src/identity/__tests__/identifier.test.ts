@@ -199,22 +199,34 @@ test('a person deleted while in view stops being present; the DT-8.1 log records
   expect(id.log[0].sim).toBeCloseTo(0.8, 6);
 });
 
-test('captureFaces collects the largest qualifying face from the next n frames, or times out', async () => {
+test('captureFaces: frames with exactly one embeddable face ≥ minPx; two faces skipped; stops at max', async () => {
+  const { id, step } = setup();
+  const p = id.captureFaces({ max: 2, durationMs: 3000, minPx: 100 });
+  step([face(like(BASIS[0]), undefined, 99)], [], 0); // embeddable but < 100 px
+  step([face(like(BASIS[0]), undefined, 150), face(like(BASIS[1]), undefined, 90)], [], 100); // two faces
+  step([face(like(BASIS[0]), undefined, 150), face(null, undefined, 40)], [], 200); // tiny bystander is fine
+  step([face(like(BASIS[0], 9), undefined, 120)], [], 300);
+  const r = await p;
+  expect(r.embeddings).toEqual([like(BASIS[0]), like(BASIS[0], 9)]);
+  expect(r.multiFaceFrames).toBe(1);
+});
+
+test('captureFaces resolves with what it has when the time is up', async () => {
   jest.useFakeTimers();
   try {
     const { id, step } = setup();
-    const p = id.captureFaces(2, 3000);
-    step([face(like(BASIS[0]), undefined, 79)], [], 0); // too small: not counted
-    step([face(like(BASIS[1]), undefined, 90), face(like(BASIS[0]), undefined, 150)], [], 100);
-    step([face(like(BASIS[0], 9))], [], 200);
-    const got = await p;
-    expect(got).toHaveLength(2);
-    expect(got[0]).toEqual(like(BASIS[0]));
-
-    const late = id.captureFaces(5, 3000);
+    const p = id.captureFaces({ max: 10, durationMs: 3000, minPx: 100 });
+    step([face(like(BASIS[0]), undefined, 150)], [], 0);
     jest.advanceTimersByTime(3001);
-    await expect(late).rejects.toThrow('timed out');
+    expect((await p).embeddings).toHaveLength(1);
   } finally {
     jest.useRealTimers();
   }
+});
+
+test('suppressUnknown keeps "unknown person" quiet while enrolling', () => {
+  const { id, enqueued, step } = setup();
+  id.suppressUnknown = true;
+  for (let i = 0; i < 6; i++) step([face(stranger)], [track(1)], i * 100);
+  expect(enqueued).toHaveLength(0);
 });
