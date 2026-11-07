@@ -198,3 +198,23 @@ test('a person deleted while in view stops being present; the DT-8.1 log records
   expect(id.log[0]).toMatchObject({ track: 1, widthPx: 120, best: 'Rahul', named: 'Rahul' });
   expect(id.log[0].sim).toBeCloseTo(0.8, 6);
 });
+
+test('captureFaces collects the largest qualifying face from the next n frames, or times out', async () => {
+  jest.useFakeTimers();
+  try {
+    const { id, step } = setup();
+    const p = id.captureFaces(2, 3000);
+    step([face(like(BASIS[0]), undefined, 79)], [], 0); // too small: not counted
+    step([face(like(BASIS[1]), undefined, 90), face(like(BASIS[0]), undefined, 150)], [], 100);
+    step([face(like(BASIS[0], 9))], [], 200);
+    const got = await p;
+    expect(got).toHaveLength(2);
+    expect(got[0]).toEqual(like(BASIS[0]));
+
+    const late = id.captureFaces(5, 3000);
+    jest.advanceTimersByTime(3001);
+    await expect(late).rejects.toThrow('timed out');
+  } finally {
+    jest.useRealTimers();
+  }
+});

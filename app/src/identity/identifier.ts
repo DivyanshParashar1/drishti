@@ -76,6 +76,7 @@ export class FaceIdentifier {
   private ids = new Map<number, IdentityState>();
   private lastUnknownAt = -Infinity;
   private present: { person: NamedPerson; dir: Direction }[] = [];
+  private capture: { n: number; got: number[][]; done: (e: number[][]) => void } | null = null;
   /** Similarity log for threshold calibration (DT-8.1). Names stay on the device. */
   readonly log: FaceLogEntry[] = [];
 
@@ -109,6 +110,29 @@ export class FaceIdentifier {
     return this.present;
   }
 
+  /**
+   * Collect embeddings of the largest qualifying face from the next `n` frames that have one
+   * (dev seed in P8; enrollment in P9). Rejects after `timeoutMs`.
+   */
+  captureFaces(n: number, timeoutMs: number): Promise<number[][]> {
+    this.capture?.done([]);
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.capture = null;
+        reject(new Error('capture timed out'));
+      }, timeoutMs);
+      this.capture = {
+        n,
+        got: [],
+        done: (e) => {
+          clearTimeout(timer);
+          this.capture = null;
+          resolve(e);
+        },
+      };
+    });
+  }
+
   reset(): void {
     this.tracks.clear();
     this.present = [];
@@ -118,6 +142,12 @@ export class FaceIdentifier {
     const persons = visible.filter((t) => t.label === 'person');
     const alive = new Set(persons.map((t) => t.id));
     for (const id of this.tracks.keys()) if (!alive.has(id)) this.tracks.delete(id);
+
+    if (this.capture) {
+      const f = faces.filter((x) => x.embedding && x.widthPx >= this.cfg.minFacePx).sort((a, b) => b.widthPx - a.widthPx)[0];
+      if (f) this.capture.got.push(f.embedding!);
+      if (this.capture.got.length >= this.capture.n) this.capture.done(this.capture.got);
+    }
 
     const people = this.d.people();
     const assigned = new Set<number>();

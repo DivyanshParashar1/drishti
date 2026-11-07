@@ -8,7 +8,9 @@ import { VoiceController, type VoiceDeps } from '../voiceController';
 
 const flush = () => new Promise<void>((r) => setImmediate(() => r()));
 
-function setup(opts: { online?: boolean | null; stt?: SttResult; askEvents?: AskEvent[]; frame?: string | null } = {}) {
+function setup(
+  opts: { online?: boolean | null; stt?: SttResult; askEvents?: AskEvent[]; frame?: string | null; present?: ReturnType<VoiceDeps['present']> } = {},
+) {
   let now = 0;
   const queue: Utterance[] = [];
   const all: Utterance[] = []; // every utterance ever enqueued
@@ -67,7 +69,7 @@ function setup(opts: { online?: boolean | null; stt?: SttResult; askEvents?: Ask
       for (const e of opts.askEvents ?? []) onEvent(e);
     },
     writeAudio: async (b64) => `file:///ans-${b64}.mp3`,
-    names: () => [],
+    present: () => opts.present ?? [],
     haptic: () => void log.push('haptic'),
     earcon: (n) => void log.push(`earcon:${n}`),
   };
@@ -205,3 +207,16 @@ test('a hazard interrupting an answer drops the rest of it, including sentences 
   expect(answers).toEqual([{ kind: 'file', uri: 'file:///ans-AAA.mp3', text: 'Kursi aage hai.' }]); // sentence 2 never queued
 });
 
+
+test('who is here: each recognised person with direction; /ask gets their names', async () => {
+  const present = [
+    { person: { id: 1, name: 'Rahul', embeddings: [] }, dir: 'left' as const },
+    { person: { id: 2, name: 'Priya', embeddings: [], clips: { 'hi-en': 'file:///priya.mp3' } }, dir: 'ahead' as const },
+  ];
+  const t = setup({ askEvents: SENTENCES, present });
+  await t.vc.handle(route('kaun hai'), 'id');
+  expect(t.said()).toEqual(['speak:Rahul aapke saamne hai dir.left', 'file:///priya.mp3 dir.ahead']);
+  expect(t.queue.every((u) => u.priority === 4)).toBe(true);
+  await t.talk();
+  expect(t.asks[0].names).toEqual(['Rahul', 'Priya']);
+});

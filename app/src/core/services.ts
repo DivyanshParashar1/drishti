@@ -1,6 +1,9 @@
 import { ClipPlayer } from '../audio/clipPlayer';
 import { ExpoAudioBackend } from '../audio/expoBackend';
 import { SpeechScheduler } from '../audio/scheduler';
+import { openDatabaseSync } from 'expo-sqlite';
+import { FaceIdentifier } from '../identity/identifier';
+import { IdentityStore, type SqlDb } from '../identity/store';
 import { ReflexLane } from '../vision/reflexLane';
 import { createConnectivityMonitor, type ConnectivityMonitor } from './connectivity';
 import { FrameGrabber } from './frameGrabber';
@@ -15,6 +18,8 @@ export interface Services {
   connectivity: ConnectivityMonitor;
   reflex: ReflexLane;
   frames: FrameGrabber;
+  identities: IdentityStore;
+  faces: FaceIdentifier;
   lang: Lang;
 }
 
@@ -30,19 +35,31 @@ export function createServices(): Services {
     onDrop: (u, reason) => metrics.note(u.id, `dropped_${reason}`),
   });
   const reflex = new ReflexLane(scheduler, metrics, DEFAULT_LANG);
-  return {
+  const identities = new IdentityStore(openDatabaseSync('drishti.db') as unknown as SqlDb);
+  const services = {} as Services;
+  const faces = new FaceIdentifier({
+    scheduler,
+    metrics,
+    lang: () => services.lang,
+    people: () => identities.people,
+  });
+  reflex.faces = faces;
+  return Object.assign(services, {
     metrics,
     player,
     scheduler,
     connectivity: createConnectivityMonitor(),
     reflex,
     frames: new FrameGrabber(),
+    identities,
+    faces,
     lang: DEFAULT_LANG,
-  };
+  });
 }
 
 /** Audio mode, clip preloading and connectivity. Returns a cleanup function. */
 export async function startServices(s: Services): Promise<() => void> {
+  await s.identities.init().catch((e) => console.warn('identity store failed', e)); // F3 then runs with nobody saved
   await ExpoAudioBackend.configure();
   await s.player.preloadPack(s.lang);
   s.connectivity.start();

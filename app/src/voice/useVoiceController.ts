@@ -75,7 +75,7 @@ export function useVoiceController(services: Services): VoiceController {
         await file.write(base64ToBytes(b64));
         return file.uri;
       },
-      names: () => [], // P8
+      present: () => services.faces.presentPeople(),
       haptic: () => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
       earcon: (name) => {
         const p = earcons[name];

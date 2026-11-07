@@ -3,9 +3,11 @@ import type { AudioPart, Priority, SpeechScheduler, Utterance } from '../audio/s
 import { monotonic, type Clock } from '../core/clock';
 import type { Lang } from '../core/lang';
 import type { Metrics } from '../core/metrics';
+import { nameParts, type NamedPerson } from '../identity/identifier';
 import type { AskEvent, AskRequest } from '../net/askClient';
 import type { SttResult } from '../net/sttClient';
 import type { Track } from '../vision/tracker';
+import type { Direction } from '../vision/types';
 import { route, type Command } from './router';
 
 /** Everything the controller touches, injected so the whole flow is testable with fakes. */
@@ -25,7 +27,8 @@ export interface VoiceDeps {
   ask(req: AskRequest, onEvent: (e: AskEvent) => void): Promise<void>;
   /** Write base64 MP3 to a local file and return its uri. */
   writeAudio(b64: string): Promise<string>;
-  names(): string[]; // recognised people in view (P8)
+  /** Recognised people in view now (F3), with where they are. */
+  present(): readonly { person: NamedPerson; dir: Direction }[];
   haptic(): void;
   earcon(name: 'listen_start' | 'listen_stop' | 'error'): void;
 }
@@ -136,9 +139,13 @@ export class VoiceController {
         if (this.lastAnswer.length === 0) return this.say('sys.nothing_to_repeat');
         for (const parts of this.lastAnswer) this.enqueue(this.d.metrics.start('describe', 'repeat'), 3, 'answer', parts);
         return;
-      case 'who':
-        // Identities come in P8; until then nobody is recognised.
-        return this.say('sys.no_one_here');
+      case 'who': {
+        const here = this.d.present();
+        if (here.length === 0) return this.say('sys.no_one_here');
+        const lang = this.d.lang();
+        for (const p of here) this.enqueue(this.d.metrics.start('system', 'enqueued'), 4, 'system', nameParts(p.person, lang, p.dir), lang);
+        return;
+      }
       case 'save':
       case 'delete':
       case 'list':
@@ -168,7 +175,7 @@ export class VoiceController {
     let chain = Promise.resolve(); // sentence files are written in order, then enqueued in order
     let sentences = 0;
     this.d.metrics.mark(id, 'ask_sent');
-    await this.d.ask({ question, lang, detections, names: this.d.names(), imageUri }, (e) => {
+    await this.d.ask({ question, lang, detections, names: this.d.present().map((p) => p.person.name), imageUri }, (e) => {
       chain = chain.then(async () => {
         if (e.type === 'sentence') {
           if (sentences++ === 0) this.d.scheduler.cancelWhere((u) => u.id === lookingId);
