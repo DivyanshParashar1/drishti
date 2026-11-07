@@ -197,6 +197,36 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** React Native delivers TalkBack's `activate` to `onAccessibilityAction` on a `Pressable` with an `onPressIn` handler (rather than `onPress`); the luminance sample of the 320 px resize tracks a covered lens.
 - **Measurements:** none.
 
+## P13 — Deploy + preview APK (2026-11-08)
+- **Status:** prepared, not run. `server/deploy.sh`, `docs/deploy.md` and a `live` smoke test (`server/tests/test_live_deployed.py`) are in place; the deploy, the EAS preview build and the smoke test are deferred (X-13.1–13.4) because they spend money and credits. Automated tests pass (Jest 401, pytest 198).
+- **Limitations:**
+  - L13.1 Nothing is deployed yet. The script (Secret Manager secrets, a service account with `roles/aiplatform.user`, min/max instances 1, timeout 300 s, 1 vCPU, 512 MiB) has only been syntax-checked.
+  - L13.2 The Docker image still hasn't been built locally (the Docker daemon was off, L1.5). `gcloud run deploy --source` builds it in Cloud Build, which is the first real build. The Dockerfile pulls `uv:latest` (unpinned).
+  - L13.3 Idle cost of min-instances 1: about $10 a month at third-party-reported idle rates ($0.0000025 per vCPU-second and per GiB-second, 1 vCPU and 0.5 GiB), before the free tier. Not checked against Google's live pricing page. The fallback (`MIN_INSTANCES=0` plus a /health warm-up) is in `docs/deploy.md`.
+  - L13.4 Spending caps are documented, not set: a GCP budget alert (it alerts, it doesn't stop spending) and an OpenRouter key credit limit.
+  - L13.5 The preview APK gets `SERVER_URL` and `APP_TOKEN` from the EAS `preview` environment (commands in `docs/deploy.md`). `APP_TOKEN` ships in the APK by design (§10); rotate it with `ROTATE=1`.
+- **Unverified assumptions:** Cloud Run passes WebSocket upgrades and SSE streaming through with `--timeout 300` (L1 assumption); `--allow-unauthenticated` plus our token is acceptable for the contest.
+- **Measurements:** none (nothing deployed).
+
+## P14 — Stretch: offline STT for commands (2026-11-08)
+- **Status:** built, needs an APK rebuild. Automated tests pass (Jest 401: offline session, the voice routing switch, offline questions → "Internet nahi hai", Devanagari commands); the config plugin applies (`expo config --type introspect`); the Android export bundles (1,009 modules). **Nothing on-device has run; this phase adds a native module, so the dev APK must be rebuilt before anything works (X-14.1).**
+- **Limitations:**
+  - L14.1 Uses `expo-speech-recognition` 58.0.1 (matches Expo SDK 58) instead of `@react-native-voice/voice`, which hasn't tracked the New Architecture. Offline, push-to-talk starts Android's on-device recognizer (`requiresOnDeviceRecognition`) instead of /stt. Fixed commands run; questions, describe and "aage" outside reading say "Internet nahi hai".
+  - L14.2 It works only if the phone has an on-device recognizer and the offline model for the language. Locales: hi-en and hi use `hi-IN`, en uses `en-IN`, ta uses `ta-IN`. The debug overlay's "Offline speech model" button asks Android to download the model (possibly with a system prompt); it's not triggered automatically. Without a recognizer the old behaviour stays: "Internet nahi hai", and holding stops reading.
+  - L14.3 The on-device Hindi model outputs Devanagari, so Devanagari command words were added (रुको, ये पढ़ो, क्वाइट मोड, फिर से बोलो, कौन है, सामने क्या है, आगे, मदद), NFC-normalised. Hinglish said offline may come back in Devanagari or Latin; both are covered for the main commands. Enrollment works offline, as before.
+  - L14.4 The recognizer owns the mic, so our PCM recorder isn't started offline. The first ~100–300 ms of speech may be lost while it starts. The final transcript is the last result within 3 s of release.
+- **Unverified assumptions:** the Realme 11 Pro (Android 15) has an on-device recognizer with Hindi and Tamil models; `supportsOnDeviceRecognition()` reports it correctly; it coexists with the camera running.
+- **Measurements:** none.
+
+## P15 — Contest deliverables (2026-11-08)
+- **Status:** drafts written: `docs/demo-checklist.md` (60 s and ~3 min shot lists with setup and safety), `docs/writeup.md` (problem, users, Gnani usage, architecture, privacy and safety, numbers, known limitations), `docs/posts.md` (LinkedIn and X). Videos are DT-15.1.
+- **Limitations:**
+  - L15.1 The write-up's on-device p50/p95 table is empty: no device measurements exist yet. The laptop numbers it quotes come from P2/P3/P8 entries. Fill the device rows only from an exported metrics file.
+  - L15.2 Team contributions, video links and Gnani AI's exact handles are left for the team.
+  - L15.3 Name: "Drishti" conflicts with "Drishti Nepal" (Play Store, a currency-recognition app for blind users) and Accenture's Drishti for the visually impaired in India. Fine as a working name; choose another before any store release.
+  - L15.4 The spec's demo storyboard assumes captions with an English line and an on-screen latency readout (F12). There's no F12 phase in PLAN.md (see "Still open"); the shot list uses the debug overlay plus captions added in editing.
+- **Measurements:** none new.
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -212,6 +242,11 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | X-4.3 | P4 | Measure clip leading/trailing silence; trim if needed (L4.4) | ffprobe / ffmpeg | needs X-4.1 |
 | X-7.1 | P7 | Run DT-7.2 once per VLM provider (OpenRouter now; Vertex when unpaused) | device + `VLM_PROVIDER` switch | Vertex paused (user) |
 | X-9.1 | P9 | Name clips through the server: 5 Indian names in hi-en and en (DT-9.3's text); listen for mispronunciations | `uv run python scripts/tts_probe.py --lang hi-en "Rahul aapke saamne hai"` (and Priya, Aishwarya, Venkatesh, Gurpreet) | spends Gnani credits (user) |
+| X-13.1 | P13 | Deploy the relay to Cloud Run | `PROJECT=… APP_TOKEN=… GNANI_API_KEY=… OPENROUTER_API_KEY=… ./server/deploy.sh` | spends money (user) |
+| X-13.2 | P13 | Smoke test against the deployed URL; one /ask per provider, compared with local timings | `DEPLOYED_URL=… APP_TOKEN=… uv run pytest -m live tests/test_live_deployed.py`; `SERVER_URL=… scripts/ask_probe.py` | needs X-13.1; spends credits |
+| X-13.3 | P13 | Set the GCP budget alert and the OpenRouter key credit limit | consoles (`docs/deploy.md` §3) | user's accounts |
+| X-13.4 | P13 | EAS preview env (SERVER_URL, APP_TOKEN) and preview APK build | `eas env:create …`; `eas build --profile preview --platform android` | needs X-13.1; EAS build minutes |
+| X-14.1 | P14 | Rebuild the development APK with expo-speech-recognition; download the offline Hindi model | `eas build --profile development --platform android`; overlay "Offline speech model" | native module added |
 | X-4.4 | P4 | Re-check Gnani credits used after the packs (L2.9) | Gnani dashboard | needs X-4.1/X-4.2 |
 
 ## Pending device tests
@@ -249,3 +284,8 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-12.1 | Status lines: lens covered (warns after 2 s, repeats every 20 s), airplane on and off (one line each, no spam), first run (tutorial once; "madad" replays) | P12 | pending | | |
 | DT-12.2 | Fully usable with TalkBack on (double tap, speak, double tap) and off | P12 | pending | | |
 | DT-12.3 | The metrics export opens the share sheet with valid JSON | P12 | pending | | |
+| DT-13.1 | The preview APK installs and runs end to end on 4G against Cloud Run | P13 | pending | | |
+| DT-13.2 | The first question after 10 min idle has no cold-start delay | P13 | pending | | |
+| DT-13.3 | Rerun DT-7.2 (release → first audio) against the deployed server | P13 | pending | | |
+| DT-14.1 | Airplane mode: "ye padho", "ruko" and "quiet mode" work by voice (needs X-14.1) | P14 | pending | | |
+| DT-15.1 | Record the 60-second and ~3-minute videos (`docs/demo-checklist.md`); export metrics after the last take | P15 | pending | | |
