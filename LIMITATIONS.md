@@ -126,6 +126,23 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** RN WebSocket's third-argument `headers` reaches the `/stt` handshake on Android; `toEncodedImageData('jpg', 70)` works from the worklet; expo-audio earcon players replay after `seekTo(0)`.
 - **Measurements:** none yet (device checks pending).
 
+## P8 — Person identification (2026-11-08)
+- **Status:** automated tests pass (Jest 239, pytest 195; `tsc` and `expo lint` clean; the Android export bundles, 989 modules, and every face function compiles as a worklet with the expected closure) | live checks: laptop face check done (below) | device checks DT-8.1–8.4 pending. **ML Kit faces, the embedder and the YUV frame path have not run on the phone.**
+- **Limitations:**
+  - L8.1 The whole face path is untested on the device: ML Kit `detectFaces(frame)` inside our `useFrameOutput` worklet (L0 assumption), nitro-image `crop`, and fast-tflite with two inputs. If the ML Kit native module is missing, faces are off and the debug overlay shows `faces: FAILED`; obstacle alerts keep working.
+  - L8.2 Frames changed from 640×480 `rgb` to 1280×720 `yuv`: ML Kit's frame API only reads YUV media images, and a 480 px-wide frame only gives an 80 px face at about 0.8 m (720 px: about 1.2 m). The detector's RGB conversion still works (CameraX `toBitmap` handles YUV), but converting and resizing a bigger frame costs more, unmeasured. This affects DT-6.1 numbers too. Naming at 2 m (F3 acceptance says 1–2 m) would need 1920×1080 or a lower `minFacePx`. Plan: DT-8.2 and DT-8.4; `VISION.frameResolution` is one config value.
+  - L8.3 Threshold 0.5 instead of the spec's 0.65 start (`IDENTITY.threshold`). The model's LFW threshold is cosine 0.27; on the laptop the same person scored 0.82 and different people 0.06–0.14. Plus an ambiguity margin: the best person must beat the runner-up by 0.08, else unknown. Plan: DT-8.1 on device.
+  - L8.4 Alignment uses ML Kit's eyes and mouth corners (the nose is left out: ML Kit's NOSE_BASE isn't the template's nose tip). Without eye landmarks it maps the face box to the template, which is rougher (laptop: same person 0.82, others ≤ 0.22). The crop is 2.2× the face box, not the spec's 20% margin, so it holds the whole aligned window.
+  - L8.5 The face step runs only on detector frames that contain a `person` detection, synchronously after the detector (same frame). It adds ML Kit (`fast`, landmarks on), up to 2 crops, warps and one embedder call to the worklet. Target 20–40 ms (DT-8.4); `dropFramesWhileBusy` sheds frames if it's slower.
+  - L8.6 A face counts only if its centre is inside a person box. A person the detector misses (e.g. only a face in view, very close) is never identified.
+  - L8.7 Announcement rules: a name sticks to a track once decided (it never flips to another name; unknown can still become a name). A name is announced once per appearance (5 min absent = new appearance), at P1. If the announcement is dropped as stale (> 500 ms waiting behind an answer) or cut by a hazard, it's retried while the person is in view; one the user stopped isn't. "Unknown person" is said once per track and at most once per 30 s overall (my addition; the spec has no cooldown). The reflex lane still says "Vyakti …" for a person first; the name follows.
+  - L8.8 Names are spoken as "<name> aapke saamne hai" + direction clip via expo-speech, since name clips come in P9. The template per language is in `NAME_TEMPLATE`; P11 should check the en/ta wording.
+  - L8.9 Dev-only "Seed face" (debug overlay, `__DEV__`) saves the largest face in the next 5 frames as "Test N", with no consent step. "Delete seeds" removes them. Both are removed in P9.
+  - L8.10 Model: MobileFaceNet from Qualcomm AI Hub (Apache-2.0, weights from foamliu/MobileFaceNet trained on MS-Celeb-1M; that dataset was withdrawn and its terms are research-oriented). Float32, NCHW, 4 MB, with the flip augmentation inside the graph (4 backbone passes per call). The GPU delegate may refuse it, in which case it falls back to CPU (the overlay shows which).
+  - L8.11 The similarity log (`Export face log`) keeps the last 1,000 embedded faces in memory with the best candidate's name, and leaves the phone only through the share sheet. It isn't added to the metrics export (names stay out of metrics).
+- **Unverified assumptions:** CameraX gives `rotationDegrees = 0` with buffer rotation on, so ML Kit coordinates are upright and match the converted image (coordinates are rescaled by ML Kit's frame size anyway); ML Kit returns landmarks in `fast` mode with `runLandmarks`; `Image.crop(x1, y1, x2, y2)` takes end coordinates (per the nitro-image docs); fast-tflite `runSync` takes inputs in model order (`img1`, `img2`).
+- **Measurements:** laptop only (`app/scripts/face_check/`, 4 photos: an LFW pair of one person, plus two public-domain portraits): same person 0.818, different people 0.062–0.143 with landmarks (0.087–0.223 box-only). With Qualcomm's demo template (25% padding), different people scored up to 0.626; that's why the InsightFace template is used. No phone numbers yet.
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -162,3 +179,7 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-7.2 | Median release → first audio ≤ 2 s over 20 questions, on Wi-Fi and on 4G (overlay describe play_start p50) | P7 | pending | | |
 | DT-7.3 | A car alert interrupts a long answer within 100 ms, and the answer does not resume | P7 | pending | | |
 | DT-7.4 | Airplane mode: a question gets "Internet nahi hai"; alerts keep working | P7 | pending | | |
+| DT-8.1 | Calibrate the threshold with 3 real people: seed each (dev), export the face log while each faces the camera and while strangers do; pick the threshold | P8 | pending | | |
+| DT-8.2 | Each enrolled person is named within 1 s at 1–2 m (note the farthest distance that works at 1280×720, L8.2) | P8 | pending | | |
+| DT-8.3 | An unenrolled person → "unknown" in 10 of 10 trials, never named | P8 | pending | | |
+| DT-8.4 | Face step time per frame (overlay "face step", target 20–40 ms), embedder delegate, and the detector's total ms at 1280×720 vs DT-6.1 | P8 | pending | | |

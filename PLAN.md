@@ -18,6 +18,8 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | §5 frame resizing and OCR (found in P0) | VisionCamera is now v5, and `vision-camera-resize-plugin` only supports v4. Frames are resized with `react-native-nitro-image` (`convertFrameToImage` → `resize`). No v5 OCR frame plugin exists, so F7 runs ML Kit (`@react-native-ml-kit/text-recognition`) on a captured photo. |
 | D16 / P3 benchmark (user, 2026-11-07) | Vertex testing and model benchmarking are paused until the app is complete. Then, benchmark models on OpenRouter, preferring open-source ones. Interim model: OpenRouter `google/gemini-3.5-flash-lite`. |
 | F6 prompt (found in P3) | Rules in English plus a per-language instruction (language, script, direction words), instead of the full prompt in each language. No "numbers as words" rule. |
+| F3 threshold, alignment and crop (found in P8) | Threshold starts at 0.5, not 0.65: the shipped MobileFaceNet's LFW threshold is cosine 0.27, and laptop photos gave 0.82 same person vs ≤ 0.14 different people. An ambiguity margin (0.08 over the runner-up) makes lookalikes unknown. Faces are aligned to the InsightFace 112×112 template from ML Kit's eyes and mouth corners; the crop is 2.2× the face box, not 20% margin. |
+| §5 camera frames (found in P8) | Frames are 1280×720 YUV instead of 640×480 RGB, so ML Kit can read them and faces reach 80 px at ~1.2 m. |
 
 ## Phase gate (end of every phase)
 
@@ -345,5 +347,6 @@ Device checks:
 
 - Which VLM model to use. Once the app is complete, benchmark on OpenRouter (open-source preferred) with `bench_vlm.py` and DT-7.2. Interim: `google/gemini-3.5-flash-lite`.
 - Which detector is the default. Decided by DT-6.1.
+- The F3 threshold and frame resolution. Decided by DT-8.1 and DT-8.2 (L8.2, L8.3).
 - The Gnani credit-to-minute rate. Estimated in P2 live checks, or ask on Gnani's Discord.
 - YOLO11n AGPL-3.0 in a public repo. Accepting it means the app code is effectively AGPL. If EfficientDet wins DT-6.1, drop the YOLO weights.
