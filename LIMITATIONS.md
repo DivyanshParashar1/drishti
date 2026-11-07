@@ -143,6 +143,21 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** CameraX gives `rotationDegrees = 0` with buffer rotation on, so ML Kit coordinates are upright and match the converted image (coordinates are rescaled by ML Kit's frame size anyway); ML Kit returns landmarks in `fast` mode with `runLandmarks`; `Image.crop(x1, y1, x2, y2)` takes end coordinates (per the nitro-image docs); fast-tflite `runSync` takes inputs in model order (`img1`, `img2`).
 - **Measurements:** laptop only (`app/scripts/face_check/`, 4 photos: an LFW pair of one person, plus two public-domain portraits): same person 0.818, different people 0.062–0.143 with landmarks (0.087–0.223 box-only). With Qualcomm's demo template (25% padding), different people scored up to 0.626; that's why the InsightFace template is used. No phone numbers yet.
 
+## P9 — Voice enrollment (2026-11-08)
+- **Status:** automated tests pass (Jest 292, pytest 195; `tsc` and `expo lint` clean; the Android export bundles, 993 modules) | live checks: none (the name-clip /tts check is deferred, X-9.1) | device checks DT-9.1–9.3 pending. **Enrollment has not run on the phone; it depends on the P8 face path (L8.1).**
+- **Limitations:**
+  - L9.1 Consent is a yes/no transcript taken from whoever speaks while the user holds the talk button. The app can't tell that it was the person being saved who said yes. Only a clear yes counts ("haan", "yes", "theek hai", "हाँ", "ஆம்", …); any no-word wins ("haan nahi" → no), and anything else cancels.
+  - L9.2 While the dialog waits for a name or a yes, the next transcript is its answer and is not routed (so "saamne kya hai" then isn't a question). "Ruko" cancels. With no answer within 30 s, it says "Theek hai, save nahi kiya". A reply that STT doesn't catch says "Samajh nahi aaya" and the dialog keeps waiting. "Naam bataiye" is asked once more, then the dialog cancels.
+  - L9.3 Capture needs the person detector to see a person (faces are only looked for then, L8.6), and exactly one face that is embeddable (≥ 80 px) and ≥ 100 px. It keeps up to 10 frames at least 300 ms apart within 4 s, counted from the "face the camera" prompt. Fewer than 5 → "Chehra saaf nahi dikha…". There's no separate "two faces" message: it's the same line.
+  - L9.4 Saving a name that already exists adds the new embeddings to that person (my choice; the spec doesn't say). There is no spoken "this name exists".
+  - L9.5 Name clips ("{name} aapke saamne hai" per language) are fetched for the current language only, right after saving, at startup and whenever the connection comes back. P11 should call `nameClips.sync(lang)` on a language switch. One failure stops a run (the rest wait for the next sync). Until a clip exists the name is spoken by expo-speech.
+  - L9.6 Delete removes the person's rows and clip files, then says "Delete ho gaya", with no confirmation question. "Delete karo" without a name asks for it.
+  - L9.7 List reads the names with expo-speech after the "Saved log hain:" clip.
+  - L9.8 Hindi-script phrasings were added to the router (save, delete, list) for names in Devanagari. Prisma's transliterate mode should give Latin script for Hindi and Hinglish, so these are a fallback. Tamil enrollment phrasings are still missing (P11).
+  - L9.9 The P8 dev seed is removed; the face log export stays.
+- **Unverified assumptions:** the expo-file-system `Directory`/`File` API writes and deletes under `Paths.document` as typed; a `file` part with a documents uri plays through expo-audio like answer files do; Timbre pronounces Indian names acceptably (DT-9.3).
+- **Measurements:** none yet.
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -157,6 +172,7 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | X-4.2 | P4 | Generate the hi, en and ta packs; native-speaker check of the Hindi and Tamil text | `scripts/gen_clips.py --langs hi,en,ta` | deferred (user) |
 | X-4.3 | P4 | Measure clip leading/trailing silence; trim if needed (L4.4) | ffprobe / ffmpeg | needs X-4.1 |
 | X-7.1 | P7 | Run DT-7.2 once per VLM provider (OpenRouter now; Vertex when unpaused) | device + `VLM_PROVIDER` switch | Vertex paused (user) |
+| X-9.1 | P9 | Name clips through the server: 5 Indian names in hi-en and en (DT-9.3's text); listen for mispronunciations | `uv run python scripts/tts_probe.py --lang hi-en "Rahul aapke saamne hai"` (and Priya, Aishwarya, Venkatesh, Gurpreet) | spends Gnani credits (user) |
 | X-4.4 | P4 | Re-check Gnani credits used after the packs (L2.9) | Gnani dashboard | needs X-4.1/X-4.2 |
 
 ## Pending device tests
@@ -183,3 +199,6 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-8.2 | Each enrolled person is named within 1 s at 1–2 m (note the farthest distance that works at 1280×720, L8.2) | P8 | pending | | |
 | DT-8.3 | An unenrolled person → "unknown" in 10 of 10 trials, never named | P8 | pending | | |
 | DT-8.4 | Face step time per frame (overlay "face step", target 20–40 ms), embedder delegate, and the detector's total ms at 1280×720 vs DT-6.1 | P8 | pending | | |
+| DT-9.1 | Eyes closed: enroll ("isko <name> ke naam se save karo" → the person says haan → face the camera), hear the name announced, then delete, by voice only | P9 | pending | | |
+| DT-9.2 | Offline enroll → the name is spoken by expo-speech; back online, the Timbre clip replaces it (overlay shows ♪) | P9 | pending | | |
+| DT-9.3 | Timbre pronunciation of 5 Indian names; note any that need phonetic spelling (open question §11; see X-9.1) | P9 | pending | | |
