@@ -6,10 +6,11 @@ import type { Lang } from '../core/lang';
  * Tamil in Tamil script, so rules cover romanised Hindi, English and a few Tamil phrasings.
  *
  * Rules are checked in a fixed order so overlapping phrasings resolve predictably:
- * stop > language > save > delete > list > quiet > repeat > read > who > describe > question.
+ * stop > next > language > save > delete > list > quiet > repeat > read > who > describe > question.
  */
 export type Command =
   | { kind: 'stop' }
+  | { kind: 'next' }
   | { kind: 'language'; lang: Lang }
   | { kind: 'save'; name: string | null }
   | { kind: 'delete'; name: string | null }
@@ -75,6 +76,12 @@ export function route(transcript: string): Command {
     (words(t) <= 3 && has(t, 'ruko', 'ruk jao', 'stop', 'chup', 'chup ho jao', 'band karo', 'நிறுத்து'))
   ) {
     return { kind: 'stop' };
+  }
+
+  // next (F7 "aage": skip to the next paragraph while reading). Exact short phrases only, so
+  // "aage kya hai" stays a question. Outside reading, the voice flow treats it as a question.
+  if (['aage', 'aage badho', 'aage padho', 'agla', 'agla padho', 'next', 'skip', 'next paragraph', 'अगला', 'आगे', 'அடுத்து'].includes(t)) {
+    return { kind: 'next' };
   }
 
   // language: "tamil mein bolo", "speak in english", "switch to hindi", "தமிழில் பேசு"

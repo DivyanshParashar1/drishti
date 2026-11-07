@@ -137,3 +137,12 @@ test.each([
 ])('consentAnswer("%s") → %s', (t, a) => {
   expect(consentAnswer(t)).toBe(a);
 });
+
+test.each(['Aage', 'aage badho', 'next', 'Skip.', 'agla padho', 'आगे', 'அடுத்து'])('next: "%s"', (p) => {
+  expect(route(p)).toEqual({ kind: 'next' });
+});
+
+test('"aage" inside a longer question is not next', () => {
+  expect(kind('aage kya hai')).toBe('describe');
+  expect(kind('aage seedhi hai kya')).toBe('question');
+});
