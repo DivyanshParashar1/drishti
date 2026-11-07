@@ -173,6 +173,30 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** `TextRecognition.recognize(fileUri, 'Devanagari')` accepts our `file://` cache uri; ML Kit block `frame`s are in the JPEG's (upright) pixels; nitro-image `toEncodedImageData('jpg', 90)` on the full frame is fast enough (≤ 100 ms).
 - **Measurements:** none yet (`reading` metrics: ocr_done, first_chunk_ready, play_start).
 
+## P11 — Languages (2026-11-08)
+- **Status:** automated tests pass (part of Jest 380 at the P12 gate) | live checks: none (generating the hi, en and ta packs is X-4.2) | device checks DT-11.1–11.2 pending.
+- **Limitations:**
+  - L11.1 The hi, en and ta clip packs (and hi-en) are still not generated (X-4.1/X-4.2), so every fixed phrase is spoken with expo-speech in that language's locale. All four packs have the text for every key (tested).
+  - L11.2 Switching language: `services.lang`, the reflex lane, the clip-pack preload, the saved setting and a background name-clip fetch for the new language. Every call that takes a language reads it per call, so /stt, /tts, /ask, alerts, names and reading switch at once. The confirmation "Ab main … bolungi" plays in the new language. The Prisma hint per language is the server's (P2: hi and hi-en use hi-IN transliterate; there's no codemix).
+  - L11.3 Tamil phrasings were added for save ("இவரை ராகுல் என்று சேமி"), delete ("ராகுல் பெயரை நீக்கு"), list, quiet, repeat, describe, next and name replies ("என் பெயர் …"). A Tamil name with a case suffix ("ராகுலை நீக்கு") isn't parsed; use "… பெயரை நீக்கு". No native speaker has checked them.
+  - L11.4 Name templates for en ("{name} is here") and ta ("{name} இருக்கிறார்") are mine; they need a native check with X-4.2. Tamil text can't be read aloud from signs (L10.3).
+  - L11.5 The language is saved in SQLite (`settings` table), so clearing app data resets it to hi-en.
+- **Unverified assumptions:** Prisma's Tamil output is Tamil script (P2 notes), as the Tamil rules assume.
+- **Measurements:** none.
+
+## P12 — Status, safety, accessibility (2026-11-08)
+- **Status:** automated tests pass (Jest 380, pytest 198; `tsc` and `expo lint` clean; the Android export bundles, 1,003 modules) | live checks: none | device checks DT-12.1–12.3 pending.
+- **Limitations:**
+  - L12.1 First run: welcome, the cane line and tutorial lines 1–5 play once (a flag in the settings table), each as its own P4 line, so a hazard only cuts one line. "Madad" / "help" / "tutorial" / "உதவி" replays them. The tutorial runs about 30 s with expo-speech; with Timbre clips the length is unmeasured.
+  - L12.2 Dark or blocked camera: the mean luminance of the 320×320 detector input (sampled every 8 px) below 0.08 for 2 s says "Camera saaf nahi dikh raha" at P1 (system, never dropped as stale), repeated every 20 s while it lasts. It clears above 0.12. Only frames the detector processes are measured; if the frame pipeline itself dies, the P6 "detector failed" line covers it. The thresholds are a guess (DT-12.1).
+  - L12.3 Connectivity: a change must hold 3 s before it's announced, with at most one announcement per 30 s (the final state is said when the gap ends). Starting online is silent; starting offline is announced. They're P2 system lines. This sits on top of the monitor's own 2-failure debounce, so "internet lost" can take up to about a minute after the network really drops (30 s ping interval).
+  - L12.4 Earcons: listen start and stop (P7), plus the error earcon before "Samajh nahi aaya", "Jawab nahi mil paaya" and "Internet nahi hai". There's no separate "sent" earcon; listen-stop plays when the question is sent.
+  - L12.5 TalkBack: a double tap (TalkBack's activate action) toggles listening, so double tap, speak, double tap to send. Double-tap-and-hold should pass through as a hold, but that's unverified. The label changes to "Listening. Double tap to send". The debug triple-tap may not work under TalkBack (it's a tester feature).
+  - L12.6 Privacy audit: tests now check that the server has no print or direct logger calls outside `logs.py`, that every `log_event` call site uses only allow-listed fields (the one spread allowed is a `…timings` dict), and that the app's only console calls are the three startup warnings and metrics notes never take user content. The face log export (P8) contains names and similarities and leaves the phone only by the tester sharing it.
+  - L12.7 The overlay already shows p50/p95 for every stage of every event kind, and export opens the share sheet (P5). New kinds (`reading`, `name`) appear automatically.
+- **Unverified assumptions:** React Native delivers TalkBack's `activate` to `onAccessibilityAction` on a `Pressable` with an `onPressIn` handler (rather than `onPress`); the luminance sample of the 320 px resize tracks a covered lens.
+- **Measurements:** none.
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -220,3 +244,8 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-10.1 | A printed A4 English notice is read correctly end to end (note the distance and font size that work at 1280×720, L10.1) | P10 | pending | | |
 | DT-10.2 | A printed A4 Hindi notice is read correctly end to end (Devanagari model chosen; overlay/metrics) | P10 | pending | | |
 | DT-10.3 | "ruko" and "aage" work mid-reading; a tap resumes; a hazard mid-chunk replays that chunk | P10 | pending | | |
+| DT-11.1 | After "Tamil mein bolo", alerts, names, answers and reading come in Tamil (expo-speech until X-4.2) | P11 | pending | | |
+| DT-11.2 | The language survives an app restart | P11 | pending | | |
+| DT-12.1 | Status lines: lens covered (warns after 2 s, repeats every 20 s), airplane on and off (one line each, no spam), first run (tutorial once; "madad" replays) | P12 | pending | | |
+| DT-12.2 | Fully usable with TalkBack on (double tap, speak, double tap) and off | P12 | pending | | |
+| DT-12.3 | The metrics export opens the share sheet with valid JSON | P12 | pending | | |
