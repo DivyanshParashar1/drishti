@@ -1,5 +1,5 @@
 import { useAudioRecorder } from '@siteed/audio-studio';
-import { createAudioPlayer, requestRecordingPermissionsAsync, type AudioPlayer } from 'expo-audio';
+import { createAudioPlayer, type AudioPlayer } from 'expo-audio';
 import { File, Paths } from 'expo-file-system';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useMemo } from 'react';
@@ -41,10 +41,8 @@ export function useVoiceController(services: Services): VoiceController {
     return players;
   }, []);
 
-  useEffect(() => {
-    void requestRecordingPermissionsAsync();
-    return () => Object.values(earcons).forEach((p) => p.remove());
-  }, [earcons]);
+  // Mic permission is requested by ReflexScreen right after the camera's (one dialog at a time).
+  useEffect(() => () => Object.values(earcons).forEach((p) => p.remove()), [earcons]);
 
   return useMemo(() => {
     let audioN = 0;

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { requestRecordingPermissionsAsync } from 'expo-audio';
 import { Camera, useCameraPermission } from 'react-native-vision-camera';
 import type { Services } from '../core/services';
 import { boxToView } from '../vision/boxLayout';
@@ -29,8 +30,24 @@ export function ReflexScreen({
   const failures = useRef(0);
   const spokeFailure = useRef(false);
 
+  // Camera, then microphone, one at a time: Android shows one permission dialog at a time, and a
+  // request made while another is open never completes (its native promise is destroyed).
+  const asked = useRef(false);
   useEffect(() => {
-    if (!hasPermission) void requestPermission();
+    if (asked.current) return;
+    asked.current = true;
+    void (async () => {
+      try {
+        if (!hasPermission) await requestPermission();
+      } catch {
+        // denied or interrupted: the screen shows "Camera permission needed"
+      }
+      try {
+        await requestRecordingPermissionsAsync();
+      } catch {
+        // denied: STT reports an error and the user hears "Samajh nahi aaya"
+      }
+    })();
   }, [hasPermission, requestPermission]);
 
   const speakFailure = useCallback(() => {
