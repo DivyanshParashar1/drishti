@@ -8,6 +8,7 @@ import type { AskEvent, AskRequest } from '../net/askClient';
 import type { SttResult } from '../net/sttClient';
 import type { Track } from '../vision/tracker';
 import type { Direction } from '../vision/types';
+import type { EnrollmentDialog } from '../identity/enrollment';
 import { route, type Command } from './router';
 
 /** Everything the controller touches, injected so the whole flow is testable with fakes. */
@@ -27,6 +28,8 @@ export interface VoiceDeps {
   ask(req: AskRequest, onEvent: (e: AskEvent) => void): Promise<void>;
   /** Write base64 MP3 to a local file and return its uri. */
   writeAudio(b64: string): Promise<string>;
+  /** F4 save/delete/list dialog; while it waits for an answer, transcripts go to it. */
+  dialog: Pick<EnrollmentDialog, 'wantsTranscript' | 'onTranscript' | 'save' | 'delete' | 'list'>;
   /** Recognised people in view now (F3), with where they are. */
   present(): readonly { person: NamedPerson; dir: Direction }[];
   haptic(): void;
@@ -40,7 +43,7 @@ type State = 'idle' | 'listening' | 'busy';
 export class VoiceController {
   state: State = 'idle';
   lastTranscript = '';
-  lastCommand: Command['kind'] | null = null;
+  lastCommand: Command['kind'] | 'dialog' | null = null;
   private session: ReturnType<VoiceDeps['startStt']> | null = null;
   private pressedAt = 0;
   private lastAnswer: AudioPart[][] = [];
@@ -117,6 +120,12 @@ export class VoiceController {
         return;
       }
       this.lastTranscript = result.text;
+      if (this.d.dialog.wantsTranscript) {
+        this.lastCommand = 'dialog';
+        this.d.metrics.note(id, 'dialog');
+        await this.d.dialog.onTranscript(result.text);
+        return;
+      }
       await this.handle(route(result.text), id);
     } finally {
       this.state = 'idle';
@@ -147,11 +156,14 @@ export class VoiceController {
         return;
       }
       case 'save':
+        return this.d.dialog.save(cmd.name);
       case 'delete':
+        return this.d.dialog.delete(cmd.name);
       case 'list':
+        return this.d.dialog.list();
       case 'read':
       case 'language':
-        return this.say('sys.not_available'); // P9 / P10 / P11
+        return this.say('sys.not_available'); // P10 / P11
       case 'describe':
       case 'question':
         return this.askQuestion(cmd.question, id);

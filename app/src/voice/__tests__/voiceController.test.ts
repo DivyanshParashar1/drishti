@@ -29,6 +29,13 @@ function setup(
     },
   };
   let micCb: ((b: ArrayBuffer) => void) | null = null;
+  const dialog = {
+    wantsTranscript: false,
+    onTranscript: async (text: string) => void log.push(`dialog:${text}`),
+    save: (name: string | null) => void log.push(`save:${name}`),
+    delete: async (name: string | null) => void log.push(`delete:${name}`),
+    list: () => void log.push('list'),
+  };
   const deps: VoiceDeps = {
     scheduler: {
       enqueue: (u) => {
@@ -70,6 +77,7 @@ function setup(
     },
     writeAudio: async (b64) => `file:///ans-${b64}.mp3`,
     present: () => opts.present ?? [],
+    dialog,
     haptic: () => void log.push('haptic'),
     earcon: (n) => void log.push(`earcon:${n}`),
   };
@@ -82,7 +90,7 @@ function setup(
     await flush();
   };
   const said = () => queue.map((u) => u.parts.map((p) => (p.kind === 'clip' ? p.key : p.kind === 'file' ? p.uri : p.kind === 'speak' ? `speak:${p.text}` : '')).join(' '));
-  return { vc, queue, all, cancelled, hooks, pushed, asks, log, metrics, reflex, talk, said, setOnline: (v: boolean | null) => (online = v), advance: (ms: number) => (now += ms) };
+  return { vc, dialog, queue, all, cancelled, hooks, pushed, asks, log, metrics, reflex, talk, said, setOnline: (v: boolean | null) => (online = v), advance: (ms: number) => (now += ms) };
 }
 
 const SENTENCES: AskEvent[] = [
@@ -168,9 +176,12 @@ test('commands: stop, quiet, repeat, who, and stubs for later phases', async () 
   await run('phir se bolo');
   await run('kaun hai');
   await run('isko Rahul ke naam se save karo');
+  await run('Priya ko delete karo');
+  await run('kaun kaun saved hai');
   await run('ye padho');
   await run('Tamil mein bolo');
-  expect(t.said()).toEqual(['sys.quiet_on', 'sys.nothing_to_repeat', 'sys.no_one_here', 'sys.not_available', 'sys.not_available', 'sys.not_available']);
+  expect(t.said()).toEqual(['sys.quiet_on', 'sys.nothing_to_repeat', 'sys.no_one_here', 'sys.not_available', 'sys.not_available']);
+  expect(t.log.filter((l) => /^(save|delete|list)/.test(l))).toEqual(['save:Rahul', 'delete:Priya', 'list']);
 });
 
 test('repeat replays the last answer', async () => {
@@ -219,4 +230,13 @@ test('who is here: each recognised person with direction; /ask gets their names'
   expect(t.queue.every((u) => u.priority === 4)).toBe(true);
   await t.talk();
   expect(t.asks[0].names).toEqual(['Rahul', 'Priya']);
+});
+
+test('while the enrollment dialog waits, the transcript is its answer, not a command or a question', async () => {
+  const t = setup({ stt: { ok: true, text: 'saamne kya hai' }, askEvents: SENTENCES });
+  t.dialog.wantsTranscript = true;
+  await t.talk();
+  expect(t.log).toContain('dialog:saamne kya hai');
+  expect(t.asks).toEqual([]);
+  expect(t.vc.lastCommand).toBe('dialog');
 });

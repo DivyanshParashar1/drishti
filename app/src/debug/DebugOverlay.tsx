@@ -129,7 +129,9 @@ export function DebugOverlay({
           <Button label="Export face log (DT-8.1)" onPress={exportFaceLog} />
         </View>
         <Text style={styles.text}>
-          saved: {identities.people.map((p) => `${p.name}(${p.embeddings.length})`).join(', ') || 'nobody'}
+          saved: {identities.people.map((p) => `${p.name}(${p.embeddings.length}${p.clips[lang] ? ' ♪' : ''})`).join(', ') || 'nobody'}
+          {` · dialog ${services.enrollment.phase}`}
+          {services.nameClips.lastError ? ` · clip error ${services.nameClips.lastError}` : ''}
         </Text>
       </ScrollView>
     </View>

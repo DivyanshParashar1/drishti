@@ -195,9 +195,9 @@ export class FaceIdentifier {
         }
         present.push({ person, dir: t.dir });
         this.seen(person, t, frame, now);
-      } else if (!s.unknownSaid && !this.suppressUnknown) {
-        s.unknownSaid = true;
-        if (now - this.lastUnknownAt >= this.cfg.unknownCooldownMs) {
+      } else if (!s.unknownSaid) {
+        s.unknownSaid = true; // muted while enrolling counts as said: no "unknown" after "Save ho gaya"
+        if (!this.suppressUnknown && now - this.lastUnknownAt >= this.cfg.unknownCooldownMs) {
           this.lastUnknownAt = now;
           this.enqueue(frame, now, [{ kind: 'clip', key: 'sys.unknown_person' }]);
         }

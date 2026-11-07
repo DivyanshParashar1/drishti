@@ -1,8 +1,13 @@
 import { ClipPlayer } from '../audio/clipPlayer';
 import { ExpoAudioBackend } from '../audio/expoBackend';
-import { SpeechScheduler } from '../audio/scheduler';
+import { SpeechScheduler, type AudioPart } from '../audio/scheduler';
 import { openDatabaseSync } from 'expo-sqlite';
+import { deleteFiles, writeNameClip } from '../identity/clipFiles';
+import { IDENTITY } from '../identity/config';
+import { EnrollmentDialog } from '../identity/enrollment';
 import { FaceIdentifier } from '../identity/identifier';
+import { NameClipSync } from '../identity/nameClips';
+import { fetchTts } from '../net/ttsClient';
 import { IdentityStore, type SqlDb } from '../identity/store';
 import { ReflexLane } from '../vision/reflexLane';
 import { createConnectivityMonitor, type ConnectivityMonitor } from './connectivity';
@@ -20,6 +25,8 @@ export interface Services {
   frames: FrameGrabber;
   identities: IdentityStore;
   faces: FaceIdentifier;
+  nameClips: NameClipSync;
+  enrollment: EnrollmentDialog;
   lang: Lang;
 }
 
@@ -44,15 +51,39 @@ export function createServices(): Services {
     people: () => identities.people,
   });
   reflex.faces = faces;
+  const connectivity = createConnectivityMonitor();
+  const nameClips = new NameClipSync({
+    store: identities,
+    tts: fetchTts,
+    writeClip: writeNameClip,
+    online: () => connectivity.online,
+  });
+  // F4 prompts and confirmations are P4 system lines (never dropped as stale).
+  const speak = (parts: AudioPart[]) => {
+    const id = metrics.start('system', 'enqueued');
+    scheduler.enqueue({ id, priority: 4, source: 'system', lang: services.lang, createdAt: performance.now(), parts });
+  };
+  const enrollment = new EnrollmentDialog({
+    say: (key) => speak([{ kind: 'clip', key }]),
+    speak,
+    capture: () =>
+      faces.captureFaces({ max: IDENTITY.enrollMaxFrames, durationMs: IDENTITY.enrollCaptureMs, minPx: IDENTITY.enrollMinPx }),
+    store: identities,
+    syncClips: () => void nameClips.sync(services.lang),
+    deleteFiles,
+    setEnrolling: (on) => (faces.suppressUnknown = on),
+  });
   return Object.assign(services, {
     metrics,
     player,
     scheduler,
-    connectivity: createConnectivityMonitor(),
+    connectivity,
     reflex,
     frames: new FrameGrabber(),
     identities,
     faces,
+    nameClips,
+    enrollment,
     lang: DEFAULT_LANG,
   });
 }
@@ -63,5 +94,12 @@ export async function startServices(s: Services): Promise<() => void> {
   await ExpoAudioBackend.configure();
   await s.player.preloadPack(s.lang);
   s.connectivity.start();
-  return () => s.connectivity.stop();
+  // Name clips deferred while offline (F4) are fetched when the relay is reachable again.
+  const off = s.connectivity.onChange((online) => {
+    if (online) void s.nameClips.sync(s.lang);
+  });
+  return () => {
+    off();
+    s.connectivity.stop();
+  };
 }

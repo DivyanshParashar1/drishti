@@ -76,6 +76,7 @@ export function useVoiceController(services: Services): VoiceController {
         return file.uri;
       },
       present: () => services.faces.presentPeople(),
+      dialog: services.enrollment,
       haptic: () => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
       earcon: (name) => {
         const p = earcons[name];

@@ -229,4 +229,7 @@ test('suppressUnknown keeps "unknown person" quiet while enrolling', () => {
   id.suppressUnknown = true;
   for (let i = 0; i < 6; i++) step([face(stranger)], [track(1)], i * 100);
   expect(enqueued).toHaveLength(0);
+  id.suppressUnknown = false; // saved now: the same track is not called unknown afterwards
+  for (let i = 6; i < 9; i++) step([face(stranger)], [track(1)], i * 100);
+  expect(enqueued).toHaveLength(0);
 });
