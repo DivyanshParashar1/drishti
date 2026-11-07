@@ -31,6 +31,7 @@ export interface LaneStats {
   lastFaceMs: number; // last frame the face step ran (−1: not yet)
   faces: number; // faces on the last frame the face step ran
   detectionsPerSec: number;
+  top: string; // best raw detection on the last frame, before alert filters ("–" if none)
 }
 
 /** F3 hook: sees every frame's faces with the visible tracks (see FaceIdentifier.update). */
@@ -51,7 +52,7 @@ export class ReflexLane {
   lang: Lang;
   visible: Track[] = [];
   frameSize = { width: 0, height: 0 };
-  stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, lastFaceMs: -1, faces: 0, detectionsPerSec: 0 };
+  stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, lastFaceMs: -1, faces: 0, detectionsPerSec: 0, top: '–' };
   faces?: FaceSink;
   lastFaces: FaceObs[] = []; // for the debug overlay
   readonly blocked = new CameraBlockedMonitor();
@@ -123,6 +124,9 @@ export class ReflexLane {
       lastFaceMs: ran ? r.faceMs! : this.stats.lastFaceMs,
       faces: ran ? (r.faces?.length ?? 0) : this.stats.faces,
       detectionsPerSec: span > 0 ? (this.frameTimes.length - 1) / span : 0,
+      top: r.detections.length
+        ? r.detections.reduce((a, b) => (b.score > a.score ? b : a)).label + ' ' + r.detections.reduce((a, b) => (b.score > a.score ? b : a)).score.toFixed(2) + ` (${r.detections.length})`
+        : '–',
     };
   }
 }

@@ -38,7 +38,7 @@ test('filters run before tracking: low score, tiny boxes and non-alert classes a
   const { lane, enqueued, frame } = setup();
   lane.handle(
     frame([
-      { label: 'chair', score: 0.4, box: [0.4, 0.3, 0.6, 0.6] },
+      { label: 'chair', score: 0.39, box: [0.4, 0.3, 0.6, 0.6] },
       { label: 'chair', score: 0.9, box: [0.4, 0.3, 0.45, 0.35] },
       { label: 'laptop', score: 0.9, box: [0.4, 0.3, 0.6, 0.6] },
     ]),

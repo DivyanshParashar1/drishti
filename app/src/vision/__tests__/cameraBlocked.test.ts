@@ -47,9 +47,9 @@ test('meanLuma: black, white and grey frames, padded rows, BGRA', () => {
     for (let y = 0; y < size; y++) for (let x = 0; x < size * bpp; x++) px[y * stride + x] = v;
     return px;
   };
-  expect(meanLuma(make(0), 'RGBA', size, 4)).toBe(0);
-  expect(meanLuma(make(255, 12), 'RGBA', size, 4)).toBeCloseTo(1, 6);
-  expect(meanLuma(make(128, 0, 3), 'RGB', size, 4)).toBeCloseTo(128 / 255, 6);
+  expect(meanLuma(make(0), 'RGBA', size, size, 4)).toBe(0);
+  expect(meanLuma(make(255, 12), 'RGBA', size, size, 4)).toBeCloseTo(1, 6);
+  expect(meanLuma(make(128, 0, 3), 'RGB', size, size, 4)).toBeCloseTo(128 / 255, 6);
   expect(meanLuma(make(51), 'BGRA', size)).toBeCloseTo(0.2, 6);
   expect(meanLuma(make(0), 'NV21' as string, size)).toBe(1); // unknown format: never "dark"
 });

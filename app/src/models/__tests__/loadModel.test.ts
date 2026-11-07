@@ -35,3 +35,11 @@ test('describes tensor shapes', () => {
     'in: images uint8[1x320x320x3] | out: boxes float32[1x25x4]',
   );
 });
+
+test('cpu preference never tries the GPU delegate', async () => {
+  load.mockResolvedValueOnce(fakeModel);
+  const r = await loadWithFallback(1, () => 0, 'cpu');
+  expect(r.delegate).toBe('cpu');
+  expect(load).toHaveBeenCalledTimes(1);
+  expect(load).toHaveBeenCalledWith(1, []);
+});

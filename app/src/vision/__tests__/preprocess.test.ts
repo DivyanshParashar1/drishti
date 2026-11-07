@@ -25,3 +25,29 @@ test('unsupported formats are rejected', () => {
   expect(supportedPixelFormat('unknown')).toBe(false);
   expect(() => toInputTensor(RGBA, 'unknown', 2, 'yolo11n')).toThrow('unsupported');
 });
+
+describe('letterbox (YOLO)', () => {
+  const { letterbox, toLetterboxTensor, unletterbox } = jest.requireActual('../preprocess') as typeof import('../preprocess');
+  test('portrait 720×1280 → 180×320 centred with 70 px bars left and right', () => {
+    expect(letterbox(720, 1280, 320)).toEqual({ size: 320, w: 180, h: 320, padX: 70, padY: 0 });
+    expect(letterbox(1280, 720, 320)).toEqual({ size: 320, w: 320, h: 180, padX: 0, padY: 70 });
+  });
+  test('image pixels land inside the bars; the bars are grey 114', () => {
+    const lb = { size: 8, w: 4, h: 8, padX: 2, padY: 0 };
+    const px = new Uint8Array(4 * 8 * 4).fill(255);
+    const t = new Float32Array(toLetterboxTensor(px, 'RGBA', lb));
+    expect(t[0]).toBeCloseTo(114 / 255); // (0,0) is a bar
+    expect(t[2]).toBeCloseTo(1); // (2,0) is image
+    expect(t[5]).toBeCloseTo(1);
+    expect(t[6]).toBeCloseTo(114 / 255);
+    expect(t[64 + 7 * 8 + 3]).toBeCloseTo(1); // green plane
+  });
+  test('unletterbox inverts the mapping and clamps boxes that spill into the bars', () => {
+    const lb = { size: 320, w: 180, h: 320, padX: 70, padY: 0 };
+    const b = unletterbox([(70 + 45) / 320, 0.25, (70 + 135) / 320, 0.75], lb);
+    expect(b[0]).toBeCloseTo(0.25);
+    expect(b[2]).toBeCloseTo(0.75);
+    expect(b[1]).toBeCloseTo(0.25);
+    expect(unletterbox([0, 0, 1, 1], lb)).toEqual([0, 0, 1, 1]);
+  });
+});

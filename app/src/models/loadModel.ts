@@ -10,12 +10,20 @@ export interface LoadedModel {
   loadMs: number;
 }
 
-/** Load a model on the Android GPU delegate, falling back to CPU if the GPU delegate fails. */
+/**
+ * Load a model. 'gpu': the Android GPU delegate, falling back to CPU if it fails. 'cpu': CPU only
+ * (TFLite's default CPU path with XNNPACK).
+ */
 export async function loadWithFallback(
   source: number,
   now: () => number = () => performance.now(),
+  prefer: 'gpu' | 'cpu' = 'gpu',
 ): Promise<LoadedModel> {
   const start = now();
+  if (prefer === 'cpu') {
+    const model = await loadTensorflowModel(source, []);
+    return { model, delegate: 'cpu', loadMs: now() - start };
+  }
   try {
     const model = await loadTensorflowModel(source, ['android-gpu']);
     return { model, delegate: 'android-gpu', loadMs: now() - start };

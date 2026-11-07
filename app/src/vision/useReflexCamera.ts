@@ -11,7 +11,7 @@ import { VISION, type DetectorId } from './config';
 import { decodeEfficientDet, decodeYolo } from './decode';
 import { embedFaces, type MlFace } from './faceWorklet';
 import { YOLO_ALERT_MASK } from './labels';
-import { meanLuma, toInputTensor } from './preprocess';
+import { letterbox, meanLuma, toInputTensor, toLetterboxTensor, unletterbox } from './preprocess';
 import type { FrameResult } from './reflexLane';
 
 export type ModelState =
@@ -68,7 +68,7 @@ export function useReflexCamera(
 
   useEffect(() => {
     let cancelled = false;
-    loadWithFallback(DETECTOR_ASSETS[detector])
+    loadWithFallback(DETECTOR_ASSETS[detector], undefined, VISION.delegate)
       .then(({ model: m, delegate, loadMs }) => {
         if (!cancelled) setLoaded({ detector, model: m, status: { state: 'ready', detector, delegate, loadMs } });
       })
@@ -87,7 +87,7 @@ export function useReflexCamera(
   });
   useEffect(() => {
     let cancelled = false;
-    loadWithFallback(FACE_EMBEDDER_ASSET)
+    loadWithFallback(FACE_EMBEDDER_ASSET, undefined, VISION.delegate)
       .then(({ model: m, delegate, loadMs }) => !cancelled && setEmbedder({ model: m, status: { state: 'ready', delegate, loadMs } }))
       .catch((e) => !cancelled && setEmbedder({ model: null, status: { state: 'failed', error: String(e) } }));
     return () => {
@@ -175,18 +175,21 @@ export function useReflexCamera(
       let disposed = false;
       try {
         const image = boxedConverter.unbox().convertFrameToImage(frame);
-        const raw = image.resize(size, size).toRawPixelData();
+        // YOLO: letterbox (keep aspect, grey bars) like its training; EfficientDet: stretch to square.
+        const lb = detector === 'yolo11n' ? letterbox(image.width, image.height, size) : null;
+        const raw = lb ? image.resize(lb.w, lb.h).toRawPixelData() : image.resize(size, size).toRawPixelData();
         const pixels = new Uint8Array(raw.buffer);
-        const luma = meanLuma(pixels, raw.pixelFormat, size); // F10 dark / blocked camera
-        const input = toInputTensor(pixels, raw.pixelFormat, size, detector);
+        const luma = lb ? meanLuma(pixels, raw.pixelFormat, lb.w, lb.h) : meanLuma(pixels, raw.pixelFormat, size); // F10
+        const input = lb ? toLetterboxTensor(pixels, raw.pixelFormat, lb) : toInputTensor(pixels, raw.pixelFormat, size, detector);
         const t1 = now();
         const outs = boxedModel.unbox().runSync([input]);
         const t2 = now();
         const views = outs.map((b) => new Float32Array(b));
-        const detections =
+        let detections =
           detector === 'efficientdet_lite0'
             ? decodeEfficientDet(views, minScore)
             : decodeYolo(views[0], views[0].length / 84, minScore, yoloIou, 20, mask);
+        if (lb) detections = detections.map((d) => ({ label: d.label, score: d.score, box: unletterbox(d.box, lb) }));
         const t3 = now();
         // F3: faces only when a person is in view; ML Kit reads the (YUV) frame itself.
         let faces: FaceObs[] = [];

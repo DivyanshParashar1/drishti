@@ -100,7 +100,7 @@ export function ReflexScreen({
       ? `${detector}: loading…`
       : status.state === 'failed'
         ? `${detector}: FAILED ${status.error}`
-        : `${detector} ${status.delegate} · load ${status.loadMs.toFixed(0)} ms · infer ${s.lastInferMs.toFixed(0)} ms · total ${s.lastTotalMs.toFixed(0)} ms · ${s.detectionsPerSec.toFixed(1)} det/s`;
+        : `${detector} ${status.delegate} · load ${status.loadMs.toFixed(0)} ms · infer ${s.lastInferMs.toFixed(0)} ms · total ${s.lastTotalMs.toFixed(0)} ms · ${s.detectionsPerSec.toFixed(1)} det/s · top ${s.top}`;
   const faceText = !facesOn
     ? 'faces: off'
     : faceStatus.state === 'loading'
