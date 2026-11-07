@@ -1,4 +1,6 @@
 import { ClipPlayer } from '../audio/clipPlayer';
+import { PhraseCache } from '../audio/phraseCache';
+import { listPhrases, writePhrase } from '../audio/phraseFiles';
 import { ExpoAudioBackend } from '../audio/expoBackend';
 import { SpeechScheduler, type AudioPart } from '../audio/scheduler';
 import { openDatabaseSync } from 'expo-sqlite';
@@ -25,6 +27,7 @@ import { SettingsStore } from './settings';
 export interface Services {
   metrics: Metrics;
   player: ClipPlayer;
+  phrases: PhraseCache;
   scheduler: SpeechScheduler;
   connectivity: ConnectivityMonitor;
   reflex: ReflexLane;
@@ -44,7 +47,11 @@ export interface Services {
 
 export function createServices(): Services {
   const metrics = new Metrics();
-  const player = new ClipPlayer(new ExpoAudioBackend());
+  const connectivity = createConnectivityMonitor();
+  // Fixed phrases in Gnani Timbre's voice: fetched once per language when online, then played
+  // from files (offline too). expo-speech only until a phrase is saved.
+  const phrases = new PhraseCache({ tts: fetchTts, write: writePhrase, list: listPhrases, online: () => connectivity.online });
+  const player = new ClipPlayer(new ExpoAudioBackend(), (lang, key) => phrases.uri(lang, key));
   const scheduler = new SpeechScheduler(player, {
     onStart: (u, at) => metrics.mark(u.id, 'play_start', at),
     onEnd: (u, reason) => {
@@ -65,7 +72,6 @@ export function createServices(): Services {
     people: () => identities.people,
   });
   reflex.faces = faces;
-  const connectivity = createConnectivityMonitor();
   const nameClips = new NameClipSync({
     store: identities,
     tts: fetchTts,
@@ -103,6 +109,7 @@ export function createServices(): Services {
   return Object.assign(services, {
     metrics,
     player,
+    phrases,
     scheduler,
     connectivity,
     reflex,
@@ -117,7 +124,7 @@ export function createServices(): Services {
     tutorial: () => {
       for (const key of TUTORIAL) speak([{ kind: 'clip', key }]);
     },
-    setLanguage: (lang: Lang) => applyLanguage({ holder: services, reflex, player, settings, nameClips }, lang),
+    setLanguage: (lang: Lang) => applyLanguage({ holder: services, reflex, player, settings, nameClips, phrases }, lang),
   });
 }
 
@@ -127,6 +134,7 @@ export async function startServices(s: Services): Promise<() => void> {
   await s.settings.init().catch((e) => console.warn('settings failed', e)); // defaults then
   s.lang = s.settings.lang ?? DEFAULT_LANG;
   s.reflex.lang = s.lang;
+  await s.phrases.load(s.lang); // Timbre phrases saved on earlier runs
   await ExpoAudioBackend.configure();
   await s.player.preloadPack(s.lang);
   void playFirstRun(s.settings, () => s.tutorial()); // F10: once ever; "help" replays it
@@ -138,7 +146,10 @@ export async function startServices(s: Services): Promise<() => void> {
   });
   const off = s.connectivity.onChange((online) => {
     announcer.onChange(online);
-    if (online) void s.nameClips.sync(s.lang); // name clips deferred while offline (F4)
+    if (online) {
+      void s.phrases.sync(s.lang); // fixed phrases in Timbre's voice
+      void s.nameClips.sync(s.lang); // name clips deferred while offline (F4)
+    }
   });
   s.connectivity.start();
   return () => {

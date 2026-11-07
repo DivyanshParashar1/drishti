@@ -100,7 +100,7 @@ test('files play by uri; speak parts use the language locale', async () => {
       'hi-en',
     ),
   ).toBe('done');
-  expect(b.calls).toEqual(['src:file:///a.mp3', 'speak:en-IN:Internet nahi hai']);
+  expect(b.calls).toEqual(['src:file:///a.mp3', 'speak:hi-IN:Internet nahi hai']);
 });
 
 test('stop mid-sequence ends the play as stopped and skips the rest', async () => {
@@ -133,4 +133,23 @@ test('preloadPack preloads only generated clips', async () => {
   const b = new FakeBackend();
   expect(await new ClipPlayer(b).preloadPack('hi-en')).toBe(2);
   expect(b.preloaded).toEqual([101, 102]);
+});
+
+test('a phrase with no bundled clip plays its saved Timbre file when there is one', () => {
+  const { toSteps } = jest.requireActual('../clipPlayer') as typeof import('../clipPlayer');
+  const lookup = (_l: string, k: string) => (k === 'obj.chair' ? 'file:///phrases/hi-en/obj.chair.mp3' : k === 'obj.car' ? 'file:///never.mp3' : undefined);
+  const steps = toSteps(
+    [
+      { kind: 'clip', key: 'obj.car' }, // bundled clip wins over a saved file
+      { kind: 'clip', key: 'obj.chair' }, // saved Timbre file
+      { kind: 'clip', key: 'dist.near' }, // neither: spoken
+    ],
+    'hi-en',
+    lookup,
+  );
+  expect(steps).toEqual([
+    { kind: 'source', source: 101 },
+    { kind: 'source', source: 'file:///phrases/hi-en/obj.chair.mp3' },
+    { kind: 'speak', text: 'paas' },
+  ]);
 });

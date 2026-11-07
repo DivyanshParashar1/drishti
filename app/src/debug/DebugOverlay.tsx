@@ -94,7 +94,9 @@ export function DebugOverlay({
       <ScrollView style={styles.panel}>
         <Text style={styles.title}>
           Debug · {lang} · {connectivity.online === null ? 'checking…' : connectivity.online ? 'Online' : 'OFFLINE'} ·
-          queue {scheduler.pending.length}
+          queue {scheduler.pending.length} · Timbre phrases {services.phrases.progress(lang).ready}/
+          {services.phrases.progress(lang).total}
+          {services.phrases.lastError ? ` (${services.phrases.lastError})` : ''}
         </Text>
         <Text style={styles.text}>
           voice: {voice.state}

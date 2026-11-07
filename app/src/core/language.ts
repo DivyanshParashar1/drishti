@@ -7,6 +7,7 @@ export interface LanguageTargets {
   player: { preloadPack(lang: Lang): Promise<unknown> };
   settings: { setLang(lang: Lang): Promise<void> };
   nameClips: { sync(lang: Lang): Promise<void> };
+  phrases?: { load(lang: Lang): Promise<void>; sync(lang: Lang): Promise<void> };
 }
 
 /**
@@ -17,6 +18,8 @@ export interface LanguageTargets {
 export async function applyLanguage(t: LanguageTargets, lang: Lang): Promise<void> {
   t.holder.lang = lang;
   t.reflex.lang = lang;
+  await t.phrases?.load(lang).catch(() => undefined); // this language's saved Timbre phrases
   await Promise.all([t.player.preloadPack(lang).catch(() => undefined), t.settings.setLang(lang).catch(() => undefined)]);
   void t.nameClips.sync(lang); // fetch this language's name clips in the background
+  void t.phrases?.sync(lang); // and its fixed phrases, if not saved yet
 }
