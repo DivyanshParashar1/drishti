@@ -86,6 +86,7 @@ function setup(
     },
     metrics,
     lang: () => lang,
+    tutorial: () => void log.push('tutorial'),
     setLanguage: async (l) => {
       log.push(`lang:${l}`);
       lang = l;
@@ -368,4 +369,13 @@ test('"Tamil mein bolo" switches language; the confirmation and every later call
   expect(sttLangs).toEqual(['ta']);
   expect(t.asks[0].lang).toBe('ta');
   expect(t.queue.every((u) => u.lang === 'ta')).toBe(true);
+});
+
+test('"madad" replays the tutorial; failure lines come with the error earcon', async () => {
+  const t = setup({ stt: { ok: false, code: 'timeout' } });
+  await t.vc.handle(route('madad'), 'id');
+  expect(t.log).toContain('tutorial');
+  await t.talk();
+  expect(t.said()).toEqual(['sys.didnt_hear']);
+  expect(t.log.at(-1)).toBe('earcon:error');
 });

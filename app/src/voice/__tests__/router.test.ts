@@ -178,3 +178,11 @@ describe('Tamil (Prisma returns Tamil script)', () => {
     expect(consentAnswer('வேண்டாம்')).toBe('no');
   });
 });
+
+test.each(['Help', 'madad', 'tutorial', 'kaise use karein', 'मदद', 'உதவி', 'help please'])('help: "%s"', (p) => {
+  expect(route(p)).toEqual({ kind: 'help' });
+});
+
+test('"help me cross the road safely please" is a question', () => {
+  expect(kind('help me cross the road safely please')).toBe('question');
+});

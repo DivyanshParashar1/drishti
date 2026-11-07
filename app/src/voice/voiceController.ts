@@ -32,6 +32,8 @@ export interface VoiceDeps {
   ask(req: AskRequest, onEvent: (e: AskEvent) => void): Promise<void>;
   /** Write base64 MP3 to a local file and return its uri. */
   writeAudio(b64: string): Promise<string>;
+  /** F10: replay the welcome + tutorial. */
+  tutorial(): void;
   /** F8: switch the app language (persisted). */
   setLanguage(lang: Lang): Promise<void>;
   /** F4 save/delete/list dialog; while it waits for an answer, transcripts go to it. */
@@ -41,6 +43,8 @@ export interface VoiceDeps {
   haptic(): void;
   earcon(name: 'listen_start' | 'listen_stop' | 'error'): void;
 }
+
+const ERROR_LINES = new Set<ClipKey>(['sys.didnt_hear', 'sys.answer_failed', 'sys.no_internet']);
 
 export const MIN_HOLD_MS = 300; // shorter presses are taps (e.g. the debug triple-tap), not speech
 
@@ -183,6 +187,8 @@ export class VoiceController {
         return this.readText(id);
       case 'next': // "aage" outside reading: a question about what's ahead
         return this.askQuestion(this.lastTranscript || 'aage', id);
+      case 'help':
+        return this.d.tutorial();
       case 'language':
         await this.d.setLanguage(cmd.lang);
         return this.say('sys.lang_switched'); // said in the new language
@@ -253,6 +259,7 @@ export class VoiceController {
   }
 
   private say(key: ClipKey): void {
+    if (ERROR_LINES.has(key)) this.d.earcon('error'); // F10: an earcon before every failure line
     this.enqueue(this.d.metrics.start('system', 'enqueued'), 4, 'system', [{ kind: 'clip', key }]);
   }
 

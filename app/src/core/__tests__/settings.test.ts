@@ -1,5 +1,6 @@
 import { CLIPS, type ClipKey } from '../../audio/clips.generated';
 import { memoryDb } from '../__fixtures__/memoryDb';
+import { playFirstRun, TUTORIAL } from '../firstRun';
 import { LANGS } from '../lang';
 import { applyLanguage } from '../language';
 import { SettingsStore } from '../settings';
@@ -53,4 +54,19 @@ test('all four clip packs define every phrase (text present; audio may still be 
     expect(Object.keys(CLIPS[lang]).sort()).toEqual([...keys].sort());
     for (const k of keys) expect(CLIPS[lang][k].text.trim()).not.toBe('');
   }
+});
+
+test('first run plays the tutorial once, across restarts', async () => {
+  const db = memoryDb();
+  let plays = 0;
+  const s1 = new SettingsStore(db);
+  await s1.init();
+  expect(await playFirstRun(s1, () => plays++)).toBe(true);
+  expect(await playFirstRun(s1, () => plays++)).toBe(false);
+  const s2 = new SettingsStore(db);
+  await s2.init();
+  expect(await playFirstRun(s2, () => plays++)).toBe(false);
+  expect(plays).toBe(1);
+  expect(TUTORIAL[0]).toBe('sys.welcome');
+  expect(TUTORIAL).toContain('sys.cane');
 });
