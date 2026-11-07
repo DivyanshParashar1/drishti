@@ -55,6 +55,6 @@ uv run pytest               # live tests (real credits) only with: uv run pytest
 | --- | --- | --- |
 | EfficientDet-Lite0 (uint8 input 320×320 NHWC, built-in NMS: boxes/classes/scores/count, max 25) | Apache-2.0 | [TensorFlow Lite task library](https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite) |
 | YOLO11n (fp32 input 1×3×320×320 NCHW 0–1, output 1×84×2100 raw, NMS in app) | AGPL-3.0 | Exported with Ultralytics 8.x (`yolo export model=yolo11n.pt format=tflite imgsz=320`; fp16 export is no longer supported). Shipping it makes the app subject to AGPL-3.0 |
-| MobileFaceNet | to verify (P8) | |
+| MobileFaceNet (fp32 inputs `img1`, `img2` each 1×3×112×112 NCHW RGB 0–1, output 2×128; flip test-time augmentation and normalisation are inside the graph, so one call embeds two faces) | Apache-2.0 (weights from [foamliu/MobileFaceNet](https://github.com/foamliu/MobileFaceNet), trained on MS-Celeb-1M) | [Qualcomm AI Hub v0.66.0 TFLite float](https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/mobile_facenet/releases/v0.66.0/mobile_facenet-tflite-float.zip), sha256 `2046ab77…f3d7` |
 
 The repo's own licence is not set yet; it depends on whether YOLO11n stays (see PLAN.md, "Still open").
