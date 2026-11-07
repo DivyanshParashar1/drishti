@@ -51,6 +51,7 @@ export class ReflexLane {
   frameSize = { width: 0, height: 0 };
   stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, lastFaceMs: -1, faces: 0, detectionsPerSec: 0 };
   faces?: FaceSink;
+  lastFaces: FaceObs[] = []; // for the debug overlay
   private frameTimes: number[] = [];
   private listeners: (() => void)[] = [];
 
@@ -80,6 +81,7 @@ export class ReflexLane {
     const frameTs = now - r.totalMs;
     const { visible, alerts } = this.tracker.update(filterDetections(r.detections, VISION), now);
     this.visible = visible;
+    this.lastFaces = r.faces ?? [];
     this.frameSize = { width: r.frameWidth, height: r.frameHeight };
     this.updateStats(now, r);
 

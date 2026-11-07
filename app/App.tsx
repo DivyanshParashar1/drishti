@@ -15,6 +15,7 @@ export default function App() {
   const services = useMemo(createServices, []);
   const [debug, setDebug] = useState(false);
   const [detector, setDetector] = useState<DetectorId>(VISION.detector);
+  const [facesOn, setFacesOn] = useState(true);
   const tap = useRef(createTapCounter()).current;
   const voice = useVoiceController(services);
 
@@ -29,7 +30,7 @@ export default function App() {
   return (
     <View style={{ flex: 1 }} onTouchEnd={() => tap() && setDebug((d) => !d)}>
       <StatusBar style="light" />
-      <ReflexScreen services={services} detector={detector} debug={debug} />
+      <ReflexScreen services={services} detector={detector} debug={debug} facesOn={facesOn} />
       <TalkSurface voice={voice} />
       {debug && (
         <DebugOverlay
@@ -37,6 +38,8 @@ export default function App() {
           voice={voice}
           detector={detector}
           onSwitchDetector={() => setDetector((d) => (d === 'yolo11n' ? 'efficientdet_lite0' : 'yolo11n'))}
+          facesOn={facesOn}
+          onToggleFaces={() => setFacesOn((f) => !f)}
         />
       )}
     </View>
