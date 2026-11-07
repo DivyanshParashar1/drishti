@@ -24,6 +24,7 @@ export const IDENTITY = {
   enrollMaxFrames: 10,
   enrollMinFrames: 5,
   enrollCaptureMs: 4000, // starts with the "face the camera" prompt, so a bit over 3 s
+  enrollGapMs: 300, // ≥ 300 ms between captured frames (10 frames span ~3 s)
   dialogTimeoutMs: 30_000, // waiting for a name or a yes/no
 };
 export type IdentityConfig = typeof IDENTITY;

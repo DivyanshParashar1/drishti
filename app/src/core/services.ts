@@ -67,7 +67,7 @@ export function createServices(): Services {
     say: (key) => speak([{ kind: 'clip', key }]),
     speak,
     capture: () =>
-      faces.captureFaces({ max: IDENTITY.enrollMaxFrames, durationMs: IDENTITY.enrollCaptureMs, minPx: IDENTITY.enrollMinPx }),
+      faces.captureFaces({ max: IDENTITY.enrollMaxFrames, durationMs: IDENTITY.enrollCaptureMs, minPx: IDENTITY.enrollMinPx, minGapMs: IDENTITY.enrollGapMs }),
     store: identities,
     syncClips: () => void nameClips.sync(services.lang),
     deleteFiles,

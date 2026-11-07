@@ -65,9 +65,10 @@ export interface CaptureResult {
 }
 
 interface Capture {
-  opts: { max: number; durationMs: number; minPx: number };
+  opts: { max: number; durationMs: number; minPx: number; minGapMs?: number };
   got: number[][];
   multiFace: number;
+  lastAt: number;
   finish: () => void;
 }
 
@@ -126,16 +127,17 @@ export class FaceIdentifier {
 
   /**
    * F4 capture: embeddings from frames where exactly one face is big enough to embed and it is
-   * ≥ `minPx` wide (frames with two such faces are skipped and counted). Resolves with what it got
-   * after `durationMs`, or as soon as it has `max`.
+   * ≥ `minPx` wide (frames with two such faces are skipped and counted), at least `minGapMs` apart
+   * so the frames span the pose. Resolves with what it got after `durationMs`, or at `max`.
    */
-  captureFaces(opts: { max: number; durationMs: number; minPx: number }): Promise<CaptureResult> {
+  captureFaces(opts: { max: number; durationMs: number; minPx: number; minGapMs?: number }): Promise<CaptureResult> {
     this.capture?.finish();
     return new Promise((resolve) => {
       const c: Capture = {
         opts,
         got: [],
         multiFace: 0,
+        lastAt: -Infinity,
         finish: () => {
           clearTimeout(timer);
           if (this.capture === c) this.capture = null;
@@ -161,7 +163,10 @@ export class FaceIdentifier {
       const c = this.capture;
       const big = faces.filter((x) => x.embedding && x.widthPx >= this.cfg.minFacePx);
       if (big.length > 1) c.multiFace++;
-      else if (big.length === 1 && big[0].widthPx >= c.opts.minPx) c.got.push(big[0].embedding!);
+      else if (big.length === 1 && big[0].widthPx >= c.opts.minPx && now - c.lastAt >= (c.opts.minGapMs ?? 0)) {
+        c.got.push(big[0].embedding!);
+        c.lastAt = now;
+      }
       if (c.got.length >= c.opts.max) c.finish();
     }
 

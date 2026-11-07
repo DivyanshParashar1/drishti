@@ -211,6 +211,14 @@ test('captureFaces: frames with exactly one embeddable face ≥ minPx; two faces
   expect(r.multiFaceFrames).toBe(1);
 });
 
+test('captureFaces keeps frames at least minGapMs apart', async () => {
+  const { id, step } = setup();
+  const p = id.captureFaces({ max: 3, durationMs: 3000, minPx: 100, minGapMs: 300 });
+  for (let t = 0; t <= 700; t += 100) step([face(like(BASIS[0]), undefined, 150)], [], t);
+  // captured at 0, 300, 600
+  expect((await p).embeddings).toHaveLength(3);
+});
+
 test('captureFaces resolves with what it has when the time is up', async () => {
   jest.useFakeTimers();
   try {
