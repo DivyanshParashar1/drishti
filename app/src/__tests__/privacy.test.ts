@@ -4,8 +4,16 @@
  * the listed startup-failure lines, and metrics notes are short codes, never variables holding
  * user content.
  */
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+// Node APIs without @types/node in the app's tsconfig (Jest runs on Node).
+declare const __dirname: string;
+/* eslint-disable @typescript-eslint/no-require-imports */
+const { readdirSync, readFileSync, statSync } = require('node:fs') as {
+  readdirSync(p: string): string[];
+  readFileSync(p: string, enc: 'utf8'): string;
+  statSync(p: string): { isDirectory(): boolean };
+};
+const { join, relative } = require('node:path') as { join(...p: string[]): string; relative(a: string, b: string): string };
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 const ROOT = join(__dirname, '..', '..');
 const files = (dir: string): string[] =>
