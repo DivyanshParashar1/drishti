@@ -158,6 +158,21 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
 - **Unverified assumptions:** the expo-file-system `Directory`/`File` API writes and deletes under `Paths.document` as typed; a `file` part with a documents uri plays through expo-audio like answer files do; Timbre pronounces Indian names acceptably (DT-9.3).
 - **Measurements:** none yet.
 
+## P10 — Text reading (2026-11-08)
+- **Status:** automated tests pass (Jest 331, pytest 195; `tsc` and `expo lint` clean; the Android export bundles, 998 modules) | live checks: none (reading spends Timbre credits per chunk; covered by DT-10.1/10.2) | device checks DT-10.1–10.3 pending. **ML Kit OCR has not run on the phone (L0.3: the package is untested on the New Architecture).**
+- **Limitations:**
+  - L10.1 OCR runs on one camera frame at the stream's resolution (1280×720, so 720 px across in portrait), saved as a quality-90 JPEG. That's not a photo capture. An A4 page filling the frame gives about 3.4 px/mm, so small print (≤ 10 pt) may misread. Plan: DT-10.1/10.2. If it fails, try 1920×1080 frames (L8.2) or add a VisionCamera photo output for reading.
+  - L10.2 Script: the package bundles the Latin and Devanagari models (plus Chinese, Japanese and Korean, which we don't use; they add APK size, so check in P13 whether gradle can exclude them). We run Devanagari first, since Google documents it as covering Latin too. If it finds no Devanagari characters, the Latin model runs and its result is used. Mixed Hindi and English text stays with the Devanagari model.
+  - L10.3 ML Kit has no Tamil model, so Tamil text can't be read. It comes back empty or as Latin garbage. Accepted (F8 scope); P11 should mention it.
+  - L10.4 Order: blocks are sorted by top edge, and blocks whose heights overlap by at least half the shorter one form a row, read left to right. Two-column layouts with uneven blocks may interleave. Lines inside a block keep ML Kit's order, and end-of-line hyphenation ("infor-/mation") is undone.
+  - L10.5 Pressing talk pauses reading (the scheduler's stopAll cuts the chunk). Then "aage" goes to the next paragraph, "ruko" or any other command ends reading, and a tap or failed STT resumes the cut chunk from its start. Offline there is no STT, so holding the button just stops reading. A hazard (P0) that cuts a chunk replays it afterwards; reading resumes, unlike answers (F6).
+  - L10.6 "Read" can only be triggered by voice, and voice needs STT (online). Offline reading happens only if the connection drops mid-read (the remaining chunks use expo-speech) or with P14's offline commands.
+  - L10.7 "aage" alone, outside reading, goes to /ask as a question (the VLM decides what "ahead" means). "aage kya hai" was already a describe.
+  - L10.8 One chunk is queued at a time, at P3 like answers. A chunk's audio is fetched when the previous one starts playing (one-chunk prefetch), so a slow /tts (about 1.5–2 s, L3.1) can leave gaps when chunks are short. If a fetch fails, that chunk is spoken with expo-speech, so the voice may switch mid-read.
+  - L10.9 At the end it says "Bas itna hi likha hai" (sys.reading_done; not in the spec, but the phrase existed).
+- **Unverified assumptions:** `TextRecognition.recognize(fileUri, 'Devanagari')` accepts our `file://` cache uri; ML Kit block `frame`s are in the JPEG's (upright) pixels; nitro-image `toEncodedImageData('jpg', 90)` on the full frame is fast enough (≤ 100 ms).
+- **Measurements:** none yet (`reading` metrics: ocr_done, first_chunk_ready, play_start).
+
 ## Deferred tests and checks (run at the end)
 
 Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) are in the next table.
@@ -202,3 +217,6 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-9.1 | Eyes closed: enroll ("isko <name> ke naam se save karo" → the person says haan → face the camera), hear the name announced, then delete, by voice only | P9 | pending | | |
 | DT-9.2 | Offline enroll → the name is spoken by expo-speech; back online, the Timbre clip replaces it (overlay shows ♪) | P9 | pending | | |
 | DT-9.3 | Timbre pronunciation of 5 Indian names; note any that need phonetic spelling (open question §11; see X-9.1) | P9 | pending | | |
+| DT-10.1 | A printed A4 English notice is read correctly end to end (note the distance and font size that work at 1280×720, L10.1) | P10 | pending | | |
+| DT-10.2 | A printed A4 Hindi notice is read correctly end to end (Devanagari model chosen; overlay/metrics) | P10 | pending | | |
+| DT-10.3 | "ruko" and "aage" work mid-reading; a tap resumes; a hazard mid-chunk replays that chunk | P10 | pending | | |

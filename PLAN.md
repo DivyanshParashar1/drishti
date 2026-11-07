@@ -20,6 +20,7 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | F6 prompt (found in P3) | Rules in English plus a per-language instruction (language, script, direction words), instead of the full prompt in each language. No "numbers as words" rule. |
 | F3 threshold, alignment and crop (found in P8) | Threshold starts at 0.5, not 0.65: the shipped MobileFaceNet's LFW threshold is cosine 0.27, and laptop photos gave 0.82 same person vs ≤ 0.14 different people. An ambiguity margin (0.08 over the runner-up) makes lookalikes unknown. Faces are aligned to the InsightFace 112×112 template from ML Kit's eyes and mouth corners; the crop is 2.2× the face box, not 20% margin. |
 | §5 camera frames (found in P8) | Frames are 1280×720 YUV instead of 640×480 RGB, so ML Kit can read them and faces reach 80 px at ~1.2 m. |
+| F7 OCR source and controls (found in P10) | OCR reads the current camera frame at full stream resolution (no separate photo), Devanagari model first, then Latin. Pressing talk pauses reading; "aage" goes to the next paragraph, a tap resumes, any other command ends it. A hazard replays the cut chunk. |
 
 ## Phase gate (end of every phase)
 
