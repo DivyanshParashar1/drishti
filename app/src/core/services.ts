@@ -15,7 +15,9 @@ import { ReflexLane } from '../vision/reflexLane';
 import { createConnectivityMonitor, type ConnectivityMonitor } from './connectivity';
 import { FrameGrabber } from './frameGrabber';
 import { DEFAULT_LANG, type Lang } from './lang';
+import { applyLanguage } from './language';
 import { Metrics } from './metrics';
+import { SettingsStore } from './settings';
 
 /** The app's long-lived singletons, created once at startup. */
 export interface Services {
@@ -30,7 +32,10 @@ export interface Services {
   nameClips: NameClipSync;
   enrollment: EnrollmentDialog;
   reader: Reader;
+  settings: SettingsStore;
   lang: Lang;
+  /** F8: switch language everywhere and persist it. */
+  setLanguage(lang: Lang): Promise<void>;
 }
 
 export function createServices(): Services {
@@ -45,7 +50,9 @@ export function createServices(): Services {
     onDrop: (u, reason) => metrics.note(u.id, `dropped_${reason}`),
   });
   const reflex = new ReflexLane(scheduler, metrics, DEFAULT_LANG);
-  const identities = new IdentityStore(openDatabaseSync('drishti.db') as unknown as SqlDb);
+  const db = openDatabaseSync('drishti.db') as unknown as SqlDb;
+  const identities = new IdentityStore(db);
+  const settings = new SettingsStore(db);
   const services = {} as Services;
   const faces = new FaceIdentifier({
     scheduler,
@@ -101,13 +108,18 @@ export function createServices(): Services {
     nameClips,
     enrollment,
     reader,
+    settings,
     lang: DEFAULT_LANG,
+    setLanguage: (lang: Lang) => applyLanguage({ holder: services, reflex, player, settings, nameClips }, lang),
   });
 }
 
 /** Audio mode, clip preloading and connectivity. Returns a cleanup function. */
 export async function startServices(s: Services): Promise<() => void> {
   await s.identities.init().catch((e) => console.warn('identity store failed', e)); // F3 then runs with nobody saved
+  await s.settings.init().catch((e) => console.warn('settings failed', e)); // defaults then
+  s.lang = s.settings.lang ?? DEFAULT_LANG;
+  s.reflex.lang = s.lang;
   await ExpoAudioBackend.configure();
   await s.player.preloadPack(s.lang);
   s.connectivity.start();

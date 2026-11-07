@@ -1,20 +1,6 @@
-import { IdentityStore, type SqlDb } from '../store';
+import { memoryDb } from '../../core/__fixtures__/memoryDb';
+import { IdentityStore } from '../store';
 import { BASIS } from '../__fixtures__/embeddings';
-
-/** expo-sqlite's async API over Node's built-in SQLite, in memory: the real SQL runs in tests. */
-function memoryDb(): SqlDb {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { DatabaseSync } = require('node:sqlite');
-  const db = new DatabaseSync(':memory:');
-  return {
-    execAsync: async (sql) => void db.exec(sql),
-    runAsync: async (sql, params) => {
-      const r = db.prepare(sql).run(...params);
-      return { lastInsertRowId: Number(r.lastInsertRowid), changes: Number(r.changes) };
-    },
-    getAllAsync: async (sql, params) => db.prepare(sql).all(...params),
-  };
-}
 
 async function newStore() {
   let t = 1000;
