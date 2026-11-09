@@ -20,7 +20,10 @@ import { TalkSurface } from './src/voice/TalkSurface';
 import { useVoiceController } from './src/voice/useVoiceController';
 
 export default function App() {
-  useKeepAwake(); // the camera can't run in the background, so keep the screen on (F10)
+  // The camera can't run in the background, so keep the screen on (F10). On reload or activity
+  // teardown the native deactivate rejects ("activity no longer available"); the lock dies with
+  // the activity anyway, so swallow that rejection.
+  useKeepAwake(undefined, { suppressDeactivateWarnings: true });
   const services = useMemo(createServices, []);
   const [debug, setDebug] = useState(false);
   const [detector, setDetector] = useState<DetectorId>(VISION.detector);
