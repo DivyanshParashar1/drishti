@@ -3,16 +3,18 @@ import type { SchedulerHooks, Utterance } from '../audio/scheduler';
 import { monotonic, type Clock } from '../core/clock';
 import { Endpointer, NoiseFloor, type EndpointConfig } from './endpointer';
 
-/** Porcupine, reduced to what the service uses (tests pass a fake). */
+/** The wake-word detector (openWakeWord, src/voice/oww.ts), reduced to what the service uses. */
 export interface WakeEngine {
   frameLength: number;
   sampleRate: number;
   /** Index of the keyword heard in this frame, or −1. */
   process(frame: number[]): Promise<number>;
+  /** Forget buffered audio (after a turn, when the stream had a gap). */
+  reset?(): void;
   delete(): Promise<void>;
 }
 
-/** Picovoice's VoiceProcessor: the mic, delivering frames of 16-bit samples to JS. */
+/** The mic, delivering frames of 16-bit samples to JS (RecorderFrameSource). */
 export interface FrameSource {
   start(frameLength: number, sampleRate: number): Promise<void>;
   stop(): Promise<void>;
@@ -34,14 +36,14 @@ export interface WakeTarget {
 
 export type WakeStatus =
   | { state: 'off' }
-  | { state: 'no_key' } // no Picovoice AccessKey or keyword file in this build
+  | { state: 'no_key' } // no wake-word model configured
   | { state: 'starting' }
   | { state: 'listening' }
   | { state: 'paused' } // the offline recognizer has the mic
   | { state: 'error'; message: string };
 
 export interface WakeDeps {
-  /** Creates Porcupine with the "Drishti" keyword; throws if the key or keyword is missing/invalid. */
+  /** Loads the wake-word models; throws if they can't load. */
   createEngine(): Promise<WakeEngine>;
   source: FrameSource;
   target: WakeTarget;
@@ -78,9 +80,9 @@ export function toPcmBytes(frame: number[]): ArrayBuffer {
 }
 
 /**
- * P17 wake word "Drishti" (Porcupine, on device, works offline).
+ * P17 wake word (openWakeWord, on device, works offline).
  *
- * While on, it owns the mic: every frame goes to Porcupine, and while a turn is open (after the
+ * While on, it owns the mic: every frame goes to the detector, and while a turn is open (after the
  * wake word, or while the screen is held) the same frames go to STT through `tap()`, so the
  * hold-to-talk recorder and the wake word never fight over the microphone. A wake-word turn ends
  * by loudness (Endpointer): 0.9 s of quiet after speech sends the question; nothing said in 5 s
@@ -97,7 +99,7 @@ export class WakeService {
   private readonly noise = new NoiseFloor();
   private selfSpeaking = false;
   private quietUntil = 0;
-  private processing = false;
+  private chain: Promise<void> = Promise.resolve();
   private listeners: (() => void)[] = [];
   private offs: (() => void)[] = [];
 
@@ -115,7 +117,7 @@ export class WakeService {
     );
   }
 
-  /** True while Porcupine has the mic, so the voice controller should use tap() instead of its recorder. */
+  /** True while the wake word has the mic, so the voice controller should use tap() instead of its recorder. */
   get ownsMic(): boolean {
     return this.running && !this.suspended;
   }
@@ -143,6 +145,7 @@ export class WakeService {
 
   untap(): void {
     this.tapCb = null;
+    this.engine?.reset?.(); // the turn's audio never reached it: start the stream afresh
     this.endpointer = null;
     this.clearOfflineTimer();
     this.quietUntil = this.clock() + REFRACTORY_MS;
@@ -224,16 +227,17 @@ export class WakeService {
       return;
     }
     this.noise.feed(level);
-    if (this.d.target.state !== 'idle' || this.selfSpeaking || this.clock() < this.quietUntil || !this.engine) return;
-    if (this.processing) return; // one frame in flight to the native engine at a time
-    this.processing = true;
-    this.engine
-      .process(frame)
+    const engine = this.engine;
+    if (!engine) return;
+    // Every frame reaches the detector, in order (openWakeWord reads a continuous stream); only
+    // whether a detection counts is gated.
+    this.chain = this.chain
+      .then(() => engine.process(frame))
       .then((k) => {
-        if (k >= 0 && this.d.target.state === 'idle' && !this.tapCb) void this.trigger();
+        const allowed = this.d.target.state === 'idle' && !this.tapCb && !this.selfSpeaking && this.clock() >= this.quietUntil;
+        if (k >= 0 && allowed) void this.trigger();
       })
-      .catch((e) => this.set({ state: 'error', message: messageOf(e) }))
-      .finally(() => (this.processing = false));
+      .catch((e) => this.set({ state: 'error', message: messageOf(e) }));
   };
 
   /** "Drishti" heard: open a hands-free turn. */
@@ -288,16 +292,16 @@ function messageOf(e: unknown): string {
 }
 
 /** Menu line for a status. */
-export function wakeStatusText(s: WakeStatus): string {
+export function wakeStatusText(s: WakeStatus, phrase: string): string {
   switch (s.state) {
     case 'off':
       return 'off';
     case 'no_key':
-      return 'not set up: needs a Picovoice AccessKey and drishti_android.ppn';
+      return 'not set up: no wake-word model';
     case 'starting':
       return 'starting…';
     case 'listening':
-      return 'listening for “Drishti”';
+      return `listening for “${phrase}”`;
     case 'paused':
       return 'paused while offline recognition runs';
     case 'error':

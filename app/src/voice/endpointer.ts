@@ -24,7 +24,7 @@ export interface EndpointConfig {
 export const ENDPOINT: EndpointConfig = {
   minLevel: 0.06,
   noiseRatio: 2.5,
-  speechFrames: 3, // 3 × 32 ms Porcupine frames ≈ 100 ms of voice
+  speechFrames: 3, // 3 × 40 ms recorder frames ≈ 120 ms of voice
   silenceMs: 900,
   noSpeechMs: 5000,
   maxMs: 10_000,

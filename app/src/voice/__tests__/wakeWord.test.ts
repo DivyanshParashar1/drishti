@@ -182,3 +182,23 @@ test('PCM bytes are little-endian int16', () => {
   const b = new Uint8Array(toPcmBytes([1, -2, 300]));
   expect([...b]).toEqual([1, 0, 0xfe, 0xff, 0x2c, 0x01]);
 });
+
+test('every frame reaches the detector in order, even back to back and while the app speaks', async () => {
+  const seen: number[] = [];
+  const t = setup();
+  await t.svc.enable(true);
+  // Swap in a recording engine through the public surface: frames are 1-sample markers.
+  (t.svc as unknown as { engine: { process(f: number[]): Promise<number>; reset(): void; frameLength: number; sampleRate: number; delete(): Promise<void> } }).engine = {
+    frameLength: 512,
+    sampleRate: 16000,
+    process: async (f) => (seen.push(f[0]), -1),
+    reset: () => seen.push(-99),
+    delete: async () => undefined,
+  };
+  t.say('Namaste, main Drishti hoon');
+  await t.feed([[1], [2], [3]]);
+  expect(seen).toEqual([1, 2, 3]);
+  t.svc.tap(() => undefined);
+  t.svc.untap();
+  expect(seen).toEqual([1, 2, 3, -99]); // reset after a turn
+});

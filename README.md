@@ -56,5 +56,16 @@ uv run pytest               # live tests (real credits) only with: uv run pytest
 | EfficientDet-Lite0 (uint8 input 320×320 NHWC, built-in NMS: boxes/classes/scores/count, max 25) | Apache-2.0 | [TensorFlow Lite task library](https://storage.googleapis.com/download.tensorflow.org/models/tflite/task_library/object_detection/android/lite-model_efficientdet_lite0_detection_metadata_1.tflite) |
 | YOLO11n (fp32 input 1×3×320×320 NCHW 0–1, output 1×84×2100 raw, NMS in app) | AGPL-3.0 | Exported with Ultralytics 8.x (`yolo export model=yolo11n.pt format=tflite imgsz=320`; fp16 export is no longer supported). Shipping it makes the app subject to AGPL-3.0 |
 | MobileFaceNet (fp32 inputs `img1`, `img2` each 1×3×112×112 NCHW RGB 0–1, output 2×128; flip test-time augmentation and normalisation are inside the graph, so one call embeds two faces) | Apache-2.0 (weights from [foamliu/MobileFaceNet](https://github.com/foamliu/MobileFaceNet), trained on MS-Celeb-1M) | [Qualcomm AI Hub v0.66.0 TFLite float](https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/mobile_facenet/releases/v0.66.0/mobile_facenet-tflite-float.zip), sha256 `2046ab77…f3d7` |
+| openWakeWord melspectrogram + embedding (v0.5.1; melspectrogram pinned to a fixed 1×1760 input by `app/scripts/wake/fix_melspec_shape.py`) | Apache-2.0 | [openWakeWord releases](https://github.com/dscripka/openWakeWord/releases/tag/v0.5.1) |
+| openWakeWord `hey_jarvis_v0.1` (wake word for testing until a "Drishti" model is trained) | CC BY-NC-SA 4.0 (non-commercial) | same release |
 
 The repo's own licence is not set yet; it depends on whether YOLO11n stays (see PLAN.md, "Still open").
+
+## Wake word
+
+The wake word runs on the phone with [openWakeWord](https://github.com/dscripka/openWakeWord) on the app's own TFLite runtime (no account, no extra native module). The app ships openWakeWord's pre-trained **"Hey Jarvis"** model for testing. To use **"Drishti"**:
+
+1. Open openWakeWord's training notebook in Google Colab (`notebooks/automatic_model_training.ipynb` in the openWakeWord repo; a GPU runtime takes about an hour). Set the target phrase to `drishti` (also try spellings like `drish tee` if the synthetic voices say it wrongly), run all cells, and download the `.tflite` model.
+2. Save it as `app/assets/models/wake/drishti.tflite`.
+3. In `app/src/models/detectorAssets.ts`, point `WAKE_WORD_ASSET` at it and set `WAKE_PHRASE = 'Drishti'`.
+4. Check it on the laptop with `app/scripts/wake/check_pipeline.py` (swap the model path), then reload the app. No APK rebuild.

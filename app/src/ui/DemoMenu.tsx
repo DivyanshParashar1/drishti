@@ -87,7 +87,7 @@ export function DemoMenu({
         </Section>
 
         <Section title="Toggles">
-          <Toggle label="Wake word “Drishti”" detail={wake.status} on={wake.on} onPress={wake.toggle} />
+          <Toggle label="Wake word" detail={wake.status} on={wake.on} onPress={wake.toggle} />
           <Toggle label="Demo UI" detail="off = plain black screen (real-user mode)" on={services.demoMode} onPress={() => services.setDemoMode(!services.demoMode)} />
           <Toggle label="Faces" detail="name saved people" on={facesOn} onPress={onToggleFaces} />
           <Toggle label="Quiet mode" detail="announce vehicles only" on={reflex.quiet} onPress={() => reflex.setQuiet(!reflex.quiet)} />

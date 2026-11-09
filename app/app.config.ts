@@ -41,16 +41,12 @@ const config: ExpoConfig = {
     // P14: on-device recognition for offline commands (Android 13+ on-device recognizer).
     ['expo-speech-recognition', { androidSpeechServicePackages: ['com.google.android.as', 'com.google.android.googlequicksearchbox'] }],
     ['expo-build-properties', { android: { minSdkVersion: 26 } }],
-    // P17: copies assets/wake/*.ppn (the "Drishti" keyword) into the Android assets for Porcupine.
-    './plugins/withWakeWordAssets',
   ],
   owner: 'divyanshdp1212',
   extra: {
     eas: { projectId: '2bda16b5-50c0-4ef7-b9fc-8cf185843351' },
     serverUrl: process.env.SERVER_URL ?? 'http://192.168.1.2:8000',
     appToken: process.env.APP_TOKEN ?? 'dev-token',
-    // P17 wake word. Empty → the menu says "not set up" and hold-to-talk still works.
-    picovoiceKey: process.env.PICOVOICE_ACCESS_KEY ?? '',
   },
 };
 

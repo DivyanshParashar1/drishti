@@ -66,7 +66,7 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | P14 | Stretch: offline STT for commands | P13 | Yes |
 | P15 | Contest deliverables | P13 | No |
 | P16 | Demo UI (F12) | P12 | No |
-| P17 | Simplify alerts, wake word, demo menu | P16 | Yes (Porcupine native module) |
+| P17 | Simplify alerts, wake word, demo menu | P16 | No |
 
 ---
 
@@ -366,7 +366,7 @@ Device testing showed objects like a bottle on a table were never announced: onl
 Work:
 - Obstacle alerts become plain object detection: all 80 YOLO classes, announced by name only ("Bottle", "Car"), once per object. No direction or near/far in alerts, no re-announce on approach or direction change. A second object of the same class within 4 s is skipped. Vehicles stay P0. Quiet mode keeps vehicles only. Decode at score 0.25 (shown in the menu), announce at ≥ 0.4 with a box ≥ 0.5% of the frame. Stale-alert window 1.5 s.
 - `/ask` answers are plain: 1–2 short sentences answering the question, with no step counts, distances or hazard sweep.
-- Wake word "Drishti" (Porcupine, on device): while on, it owns the mic and feeds turns to STT; a turn ends after 0.9 s of quiet. Hold-to-talk stays.
+- Wake word (openWakeWord on the app's TFLite runtime and recorder, on device; Porcupine was dropped because Picovoice needs a company email): while on, it owns the mic and feeds turns to STT; a turn ends after 0.9 s of quiet. Ships "Hey Jarvis" until a "Drishti" model is trained (README → Wake word). Hold-to-talk stays.
 - Demo menu (triple-tap): language, back/front camera, wake word, demo UI, faces, quiet, debug overlay, detector, actions, and a live list of what the detector sees. Toggles are saved.
 
 Automated tests: tracker and alert rules, every class has a phrase, mirroring for the front camera, saved flags, the end-of-speech detector, the wake service (turns, no-speech, self-name, refractory gap, hold-to-talk tap, offline hand-off, errors), the prompt has no step counts.

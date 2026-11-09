@@ -13,8 +13,11 @@ import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-ki
 import { readImage } from '../reading/ocr';
 import { micLevel, pcmLevel } from '../ui/micLevel';
 import { VoiceController } from './voiceController';
-import { WakeService, type FrameSource, type WakeEngine } from './wakeWord';
-import { PICOVOICE_KEY, WAKE_KEYWORD_FILE } from '../core/config';
+import { WakeService, type WakeEngine } from './wakeWord';
+import { OwwEngine } from './oww';
+import { RecorderFrameSource } from './recorderSource';
+import { loadTensorflowModel } from 'react-native-fast-tflite';
+import { WAKE_FEATURE_ASSETS, WAKE_WORD_ASSET } from '../models/detectorAssets';
 
 const MIC = { sampleRate: 16000, channels: 1, encoding: 'pcm_16bit', interval: 40 } as const;
 
@@ -32,45 +35,25 @@ class MicBridge {
   }
 }
 
-/** Picovoice's VoiceProcessor, required on first use (the module exists only in rebuilt APKs). */
-function voiceProcessorSource(): FrameSource {
-  type VP = FrameSource;
-  let vp: VP | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const get = (): VP => (vp ??= require('@picovoice/react-native-voice-processor').VoiceProcessor.instance as VP);
-  const quietly = (f: () => void) => {
-    try {
-      f();
-    } catch {
-      // module missing: nothing was added
-    }
-  };
-  return {
-    start: (len, rate) => get().start(len, rate),
-    stop: () => get().stop(),
-    addFrameListener: (cb) => get().addFrameListener(cb),
-    removeFrameListener: (cb) => quietly(() => get().removeFrameListener(cb)),
-    addErrorListener: (cb) => get().addErrorListener(cb),
-    removeErrorListener: (cb) => quietly(() => get().removeErrorListener(cb)),
-  };
-}
-
-/** Porcupine with the custom "Drishti" keyword (assets/wake/drishti_android.ppn, copied into the APK). */
-async function createPorcupine(): Promise<WakeEngine> {
-  let mod: { Porcupine: { fromKeywordPaths(key: string, paths: string[], model?: string, device?: string, sens?: number[]): Promise<WakeEngine> } };
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    mod = require('@picovoice/porcupine-react-native');
-  } catch {
-    throw new Error('Porcupine is not in this build: rebuild the APK');
-  }
-  const p = await mod.Porcupine.fromKeywordPaths(PICOVOICE_KEY, [WAKE_KEYWORD_FILE], '', '', [0.6]);
-  return { frameLength: p.frameLength, sampleRate: p.sampleRate, process: (f) => p.process(f), delete: () => p.delete() };
+/** openWakeWord's three models on the app's TFLite runtime (CPU), as one engine. */
+async function createOwwEngine(): Promise<WakeEngine> {
+  const [mel, emb, ww] = await Promise.all([
+    loadTensorflowModel(WAKE_FEATURE_ASSETS.melspec, []),
+    loadTensorflowModel(WAKE_FEATURE_ASSETS.embedding, []),
+    loadTensorflowModel(WAKE_WORD_ASSET, []),
+  ]);
+  const f32 = (b: ArrayBuffer) => new Float32Array(b);
+  const copy = (x: Float32Array) => x.slice().buffer as ArrayBuffer;
+  return new OwwEngine({
+    melspec: (x) => f32(mel.runSync([copy(x)])[0]),
+    embed: (m) => f32(emb.runSync([copy(m)])[0]),
+    classify: (feats) => f32(ww.runSync([copy(feats)])[0])[0],
+  });
 }
 
 /**
  * Builds the VoiceController with the real mic, /stt, /ask, files, haptics and earcons, and the
- * wake-word service (P17). While the wake word is on it owns the mic and turns read from it.
+ * wake-word service (P17, openWakeWord). While the wake word is on it owns the mic and turns read from it.
  */
 export function useVoiceController(services: Services): { voice: VoiceController; wake: WakeService } {
   const recorder = useAudioRecorder();
@@ -149,14 +132,29 @@ export function useVoiceController(services: Services): { voice: VoiceController
         void p.seekTo(0).then(() => p.play());
       },
     });
+    // While the wake word is on, this recorder stream is the only mic: turns tap it (startMic above).
+    const wakeSource = new RecorderFrameSource({
+      start: async (onPcm) => {
+        await mic.get().startRecording({
+          ...MIC,
+          output: { primary: { enabled: false } },
+          onAudioStream: async (e) => {
+            if (typeof e.data === 'string') onPcm(base64ToBytes(e.data));
+          },
+        });
+      },
+      stop: async () => {
+        await mic.get().stopRecording();
+      },
+    });
     box.wake = new WakeService({
-      createEngine: createPorcupine,
-      source: voiceProcessorSource(),
+      createEngine: createOwwEngine,
+      source: wakeSource,
       target: voice,
       scheduler: services.scheduler,
       noSpeech: () => services.say('sys.didnt_hear'),
       online: () => services.connectivity.online,
-      configured: PICOVOICE_KEY !== '',
+      configured: true, // the models are bundled
     });
     return { voice, wake: box.wake };
   }, [services, earcons, mic]);
