@@ -51,8 +51,25 @@ class Detection(BaseModel):
     dist: str = Field(default="", max_length=20)
 
 
+# F12: the demo UI shows an English line under each spoken sentence. The gloss goes in braces
+# right after its sentence; the pipeline strips it before TTS, so it's never read aloud.
+GLOSS_RULE = (
+    "After each sentence, write its English translation in curly braces, for example: "
+    "<sentence> {<English translation>}. The braces are shown on screen, not read aloud; "
+    "keep them out of the 2-sentence limit."
+)
+
+# Extra tokens for the glosses, so they don't eat into the answer's own budget.
+GLOSS_TOKENS = 50
+
+
+def wants_gloss(lang: Lang) -> bool:
+    return lang != "en"
+
+
 def system_prompt(lang: Lang) -> str:
-    return f"{RULES}\n\nLanguage: {LANGUAGE_RULES[lang]}"
+    p = f"{RULES}\n\nLanguage: {LANGUAGE_RULES[lang]}"
+    return f"{p}\n\n{GLOSS_RULE}" if wants_gloss(lang) else p
 
 
 def user_text(question: str, detections: list[Detection], names: list[str]) -> str:

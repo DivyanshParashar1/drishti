@@ -3,7 +3,7 @@ import base64
 
 from app.ask.image import jpeg_size
 from app.ask.pipeline import AskInput, AskResult, run_ask
-from app.ask.prompt import Detection
+from app.ask.prompt import GLOSS_TOKENS, Detection
 from app.vlm.base import VlmError
 from tests.fakes_ask import FakeTts, FakeVlm, jpeg
 
@@ -63,7 +63,7 @@ async def test_vlm_gets_prompt_image_and_context():
     assert "Hinglish" in system
     assert image == INP.image_jpeg
     assert "car (left)" in text and "Rahul" in text
-    assert (max_tokens, temperature) == (80, 0.2)
+    assert (max_tokens, temperature) == (80 + GLOSS_TOKENS, 0.2)  # Hinglish: + gloss budget
 
 
 async def test_vlm_error_before_any_text():
@@ -96,6 +96,7 @@ async def test_tts_failure_sends_text_without_audio_and_continues():
         "text": "Ek.",
         "audio_b64": None,
         "mime": None,
+        "en": None,
         "tts_error": "rate_limited",
     }
     assert audio(events[1]) == b"mp3:Do."
@@ -132,3 +133,38 @@ def test_jpeg_size():
     assert jpeg_size(b"\x89PNG\r\n") is None
     assert jpeg_size(b"\xff\xd8\xff\xda\x00\x08") is None
     assert jpeg_size(b"\xff\xd8") is None
+
+
+# --- F12 English gloss ---
+
+
+async def test_gloss_rides_on_the_sentence_and_is_not_spoken():
+    vlm = FakeVlm(["Aage kursi hai. {A chair is ahead.} ", "Car left. {A car on the left.}"])
+    tts = FakeTts(delays={"Aage kursi hai.": 0.02})
+    events = await run(vlm, tts)
+    assert tts.started == ["Aage kursi hai.", "Car left."]  # braces never reach TTS
+    assert [(e[0], e[1].get("en")) for e in events[:2]] == [
+        ("sentence", "A chair is ahead."),
+        ("sentence", "A car on the left."),
+    ]
+
+
+async def test_late_gloss_comes_as_its_own_event_before_the_next_sentence():
+    # Sentence 1's audio is ready before its gloss has streamed in.
+    vlm = FakeVlm(
+        ["Aage kursi hai. ", "{A chair ", "is ahead.} ", "Car left. {A car.}"], delay_s=0.02
+    )
+    events = await run(vlm, FakeTts())
+    assert [e[0] for e in events] == ["sentence", "gloss", "sentence", "done"]
+    assert events[0][1]["en"] is None
+    assert events[1][1] == {"index": 0, "en": "A chair is ahead."}
+    assert events[2][1]["en"] == "A car."
+
+
+async def test_gloss_gets_its_own_token_budget_outside_english():
+    vlm = FakeVlm(["Theek hai."])
+    await run(vlm, FakeTts())
+    assert vlm.calls[0][3] == 80 + GLOSS_TOKENS
+    vlm = FakeVlm(["Fine."])
+    await run(vlm, FakeTts(), inp=AskInput("What?", "en", jpeg()))
+    assert vlm.calls[0][3] == 80

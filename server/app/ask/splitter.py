@@ -81,3 +81,41 @@ def chunk_for_tts(text: str, limit: int = MAX_CHARS) -> list[str]:
     if text:
         chunks.append(text)
     return chunks
+
+
+class GlossSplitter:
+    """Separates `{English gloss}` (F12) from the spoken text, as the stream arrives.
+
+    `feed()` returns ("sentence", text) and ("gloss", english) items in stream order. A `{` ends
+    the sentence before it (the model may leave out the full stop before a gloss), and the gloss
+    belongs to the last sentence returned. A gloss still open at `flush()` was cut off and is
+    dropped; a stray `}` is ignored.
+    """
+
+    def __init__(self) -> None:
+        self._s = SentenceSplitter()
+        self._gloss: str | None = None  # None: outside braces
+
+    def feed(self, delta: str) -> list[tuple[str, str]]:
+        out: list[tuple[str, str]] = []
+        spoken = ""
+        for ch in delta:
+            if self._gloss is not None:
+                if ch == "}":
+                    if g := " ".join(self._gloss.split()):
+                        out.append(("gloss", g))
+                    self._gloss = None
+                else:
+                    self._gloss += ch
+            elif ch == "{":
+                out += [("sentence", s) for s in self._s.feed(spoken) + self._s.flush()]
+                spoken = ""
+                self._gloss = ""
+            elif ch != "}":
+                spoken += ch
+        out += [("sentence", s) for s in self._s.feed(spoken)]
+        return out
+
+    def flush(self) -> list[tuple[str, str]]:
+        self._gloss = None
+        return [("sentence", s) for s in self._s.flush()]

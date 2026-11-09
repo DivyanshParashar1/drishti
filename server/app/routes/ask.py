@@ -1,6 +1,7 @@
 """POST /ask: multipart question + frame in, SSE out (spec §7).
 
-Events: `sentence` {index, text, audio_b64, mime[, tts_error]} in order, then `done` {timings}
+Events: `sentence` {index, text, audio_b64, mime, en[, tts_error]} in order (with `gloss`
+{index, en} for an English line that came after its sentence), then `done` {timings}
 or `error` {code, timings}. Request problems are rejected before the stream starts, with a
 4xx/5xx and {"code": …}.
 """

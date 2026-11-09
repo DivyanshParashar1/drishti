@@ -1,6 +1,6 @@
 import pytest
 
-from app.ask.splitter import SentenceSplitter, chunk_for_tts
+from app.ask.splitter import GlossSplitter, SentenceSplitter, chunk_for_tts
 
 
 def split_stream(deltas: list[str]) -> list[list[str]]:
@@ -72,3 +72,51 @@ def test_chunk_prefers_comma():
 
 def test_chunk_hard_cut_without_spaces():
     assert chunk_for_tts("x" * 450) == ["x" * 200, "x" * 200, "x" * 50]
+
+
+# --- F12 English gloss in braces ---
+
+
+def gloss_run(deltas: list[str]) -> list[tuple[str, str]]:
+    g = GlossSplitter()
+    out = [item for d in deltas for item in g.feed(d)]
+    return out + g.flush()
+
+
+def test_gloss_follows_its_sentence_and_is_not_spoken():
+    assert gloss_run(
+        ["Aage kursi hai. {A chair is ahead.} Left mein car hai. {A car is on the left.}"]
+    ) == [
+        ("sentence", "Aage kursi hai."),
+        ("gloss", "A chair is ahead."),
+        ("sentence", "Left mein car hai."),
+        ("gloss", "A car is on the left."),
+    ]
+
+
+def test_gloss_split_across_deltas():
+    assert gloss_run(["सामने कुर्सी है। {A ch", "air is ", "ahead.}"]) == [
+        ("sentence", "सामने कुर्सी है।"),
+        ("gloss", "A chair is ahead."),
+    ]
+
+
+def test_brace_ends_a_sentence_without_a_full_stop():
+    assert gloss_run(["Aage kursi hai {A chair is ahead}"]) == [
+        ("sentence", "Aage kursi hai"),
+        ("gloss", "A chair is ahead"),
+    ]
+
+
+def test_cut_off_gloss_is_dropped_and_stray_brace_ignored():
+    assert gloss_run(["Theek hai.} Aage jao. {Go ah"]) == [
+        ("sentence", "Theek hai."),
+        ("sentence", "Aage jao."),
+    ]
+
+
+def test_no_braces_is_plain_splitting():
+    assert gloss_run(["Car left. ", "Bus right."]) == [
+        ("sentence", "Car left."),
+        ("sentence", "Bus right."),
+    ]

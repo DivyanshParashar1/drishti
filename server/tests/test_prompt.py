@@ -1,6 +1,6 @@
 import pytest
 
-from app.ask.prompt import HAZARDS, Detection, system_prompt, user_text
+from app.ask.prompt import HAZARDS, Detection, system_prompt, user_text, wants_gloss
 from app.gnani.languages import LANGS
 
 
@@ -45,3 +45,14 @@ def test_user_text_says_no_names():
     t = user_text("Who is this?", [], [])
     assert "detections" not in t
     assert t.endswith("Recognised people in view: none")
+
+
+@pytest.mark.parametrize("lang", ["hi", "hi-en", "ta"])
+def test_gloss_rule_outside_english(lang):
+    assert wants_gloss(lang)
+    assert "curly braces" in system_prompt(lang)
+
+
+def test_no_gloss_in_english():
+    assert not wants_gloss("en")
+    assert "curly braces" not in system_prompt("en")
