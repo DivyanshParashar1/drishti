@@ -13,6 +13,8 @@ import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-ki
 import { readImage } from '../reading/ocr';
 import { micLevel, pcmLevel } from '../ui/micLevel';
 import { VoiceController } from './voiceController';
+import { WakeService, type FrameSource, type WakeEngine } from './wakeWord';
+import { PICOVOICE_KEY, WAKE_KEYWORD_FILE } from '../core/config';
 
 const MIC = { sampleRate: 16000, channels: 1, encoding: 'pcm_16bit', interval: 40 } as const;
 
@@ -30,8 +32,47 @@ class MicBridge {
   }
 }
 
-/** Builds the VoiceController with the real mic, /stt, /ask, files, haptics and earcons. */
-export function useVoiceController(services: Services): VoiceController {
+/** Picovoice's VoiceProcessor, required on first use (the module exists only in rebuilt APKs). */
+function voiceProcessorSource(): FrameSource {
+  type VP = FrameSource;
+  let vp: VP | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const get = (): VP => (vp ??= require('@picovoice/react-native-voice-processor').VoiceProcessor.instance as VP);
+  const quietly = (f: () => void) => {
+    try {
+      f();
+    } catch {
+      // module missing: nothing was added
+    }
+  };
+  return {
+    start: (len, rate) => get().start(len, rate),
+    stop: () => get().stop(),
+    addFrameListener: (cb) => get().addFrameListener(cb),
+    removeFrameListener: (cb) => quietly(() => get().removeFrameListener(cb)),
+    addErrorListener: (cb) => get().addErrorListener(cb),
+    removeErrorListener: (cb) => quietly(() => get().removeErrorListener(cb)),
+  };
+}
+
+/** Porcupine with the custom "Drishti" keyword (assets/wake/drishti_android.ppn, copied into the APK). */
+async function createPorcupine(): Promise<WakeEngine> {
+  let mod: { Porcupine: { fromKeywordPaths(key: string, paths: string[], model?: string, device?: string, sens?: number[]): Promise<WakeEngine> } };
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    mod = require('@picovoice/porcupine-react-native');
+  } catch {
+    throw new Error('Porcupine is not in this build: rebuild the APK');
+  }
+  const p = await mod.Porcupine.fromKeywordPaths(PICOVOICE_KEY, [WAKE_KEYWORD_FILE], '', '', [0.6]);
+  return { frameLength: p.frameLength, sampleRate: p.sampleRate, process: (f) => p.process(f), delete: () => p.delete() };
+}
+
+/**
+ * Builds the VoiceController with the real mic, /stt, /ask, files, haptics and earcons, and the
+ * wake-word service (P17). While the wake word is on it owns the mic and turns read from it.
+ */
+export function useVoiceController(services: Services): { voice: VoiceController; wake: WakeService } {
   const recorder = useAudioRecorder();
   const mic = useMemo(() => new MicBridge(), []);
   useEffect(() => mic.set(recorder), [mic, recorder]);
@@ -48,7 +89,8 @@ export function useVoiceController(services: Services): VoiceController {
   return useMemo(() => {
     let audioN = 0;
     const transport = xhrTransport();
-    return new VoiceController({
+    const box: { wake: WakeService | null } = { wake: null };
+    const voice = new VoiceController({
       scheduler: services.scheduler,
       metrics: services.metrics,
       lang: () => services.lang,
@@ -57,9 +99,19 @@ export function useVoiceController(services: Services): VoiceController {
       startStt: (lang) => new SttSession(rnWebSocketFactory, lang),
       startOfflineStt: (lang) => {
         const rec = onDeviceRecognizer();
-        return rec ? new OfflineSttSession(rec, lang) : null;
+        if (!rec) return null;
+        void box.wake?.suspend(); // the recognizer opens the mic itself
+        return new OfflineSttSession(rec, lang);
       },
       startMic: async (onChunk) => {
+        const wake = box.wake;
+        if (wake?.ownsMic) {
+          wake.tap((pcm, level) => {
+            micLevel.emit(level); // F12 waveform
+            onChunk(pcm);
+          });
+          return;
+        }
         await mic.get().startRecording({
           ...MIC,
           output: { primary: { enabled: false } },
@@ -74,6 +126,7 @@ export function useVoiceController(services: Services): VoiceController {
       },
       stopMic: async () => {
         micLevel.emit(0);
+        if (box.wake?.ownsMic) return box.wake.untap();
         await mic.get().stopRecording();
       },
       grabFrame: (mode) => services.frames.grabToFile(mode),
@@ -96,5 +149,15 @@ export function useVoiceController(services: Services): VoiceController {
         void p.seekTo(0).then(() => p.play());
       },
     });
+    box.wake = new WakeService({
+      createEngine: createPorcupine,
+      source: voiceProcessorSource(),
+      target: voice,
+      scheduler: services.scheduler,
+      noSpeech: () => services.say('sys.didnt_hear'),
+      online: () => services.connectivity.online,
+      configured: PICOVOICE_KEY !== '',
+    });
+    return { voice, wake: box.wake };
   }, [services, earcons, mic]);
 }

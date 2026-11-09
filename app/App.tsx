@@ -19,6 +19,7 @@ import { VISION, type DetectorId } from './src/vision/config';
 import type { ModelState } from './src/vision/useReflexCamera';
 import { TalkSurface } from './src/voice/TalkSurface';
 import { useVoiceController } from './src/voice/useVoiceController';
+import { wakeStatusText } from './src/voice/wakeWord';
 
 export default function App() {
   // The camera can't run in the background, so keep the screen on (F10). On reload or activity
@@ -35,7 +36,9 @@ export default function App() {
   const [demo, setDemo] = useState(services.demoMode);
   const tap = useRef(createTapCounter()).current;
   const templeTouch = useRef(false);
-  const voice = useVoiceController(services);
+  const { voice, wake } = useVoiceController(services);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [, setWakeTick] = useState(0);
   const perms = usePermissions();
 
   const store = useMemo(
@@ -70,6 +73,7 @@ export default function App() {
         cleanup = c;
         setFacesOn(services.settings.flag('faces')); // P17: menu toggles are saved
         setFront(services.settings.flag('frontCamera'));
+        setSettingsLoaded(true);
       })
       .catch((e) => console.warn('startServices failed', e));
     return () => cleanup?.();
@@ -95,7 +99,21 @@ export default function App() {
       void services.settings.setFlag('frontCamera', !f).catch(() => undefined);
       return !f;
     });
-  const wake: WakeInfo = { on: false, status: 'not set up yet', toggle: () => undefined };
+  // P17 wake word "Drishti": on once settings are loaded and the mic is allowed (saved toggle).
+  useEffect(() => wake.onStatus(() => setWakeTick((n) => n + 1)), [wake]);
+  useEffect(() => {
+    if (settingsLoaded && perms.mic.granted && services.settings.flag('wakeWord')) void wake.enable(true);
+  }, [settingsLoaded, perms.mic.granted, services, wake]);
+  useEffect(() => () => void wake.dispose(), [wake]);
+  const wakeInfo: WakeInfo = {
+    on: wake.on,
+    status: wakeStatusText(wake.status),
+    toggle: () => {
+      const on = !wake.on;
+      void services.settings.setFlag('wakeWord', on).catch(() => undefined);
+      void wake.enable(on);
+    },
+  };
 
   return (
     <View
@@ -132,7 +150,7 @@ export default function App() {
           onToggleFaces={toggleFaces}
           debug={debug}
           onToggleDebug={() => setDebug((d) => !d)}
-          wake={wake}
+          wake={wakeInfo}
         />
       )}
       {perms.screen && <PermissionScreen kind={perms.screen.kind} canRequest={perms.screen.canRequest} onRequest={perms.screen.request} onSkip={perms.screen.skip} say={services.say} />}
@@ -180,5 +198,5 @@ function usePermissions() {
   else if (!asking && !mic.hasPermission && !micSkipped) {
     screen = { kind: 'microphone', canRequest: mic.canRequestPermission, request: request(mic), skip: () => setMicSkipped(true) };
   }
-  return { camera: { granted: cam.hasPermission }, screen };
+  return { camera: { granted: cam.hasPermission }, mic: { granted: mic.hasPermission }, screen };
 }

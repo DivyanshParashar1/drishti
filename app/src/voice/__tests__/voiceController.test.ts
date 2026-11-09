@@ -515,3 +515,16 @@ test('F12: reading is filed under the reading kind (latency card READ, not ANSWE
   expect(metrics.stageStats('reading', 'stt_final')?.n).toBe(1);
   expect(metrics.stageStats('describe', 'stt_final')).toBeNull();
 });
+
+test('wake word: opens a turn like a press, only when idle', async () => {
+  const t = setup({ askEvents: SENTENCES });
+  await t.vc.wake();
+  expect(t.vc.state).toBe('listening');
+  expect(t.log).toEqual(['haptic', 'stopAll', 'earcon:listen_start', 'mic.start']);
+  await t.vc.wake(); // already listening: no second session
+  expect(t.log.filter((l) => l === 'mic.start')).toHaveLength(1);
+  t.advance(2000);
+  await t.vc.pressOut(); // WakeService ends the turn when the user goes quiet
+  await flush();
+  expect(t.asks).toHaveLength(1);
+});

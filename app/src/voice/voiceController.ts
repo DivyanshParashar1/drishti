@@ -158,6 +158,12 @@ export class VoiceController {
     }
   }
 
+  /** P17 wake word "Drishti": open a hands-free turn (WakeService ends it by loudness). */
+  async wake(): Promise<void> {
+    if (this.state !== 'idle') return;
+    await this.pressIn();
+  }
+
   /** TalkBack's double-tap: start listening, or send what was said. */
   async toggle(): Promise<void> {
     if (this.state === 'listening') return this.pressOut();
