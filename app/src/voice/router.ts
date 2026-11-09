@@ -6,9 +6,11 @@ import type { Lang } from '../core/lang';
  * Tamil in Tamil script, so rules cover romanised Hindi, English and a few Tamil phrasings.
  *
  * Rules are checked in a fixed order so overlapping phrasings resolve predictably:
- * stop > next > help > language > save > delete > list > quiet > repeat > read > who > describe > question.
+ * demo > stop > next > help > language > save > delete > list > quiet > repeat > read > who > describe >
+ * question.
  */
 export type Command =
+  | { kind: 'demo'; on: boolean }
   | { kind: 'stop' }
   | { kind: 'next' }
   | { kind: 'help' }
@@ -72,6 +74,12 @@ export function cleanName(raw: string | undefined): string | null {
 export function route(transcript: string): Command {
   const t = normalize(transcript);
   if (!t) return { kind: 'empty' };
+
+  // F12 demo mode: "demo mode band karo" / "demo mode chalu karo", "demo mode off/on". First, so
+  // "demo band karo" isn't taken for "band karo" (stop).
+  if (/\bdemo\b|डेमो|டெமோ/.test(t)) {
+    return { kind: 'demo', on: !/\b(band|off|hatao|stop)\b|बंद|ऑफ|हटाओ|நிறுத்து|அணை|ஆஃப்/.test(t) };
+  }
 
   // stop: short utterances only, so "stop sign kya hai" stays a question. "bas" only on its own:
   // Prisma also spells "bus" as "bas" ("ye bas hai").

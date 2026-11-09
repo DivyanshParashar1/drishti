@@ -124,6 +124,7 @@ function setup(
     dialog,
     haptic: () => void log.push('haptic'),
     earcon: (n) => void log.push(`earcon:${n}`),
+    setDemoMode: (on) => void log.push(`demo:${on}`),
   };
   const vc = new VoiceController(deps, () => now);
   const talk = async (holdMs = 1000, chunks = 3) => {
@@ -139,8 +140,8 @@ function setup(
 }
 
 const SENTENCES: AskEvent[] = [
-  { type: 'sentence', index: 0, text: 'Kursi aage hai.', audioB64: 'AAA' },
-  { type: 'sentence', index: 1, text: 'Dhyan se.', audioB64: null, ttsError: 'rate_limited' },
+  { type: 'sentence', index: 0, text: 'Kursi aage hai.', audioB64: 'AAA', en: null },
+  { type: 'sentence', index: 1, text: 'Dhyan se.', audioB64: null, en: null, ttsError: 'rate_limited' },
   { type: 'done', timings: { first_audio_ms: 1500, total_ms: 2100 } },
 ];
 
@@ -445,4 +446,72 @@ describe('offline commands (P14)', () => {
     await t.talk();
     expect(t.said()).toEqual(['sys.no_internet']);
   });
+});
+
+// --- F12 demo UI ---
+
+test('F12: thinking from release until the first sentence; the transcript and its command are kept for the bubble', async () => {
+  const ask: AskEvent[] = [{ type: 'sentence', index: 0, text: 'Kursi aage hai.', audioB64: 'AAA', en: 'A chair is ahead.' }];
+  const { vc, all, talk } = setup({ askEvents: ask });
+  const seen: boolean[] = [];
+  vc.onChange(() => seen.push(vc.thinking));
+  await talk();
+  expect(seen).toContain(true);
+  expect(vc.thinking).toBe(false);
+  expect(vc.heard).toMatchObject({ text: 'Saamne kya hai?', cmd: { kind: 'describe' } });
+  const answer = all.find((u) => u.source === 'answer')!;
+  expect(answer.parts).toEqual([{ kind: 'file', uri: 'file:///ans-AAA.mp3', text: 'Kursi aage hai.', en: 'A chair is ahead.' }]);
+});
+
+test('F12: nothing heard → heard with no command ("Didn\'t catch that")', async () => {
+  const { vc, talk } = setup({ stt: { ok: false, code: 'empty' } as SttResult });
+  await talk();
+  expect(vc.heard).toMatchObject({ text: '', cmd: null });
+  expect(vc.thinking).toBe(false);
+});
+
+test('F12: a late English line updates the queued part and tells listeners', async () => {
+  const ask: AskEvent[] = [
+    { type: 'sentence', index: 0, text: 'Kursi aage hai.', audioB64: null, en: null },
+    { type: 'gloss', index: 0, en: 'A chair is ahead.' },
+  ];
+  const { vc, all, talk } = setup({ askEvents: ask });
+  const got: string[] = [];
+  vc.onGloss((_id, text, en) => got.push(`${text} = ${en}`));
+  await talk();
+  expect(got).toEqual(['Kursi aage hai. = A chair is ahead.']);
+  expect(all.find((u) => u.source === 'answer')!.parts[0]).toMatchObject({ kind: 'speak', en: 'A chair is ahead.' });
+});
+
+test('F12: "demo mode band karo" switches demo mode off; a command is not "thinking"', async () => {
+  const { vc, log, talk, setStt } = setup();
+  setStt({ ok: true, text: 'demo mode band karo' });
+  await talk();
+  expect(log).toContain('demo:false');
+  setStt({ ok: true, text: 'demo mode chalu karo' });
+  await talk();
+  expect(log).toContain('demo:true');
+  expect(vc.thinking).toBe(false);
+});
+
+test('F12: cancel drops a talk without sending; stopSpeech stops reading and speech', async () => {
+  const { vc, log, asks, reading } = setup();
+  await vc.pressIn();
+  await vc.cancel();
+  expect(vc.state).toBe('idle');
+  expect(log).toContain('stt.cancel');
+  expect(log).toContain('mic.stop');
+  await vc.pressOut(); // the finger lifting later does nothing
+  expect(asks).toHaveLength(0);
+  reading.state = 'playing';
+  vc.stopSpeech();
+  expect(log.slice(-2)).toEqual(['read.stop', 'stopAll']);
+});
+
+test('F12: reading is filed under the reading kind (latency card READ, not ANSWER)', async () => {
+  const { metrics, talk, setStt } = setup({ ocr: ['Parking nahi'] });
+  setStt({ ok: true, text: 'ye padho' });
+  await talk();
+  expect(metrics.stageStats('reading', 'stt_final')?.n).toBe(1);
+  expect(metrics.stageStats('describe', 'stt_final')).toBeNull();
 });

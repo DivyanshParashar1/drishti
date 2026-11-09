@@ -46,7 +46,7 @@ test('a known person is named after 3 of the last 5 frames and announced once, [
   expect(enqueued).toHaveLength(1);
   expect(enqueued[0].priority).toBe(1);
   expect(enqueued[0].parts).toEqual([
-    { kind: 'speak', text: 'Rahul aapke saamne hai' },
+    { kind: 'speak', text: 'Rahul aapke saamne hai', en: 'Rahul is ahead of you' },
     { kind: 'clip', key: 'dir.left' },
   ]);
   expect(id.decisionOf(5)?.label).toBe('Rahul');
@@ -57,8 +57,8 @@ test('a known person is named after 3 of the last 5 frames and announced once, [
 });
 
 test('the name clip file is used when one exists for the language', () => {
-  expect(nameParts(priya, 'hi-en', 'right')[0]).toEqual({ kind: 'file', uri: 'file:///priya.mp3', text: 'Priya aapke saamne hai' });
-  expect(nameParts(priya, 'en', 'right')[0]).toEqual({ kind: 'speak', text: 'Priya is here' });
+  expect(nameParts(priya, 'hi-en', 'right')[0]).toEqual({ kind: 'file', uri: 'file:///priya.mp3', text: 'Priya aapke saamne hai', en: 'Priya is ahead of you' });
+  expect(nameParts(priya, 'en', 'right')[0]).toEqual({ kind: 'speak', text: 'Priya is here', en: 'Priya is ahead of you' });
 });
 
 test('an unenrolled person → "unknown" after 5 frames with no match, never named', () => {
@@ -97,7 +97,7 @@ test('unknown → name is allowed (face turned toward the camera); a name never 
   expect(id.decisionOf(3)?.label).toBe('Priya');
   expect(enqueued.map((u) => u.parts[0])).toEqual([
     { kind: 'clip', key: 'sys.unknown_person' },
-    { kind: 'file', uri: 'file:///priya.mp3', text: 'Priya aapke saamne hai' },
+    { kind: 'file', uri: 'file:///priya.mp3', text: 'Priya aapke saamne hai', en: 'Priya is ahead of you' },
   ]);
 });
 

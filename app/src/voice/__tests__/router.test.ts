@@ -207,3 +207,13 @@ describe('Devanagari commands (on-device Hindi recognition offline, P14)', () =>
     expect(route('क्वाइट मोड बंद')).toEqual({ kind: 'quiet', on: false });
   });
 });
+
+test('F12 demo mode on/off, before stop', () => {
+  expect(route('demo mode band karo')).toEqual({ kind: 'demo', on: false });
+  expect(route('demo band karo')).toEqual({ kind: 'demo', on: false });
+  expect(route('Demo mode off')).toEqual({ kind: 'demo', on: false });
+  expect(route('demo mode chalu karo')).toEqual({ kind: 'demo', on: true });
+  expect(route('demo mode on')).toEqual({ kind: 'demo', on: true });
+  expect(route('डेमो मोड बंद करो')).toEqual({ kind: 'demo', on: false });
+  expect(route('band karo')).toEqual({ kind: 'stop' });
+});

@@ -53,8 +53,9 @@ export const NAME_TEMPLATE: Record<Lang, (name: string) => string> = {
 
 export function nameParts(p: NamedPerson, lang: Lang, dir: Direction): AudioPart[] {
   const text = NAME_TEMPLATE[lang](p.name);
+  const en = `${p.name} is ahead of you`; // F12 caption; the direction clip adds its own English
   const uri = p.clips?.[lang];
-  return [uri ? { kind: 'file', uri, text } : { kind: 'speak', text }, { kind: 'clip', key: `dir.${dir}` }];
+  return [uri ? { kind: 'file', uri, text, en } : { kind: 'speak', text, en }, { kind: 'clip', key: `dir.${dir}` }];
 }
 
 const LOG_MAX = 1000;

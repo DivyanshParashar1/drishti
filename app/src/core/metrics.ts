@@ -69,6 +69,19 @@ export class Metrics {
     if (e) e.note = code;
   }
 
+  /** Re-file an event under another kind (e.g. a voice command that turned out to be reading). */
+  setKind(id: string, kind: EventKind): void {
+    const e = this.byId.get(id);
+    if (e) e.kind = kind;
+  }
+
+  /** p50/p95 of one stage for one kind over the window, or null if no event has it yet. */
+  stageStats(kind: EventKind, stage: string): StageStats | null {
+    const v: number[] = [];
+    for (const e of this.events) if (e.kind === kind && stage in e.stages) v.push(e.stages[stage]);
+    return v.length ? { n: v.length, p50: percentile(v, 50), p95: percentile(v, 95) } : null;
+  }
+
   get(id: string): MetricEvent | undefined {
     return this.byId.get(id);
   }

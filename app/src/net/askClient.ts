@@ -17,7 +17,8 @@ export interface AskRequest {
 }
 
 export type AskEvent =
-  | { type: 'sentence'; index: number; text: string; audioB64: string | null; ttsError?: string }
+  | { type: 'sentence'; index: number; text: string; audioB64: string | null; en: string | null; ttsError?: string }
+  | { type: 'gloss'; index: number; en: string } // F12: English line that arrived after its sentence
   | { type: 'done'; timings: Record<string, number> }
   | { type: 'error'; code: string; timings?: Record<string, number> };
 
@@ -56,8 +57,12 @@ export function toAskEvent(event: string, data: string): AskEvent | null {
       index: Number(d.index),
       text: String(d.text ?? ''),
       audioB64: typeof d.audio_b64 === 'string' ? d.audio_b64 : null,
+      en: typeof d.en === 'string' && d.en ? d.en : null,
       ...(typeof d.tts_error === 'string' ? { ttsError: d.tts_error } : {}),
     };
+  }
+  if (event === 'gloss') {
+    return typeof d.en === 'string' && d.en ? { type: 'gloss', index: Number(d.index), en: d.en } : null;
   }
   if (event === 'done') return { type: 'done', timings: (d.timings as Record<string, number>) ?? {} };
   if (event === 'error') {
@@ -76,7 +81,7 @@ export async function ask(transport: StreamingTransport, req: AskRequest, onEven
   let finished = false;
   const emit = (e: AskEvent) => {
     if (finished) return;
-    if (e.type !== 'sentence') finished = true;
+    if (e.type !== 'sentence' && e.type !== 'gloss') finished = true;
     onEvent(e);
   };
   const onChunk = (text: string) => {

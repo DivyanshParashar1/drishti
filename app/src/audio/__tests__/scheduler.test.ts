@@ -302,3 +302,14 @@ test('subscribe adds listeners; unsubscribe removes them', async () => {
   await flush();
   expect(ends).toEqual(['u-one:done']);
 });
+
+test('F12 onPlay: once per played entry with every coalesced member, after their onStart', async () => {
+  const { player, log, s } = setup();
+  s.subscribe({ onPlay: (members) => log.push(`play ${members.map((m) => label(m.parts)).join(' + ')}`) });
+  s.enqueue(utt('busy', 4));
+  s.enqueue(utt('car', 2, 'reflex', { frameId: 7 }));
+  s.enqueue(utt('dog', 2, 'reflex', { frameId: 7 }));
+  player.finish();
+  await flush();
+  expect(log.filter((l) => l.startsWith('play') || l.startsWith('start'))).toEqual(['start busy', 'play busy', 'start car', 'start dog', 'play car + dog']);
+});

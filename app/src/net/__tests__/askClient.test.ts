@@ -64,8 +64,8 @@ test('posts to /ask with the token', async () => {
 test('sentences and done stream through, even when chunks split events', async () => {
   const chunks = SSE.match(/.{1,7}/gs)!;
   expect(await collect(transport(chunks))).toEqual([
-    { type: 'sentence', index: 0, text: 'Kursi aage hai.', audioB64: 'SUQz' },
-    { type: 'sentence', index: 1, text: 'Dhyan se.', audioB64: null, ttsError: 'rate_limited' },
+    { type: 'sentence', index: 0, text: 'Kursi aage hai.', audioB64: 'SUQz', en: null },
+    { type: 'sentence', index: 1, text: 'Dhyan se.', audioB64: null, en: null, ttsError: 'rate_limited' },
     { type: 'done', timings: { vlm_first_token_ms: 800, total_ms: 2100 } },
   ]);
 });
@@ -94,4 +94,13 @@ test('network failure → ask_unreachable; a stream that just stops → stream_e
 test('unknown or malformed events are ignored', () => {
   expect(toAskEvent('ping', '{}')).toBeNull();
   expect(toAskEvent('sentence', 'not json')).toBeNull();
+});
+
+test('F12: English line on a sentence, and a late gloss event that does not end the stream', () => {
+  expect(toAskEvent('sentence', JSON.stringify({ index: 0, text: 'Kursi aage hai.', audio_b64: null, en: 'A chair is ahead.' }))).toMatchObject({
+    type: 'sentence',
+    en: 'A chair is ahead.',
+  });
+  expect(toAskEvent('gloss', JSON.stringify({ index: 1, en: 'Go slowly.' }))).toEqual({ type: 'gloss', index: 1, en: 'Go slowly.' });
+  expect(toAskEvent('gloss', JSON.stringify({ index: 1, en: '' }))).toBeNull();
 });

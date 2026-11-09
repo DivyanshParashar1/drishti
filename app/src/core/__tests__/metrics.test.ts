@@ -69,3 +69,20 @@ test('export includes server timings and notes', () => {
   expect(out.events[0]).toMatchObject({ id, server: { first_audio_ms: 2400 }, note: 'answer_failed' });
   expect(out.summary).toBeDefined();
 });
+
+test('F12: stageStats per kind and stage; setKind re-files an event', () => {
+  const { clock, advance } = fakeClock();
+  const m = new Metrics(200, clock);
+  expect(m.stageStats('reflex', 'play_start')).toBeNull();
+  for (const ms of [30, 40, 90]) {
+    const id = m.start('reflex', 'frame_ts');
+    advance(ms);
+    m.mark(id, 'play_start');
+  }
+  expect(m.stageStats('reflex', 'play_start')).toEqual({ n: 3, p50: 40, p95: 90 });
+  const r = m.start('describe', 'ptt_release');
+  m.mark(r, 'stt_final');
+  m.setKind(r, 'reading');
+  expect(m.stageStats('describe', 'stt_final')).toBeNull();
+  expect(m.stageStats('reading', 'stt_final')?.n).toBe(1);
+});

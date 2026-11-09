@@ -1,7 +1,7 @@
 import type { SqlDb } from '../identity/store';
 import { LANGS, type Lang } from './lang';
 
-/** Small persisted settings (F8 language, F10 first run) in the app's SQLite database. */
+/** Small persisted settings (F8 language, F10 first run, F12 demo mode) in the app's SQLite database. */
 export class SettingsStore {
   private values = new Map<string, string>();
 
@@ -21,6 +21,15 @@ export class SettingsStore {
 
   get firstRunDone(): boolean {
     return this.values.get('first_run_done') === '1';
+  }
+
+  /** F12: the demo UI is the default; real-user mode (a plain black screen) is opt-in. */
+  get demoMode(): boolean {
+    return this.values.get('demo_mode') !== '0';
+  }
+
+  setDemoMode(on: boolean): Promise<void> {
+    return this.set('demo_mode', on ? '1' : '0');
   }
 
   setLang(lang: Lang): Promise<void> {

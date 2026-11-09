@@ -22,8 +22,8 @@ export type Source = 'reflex' | 'answer' | 'reading' | 'system';
 
 export type AudioPart =
   | { kind: 'clip'; key: ClipKey } // bundled clip from the language pack
-  | { kind: 'file'; uri: string; text: string } // answer sentence or name clip; text is the fallback
-  | { kind: 'speak'; text: string } // expo-speech
+  | { kind: 'file'; uri: string; text: string; en?: string } // answer sentence or name clip; text is the fallback
+  | { kind: 'speak'; text: string; en?: string } // expo-speech; en: English caption line (F12)
   | { kind: 'pause'; ms: number };
 
 export interface Utterance {
@@ -53,6 +53,8 @@ export interface SchedulerHooks {
   onStart?(u: Utterance, at: number): void;
   onEnd?(u: Utterance, reason: EndReason): void;
   onDrop?(u: Utterance, reason: DropReason): void;
+  /** Once per played entry, with all its members (a coalesced alert is one entry), after onStart. */
+  onPlay?(members: readonly Utterance[], at: number): void;
 }
 
 export const STALE_MS = 500;
@@ -87,7 +89,7 @@ export class SpeechScheduler {
       (...args: Parameters<Required<SchedulerHooks>[K]>) => {
         for (const l of this.listeners) (l[k] as ((...a: typeof args) => void) | undefined)?.(...args);
       };
-    this.hooks = { onStart: each('onStart'), onEnd: each('onEnd'), onDrop: each('onDrop') };
+    this.hooks = { onStart: each('onStart'), onEnd: each('onEnd'), onDrop: each('onDrop'), onPlay: each('onPlay') };
   }
 
   /** Add another set of hooks (e.g. the voice controller watching for interrupted answers). */
@@ -202,6 +204,7 @@ export class SpeechScheduler {
         this.currentInterrupted = false;
         const at = this.clock();
         for (const m of entry.members) this.hooks.onStart(m, at);
+        this.hooks.onPlay(entry.members, at); // after onStart, so play_start is already marked
         let reason: EndReason;
         try {
           const outcome = await this.player.play(this.partsOf(entry), entry.members[0].lang);
