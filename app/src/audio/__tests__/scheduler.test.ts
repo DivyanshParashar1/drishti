@@ -145,25 +145,25 @@ test('P1 and P2 never cut the current clip', async () => {
   expect(player.playing).toBe('Rahul');
 });
 
-test('reflex older than 500 ms at the head of the queue is dropped', async () => {
+test('reflex older than 1.5 s at the head of the queue is dropped', async () => {
   const { player, log, s } = setup();
   s.enqueue(utt('answer', 3, 'answer'));
   await flush();
   s.enqueue(utt('Kursi aage', 2, 'reflex')); // created at t=0
-  s.enqueue(utt('Kutta', 2, 'reflex', { createdAt: 450 }));
-  now = 600;
+  s.enqueue(utt('Kutta', 2, 'reflex', { createdAt: 1450 }));
+  now = 1600;
   player.finish();
   await flush();
   expect(log).toContain('drop Kursi aage stale');
   expect(player.playing).toBe('Kutta'); // 150 ms old: still fresh
 });
 
-test('exactly 500 ms old is not stale', async () => {
+test('exactly 1.5 s old is not stale', async () => {
   const { player, s } = setup();
   s.enqueue(utt('answer', 3, 'answer'));
   await flush();
   s.enqueue(utt('Kursi', 2, 'reflex'));
-  now = 500;
+  now = 1500;
   player.finish();
   await flush();
   expect(player.playing).toBe('Kursi');
@@ -224,8 +224,8 @@ test('a stale member of a coalesced group is dropped, the fresh one plays', asyn
   s.enqueue(utt('answer', 3, 'answer'));
   await flush();
   s.enqueue(utt('Kursi', 2, 'reflex', { frameId: 3, createdAt: 0 }));
-  s.enqueue(utt('Kutta', 2, 'reflex', { frameId: 3, createdAt: 400 }));
-  now = 700;
+  s.enqueue(utt('Kutta', 2, 'reflex', { frameId: 3, createdAt: 1400 }));
+  now = 1700;
   player.finish();
   await flush();
   expect(log).toContain('drop Kursi stale');

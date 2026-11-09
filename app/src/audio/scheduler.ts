@@ -11,7 +11,8 @@ import type { ClipKey } from './clips.generated';
  *   dropped, not resumed (F6: the user can say "repeat").
  * - P1–P4 never cut a clip: they wait for the current utterance to finish. Answers arrive as one
  *   utterance per sentence, so a name can be announced between two sentences.
- * - Reflex utterances older than 500 ms when they reach the head of the queue are dropped.
+ * - Reflex utterances older than 1.5 s when they reach the head of the queue are dropped (P17:
+ *   was 500 ms, which dropped most alerts queued behind a phone-TTS line of ~0.6–1 s).
  *   Answers, reading and system lines are never dropped as stale.
  * - Reflex alerts from the same frame coalesce into one utterance, at most 2 objects
  *   ("Car left mein, kursi aage"); the 2 highest-priority objects win.
@@ -57,7 +58,7 @@ export interface SchedulerHooks {
   onPlay?(members: readonly Utterance[], at: number): void;
 }
 
-export const STALE_MS = 500;
+export const STALE_MS = 1500;
 export const MAX_COALESCED = 2;
 export const COALESCE_PAUSE_MS = 120;
 
