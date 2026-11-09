@@ -42,6 +42,11 @@ export class PhraseCache {
     private readonly retryMs = 60_000,
   ) {}
 
+  /** True while phrases are being fetched (F12: "Voice pack 34/61" in the status strip). */
+  get syncing(): boolean {
+    return this.running !== null;
+  }
+
   /** The saved Timbre file for a phrase, if any. */
   uri(lang: Lang, key: ClipKey): string | undefined {
     return this.uris[lang]?.[key];

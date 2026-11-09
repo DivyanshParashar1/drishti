@@ -14,6 +14,8 @@ import { Reader } from '../reading/reader';
 import { File, Paths } from 'expo-file-system';
 import { IdentityStore, type SqlDb } from '../identity/store';
 import { ReflexLane } from '../vision/reflexLane';
+import type { ClipKey } from '../audio/clips.generated';
+import { Signal } from './signal';
 import { createConnectivityMonitor, type ConnectivityMonitor } from './connectivity';
 import { FrameGrabber } from './frameGrabber';
 import { DEFAULT_LANG, type Lang } from './lang';
@@ -43,6 +45,18 @@ export interface Services {
   tutorial(): void;
   /** F8: switch language everywhere and persist it. */
   setLanguage(lang: Lang): Promise<void>;
+  /** F12: fired after a language switch has been applied. */
+  langChanged: Signal<[Lang]>;
+  /** F12: the demo UI (default) or real-user mode (plain black screen). Saved. */
+  demoMode: boolean;
+  /** Switch demo mode, save it and say so ("Demo mode chalu ho gaya"). */
+  setDemoMode(on: boolean): void;
+  /** F12: fired when demo mode changes (also once when the saved setting loads). */
+  demoChanged: Signal<[on: boolean, byUser: boolean]>;
+  /** True when this session played the first-run tutorial (F12 caption says "First run"). */
+  firstRun: boolean;
+  /** A fixed phrase as a P4 system line. */
+  say(key: ClipKey): void;
 }
 
 export function createServices(): Services {
@@ -124,7 +138,21 @@ export function createServices(): Services {
     tutorial: () => {
       for (const key of TUTORIAL) speak([{ kind: 'clip', key }]);
     },
-    setLanguage: (lang: Lang) => applyLanguage({ holder: services, reflex, player, settings, nameClips, phrases }, lang),
+    setLanguage: async (lang: Lang) => {
+      await applyLanguage({ holder: services, reflex, player, settings, nameClips, phrases }, lang);
+      services.langChanged.emit(lang);
+    },
+    langChanged: new Signal<[Lang]>(),
+    demoMode: true,
+    setDemoMode: (on: boolean) => {
+      services.demoMode = on;
+      void settings.setDemoMode(on).catch(() => undefined);
+      speak([{ kind: 'clip', key: on ? 'sys.demo_on' : 'sys.demo_off' }]);
+      services.demoChanged.emit(on, true);
+    },
+    demoChanged: new Signal<[boolean, boolean]>(),
+    firstRun: false,
+    say: (key: ClipKey) => speak([{ kind: 'clip', key }]),
   });
 }
 
@@ -134,9 +162,13 @@ export async function startServices(s: Services): Promise<() => void> {
   await s.settings.init().catch((e) => console.warn('settings failed', e)); // defaults then
   s.lang = s.settings.lang ?? DEFAULT_LANG;
   s.reflex.lang = s.lang;
+  s.langChanged.emit(s.lang);
+  s.demoMode = s.settings.demoMode;
+  s.demoChanged.emit(s.demoMode, false);
   await s.phrases.load(s.lang); // Timbre phrases saved on earlier runs
   await ExpoAudioBackend.configure();
   await s.player.preloadPack(s.lang);
+  s.firstRun = !s.settings.firstRunDone;
   void playFirstRun(s.settings, () => s.tutorial()); // F10: once ever; "help" replays it
   // F10: "Internet chala gaya, alerts chalu hain" / "Internet wapas aa gaya", without flapping spam.
   const announcer = new ConnectivityAnnouncer((key) => {
