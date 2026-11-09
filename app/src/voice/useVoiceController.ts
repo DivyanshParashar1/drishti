@@ -11,6 +11,7 @@ import { OfflineSttSession, onDeviceRecognizer } from '../net/offlineStt';
 import { rnWebSocketFactory, SttSession } from '../net/sttClient';
 import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-kit/text-recognition';
 import { readImage } from '../reading/ocr';
+import { micLevel, pcmLevel } from '../ui/micLevel';
 import { VoiceController } from './voiceController';
 
 const MIC = { sampleRate: 16000, channels: 1, encoding: 'pcm_16bit', interval: 40 } as const;
@@ -65,12 +66,14 @@ export function useVoiceController(services: Services): VoiceController {
           onAudioStream: async (e) => {
             if (typeof e.data === 'string') {
               const bytes = base64ToBytes(e.data);
+              micLevel.emit(pcmLevel(bytes)); // F12 waveform
               onChunk(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
             }
           },
         });
       },
       stopMic: async () => {
+        micLevel.emit(0);
         await mic.get().stopRecording();
       },
       grabFrame: (mode) => services.frames.grabToFile(mode),
@@ -86,6 +89,7 @@ export function useVoiceController(services: Services): VoiceController {
       dialog: services.enrollment,
       setLanguage: (lang) => services.setLanguage(lang),
       tutorial: () => services.tutorial(),
+      setDemoMode: (on) => services.setDemoMode(on),
       haptic: () => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light),
       earcon: (name) => {
         const p = earcons[name];

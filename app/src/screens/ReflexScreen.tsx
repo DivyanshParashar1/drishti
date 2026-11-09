@@ -1,54 +1,39 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
-import { requestRecordingPermissionsAsync } from 'expo-audio';
-import { Camera, useCameraPermission } from 'react-native-vision-camera';
+import { Camera } from 'react-native-vision-camera';
 import type { Services } from '../core/services';
 import { boxToView } from '../vision/boxLayout';
 import type { DetectorId } from '../vision/config';
 import type { FrameResult } from '../vision/reflexLane';
-import { useReflexCamera } from '../vision/useReflexCamera';
+import { useReflexCamera, type ModelState } from '../vision/useReflexCamera';
 
 const FAILURES_BEFORE_SPEAKING = 5;
 
-/** Camera + Reflex lane (F1/F2). Boxes, labels and track ids show in debug mode. */
+/**
+ * Camera + Reflex lane (F1/F2). Boxes, labels and track ids show in debug mode; the demo UI draws
+ * its own (F12). Permissions are asked by App (F12 permission screens).
+ */
 export function ReflexScreen({
   services,
   detector,
   debug,
   facesOn,
+  hasPermission,
+  onStatus,
 }: {
   services: Services;
   detector: DetectorId;
   debug: boolean;
   facesOn: boolean;
+  hasPermission: boolean;
+  onStatus?: (state: ModelState['state']) => void;
 }) {
   const { reflex, scheduler, metrics, faces } = services;
-  const { hasPermission, requestPermission } = useCameraPermission();
   const [, setTick] = useState(0);
   const [view, setView] = useState({ width: 0, height: 0 });
   const [lastError, setLastError] = useState<string | null>(null);
   const failures = useRef(0);
   const spokeFailure = useRef(false);
-
-  // Camera, then microphone, one at a time: Android shows one permission dialog at a time, and a
-  // request made while another is open never completes (its native promise is destroyed).
-  const asked = useRef(false);
-  useEffect(() => {
-    if (asked.current) return;
-    asked.current = true;
-    void (async () => {
-      try {
-        if (!hasPermission) await requestPermission();
-      } catch {
-        // denied or interrupted: the screen shows "Camera permission needed"
-      }
-      try {
-        await requestRecordingPermissionsAsync();
-      } catch {
-        // denied: STT reports an error and the user hears "Samajh nahi aaya"
-      }
-    })();
-  }, [hasPermission, requestPermission]);
 
   const speakFailure = useCallback(() => {
     if (spokeFailure.current) return;
@@ -89,7 +74,8 @@ export function ReflexScreen({
 
   useEffect(() => {
     if (status.state === 'failed') speakFailure(); // §9: spoken error, no silent failure
-  }, [status.state, speakFailure]);
+    onStatus?.(status.state);
+  }, [status.state, speakFailure, onStatus]);
 
   useEffect(() => reflex.onUpdate(() => debug && setTick((n) => n + 1)), [reflex, debug]);
 
@@ -111,11 +97,7 @@ export function ReflexScreen({
 
   return (
     <View style={styles.root} onLayout={onLayout}>
-      {hasPermission ? (
-        <Camera style={StyleSheet.absoluteFill} device="back" isActive outputs={[frameOutput]} />
-      ) : (
-        <Text style={styles.text}>Camera permission needed</Text>
-      )}
+      {hasPermission && <Camera style={StyleSheet.absoluteFill} device="back" isActive outputs={[frameOutput]} />}
       {debug &&
         reflex.frameSize.width > 0 &&
         reflex.visible.map((t) => {

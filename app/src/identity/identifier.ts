@@ -121,6 +121,12 @@ export class FaceIdentifier {
     return { label, sim: s.last ? s.last.sim : null };
   }
 
+  /** F12 box tags: the track's decided name, "unknown", or null while undecided (face too small). */
+  identityOf(trackId: number): { kind: 'name'; name: string } | { kind: 'unknown' } | null {
+    const d = this.tracks.get(trackId)?.decision;
+    return d ? (d.kind === 'name' ? { kind: 'name', name: d.name } : { kind: 'unknown' }) : null;
+  }
+
   /** Recognised people in view now (who-is-here, and names for /ask). */
   presentPeople(): readonly { person: NamedPerson; dir: Direction }[] {
     return this.present;

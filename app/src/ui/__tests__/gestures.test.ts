@@ -44,3 +44,17 @@ test('tap waits out the window; a second tap inside it is a double', () => {
   jest.advanceTimersByTime(1000);
   expect(log).toEqual(['tap', 'double']);
 });
+
+test('mic level: silence is 0, loud speech saturates at 1', () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { pcmLevel } = require('../micLevel') as typeof import('../micLevel');
+  const pcm = (v: number) => {
+    const b = new Uint8Array(1280);
+    const d = new DataView(b.buffer);
+    for (let i = 0; i < 640; i++) d.setInt16(i * 2, i % 2 ? v : -v, true);
+    return b;
+  };
+  expect(pcmLevel(pcm(0))).toBe(0);
+  expect(pcmLevel(pcm(3000))).toBeCloseTo(0.5);
+  expect(pcmLevel(pcm(20000))).toBe(1);
+});
