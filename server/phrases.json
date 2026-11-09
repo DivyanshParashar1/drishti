@@ -328,5 +328,35 @@
     "hi": "यह अभी उपलब्ध नहीं है",
     "en": "That isn't available yet",
     "ta": "இது இன்னும் கிடைக்கவில்லை"
+  },
+  "sys.demo_on": {
+    "hi-en": "Demo mode chalu ho gaya",
+    "hi": "डेमो मोड चालू हो गया",
+    "en": "Demo mode is on",
+    "ta": "டெமோ முறை இயக்கப்பட்டது"
+  },
+  "sys.demo_off": {
+    "hi-en": "Demo mode band ho gaya",
+    "hi": "डेमो मोड बंद हो गया",
+    "en": "Demo mode is off",
+    "ta": "டெமோ முறை நிறுத்தப்பட்டது"
+  },
+  "sys.perm_camera": {
+    "hi-en": "Drishti ko aage dekhne ke liye camera chahiye.",
+    "hi": "दृष्टि को आगे देखने के लिए कैमरा चाहिए।",
+    "en": "Drishti needs the camera to see what's ahead.",
+    "ta": "முன்னால் உள்ளதைப் பார்க்க திருஷ்டிக்கு கேமரா தேவை."
+  },
+  "sys.perm_mic": {
+    "hi-en": "Aapke sawaal sunne ke liye Drishti ko microphone chahiye.",
+    "hi": "आपके सवाल सुनने के लिए दृष्टि को माइक्रोफ़ोन चाहिए।",
+    "en": "Drishti needs the microphone to hear your questions.",
+    "ta": "உங்கள் கேள்விகளைக் கேட்க திருஷ்டிக்கு மைக்ரோஃபோன் தேவை."
+  },
+  "sys.perm_settings": {
+    "hi-en": "Settings kholiye aur camera ki anumati dijiye.",
+    "hi": "सेटिंग्स खोलिए और कैमरा की अनुमति दीजिए।",
+    "en": "Open Settings and allow the camera.",
+    "ta": "அமைப்புகளைத் திறந்து கேமராவை அனுமதிக்கவும்."
   }
 }

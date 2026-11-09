@@ -59,6 +59,11 @@ export type ClipKey =
   | "sys.lang_switched"
   | "sys.detector_failed"
   | "sys.not_available"
+  | "sys.demo_on"
+  | "sys.demo_off"
+  | "sys.perm_camera"
+  | "sys.perm_mic"
+  | "sys.perm_settings"
 ;
 
 export interface Clip {
@@ -124,6 +129,11 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.lang_switched": { text: "अब मैं हिंदी में बोलूँगी", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "रुकावट अलर्ट शुरू नहीं हो पाए। ऐप दोबारा खोलिए।", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
     "sys.not_available": { text: "यह अभी उपलब्ध नहीं है", en: "That isn't available yet", asset: null },
+    "sys.demo_on": { text: "डेमो मोड चालू हो गया", en: "Demo mode is on", asset: null },
+    "sys.demo_off": { text: "डेमो मोड बंद हो गया", en: "Demo mode is off", asset: null },
+    "sys.perm_camera": { text: "दृष्टि को आगे देखने के लिए कैमरा चाहिए।", en: "Drishti needs the camera to see what's ahead.", asset: null },
+    "sys.perm_mic": { text: "आपके सवाल सुनने के लिए दृष्टि को माइक्रोफ़ोन चाहिए।", en: "Drishti needs the microphone to hear your questions.", asset: null },
+    "sys.perm_settings": { text: "सेटिंग्स खोलिए और कैमरा की अनुमति दीजिए।", en: "Open Settings and allow the camera.", asset: null },
   },
   "hi-en": {
     "obj.person": { text: "Vyakti", en: "Person", asset: null },
@@ -181,6 +191,11 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.lang_switched": { text: "Ab main Hinglish mein bolungi", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "Rukaawat alerts shuru nahi ho paaye. App dobara kholiye.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
     "sys.not_available": { text: "Ye abhi uplabdh nahi hai", en: "That isn't available yet", asset: null },
+    "sys.demo_on": { text: "Demo mode chalu ho gaya", en: "Demo mode is on", asset: null },
+    "sys.demo_off": { text: "Demo mode band ho gaya", en: "Demo mode is off", asset: null },
+    "sys.perm_camera": { text: "Drishti ko aage dekhne ke liye camera chahiye.", en: "Drishti needs the camera to see what's ahead.", asset: null },
+    "sys.perm_mic": { text: "Aapke sawaal sunne ke liye Drishti ko microphone chahiye.", en: "Drishti needs the microphone to hear your questions.", asset: null },
+    "sys.perm_settings": { text: "Settings kholiye aur camera ki anumati dijiye.", en: "Open Settings and allow the camera.", asset: null },
   },
   "en": {
     "obj.person": { text: "Person", en: "Person", asset: null },
@@ -238,6 +253,11 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.lang_switched": { text: "I'll speak in English now", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "Obstacle alerts could not start. Please reopen the app.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
     "sys.not_available": { text: "That isn't available yet", en: "That isn't available yet", asset: null },
+    "sys.demo_on": { text: "Demo mode is on", en: "Demo mode is on", asset: null },
+    "sys.demo_off": { text: "Demo mode is off", en: "Demo mode is off", asset: null },
+    "sys.perm_camera": { text: "Drishti needs the camera to see what's ahead.", en: "Drishti needs the camera to see what's ahead.", asset: null },
+    "sys.perm_mic": { text: "Drishti needs the microphone to hear your questions.", en: "Drishti needs the microphone to hear your questions.", asset: null },
+    "sys.perm_settings": { text: "Open Settings and allow the camera.", en: "Open Settings and allow the camera.", asset: null },
   },
   "ta": {
     "obj.person": { text: "ஒருவர்", en: "Person", asset: null },
@@ -295,6 +315,11 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.lang_switched": { text: "இனி நான் தமிழில் பேசுவேன்", en: "I'll speak in English now", asset: null },
     "sys.detector_failed": { text: "தடை எச்சரிக்கைகள் தொடங்கவில்லை. செயலியை மீண்டும் திறக்கவும்.", en: "Obstacle alerts could not start. Please reopen the app.", asset: null },
     "sys.not_available": { text: "இது இன்னும் கிடைக்கவில்லை", en: "That isn't available yet", asset: null },
+    "sys.demo_on": { text: "டெமோ முறை இயக்கப்பட்டது", en: "Demo mode is on", asset: null },
+    "sys.demo_off": { text: "டெமோ முறை நிறுத்தப்பட்டது", en: "Demo mode is off", asset: null },
+    "sys.perm_camera": { text: "முன்னால் உள்ளதைப் பார்க்க திருஷ்டிக்கு கேமரா தேவை.", en: "Drishti needs the camera to see what's ahead.", asset: null },
+    "sys.perm_mic": { text: "உங்கள் கேள்விகளைக் கேட்க திருஷ்டிக்கு மைக்ரோஃபோன் தேவை.", en: "Drishti needs the microphone to hear your questions.", asset: null },
+    "sys.perm_settings": { text: "அமைப்புகளைத் திறந்து கேமராவை அனுமதிக்கவும்.", en: "Open Settings and allow the camera.", asset: null },
   },
 };
 
