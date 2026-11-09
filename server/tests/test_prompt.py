@@ -1,19 +1,20 @@
 import pytest
 
-from app.ask.prompt import HAZARDS, Detection, system_prompt, user_text, wants_gloss
+from app.ask.prompt import Detection, system_prompt, user_text, wants_gloss
 from app.gnani.languages import LANGS
 
 
 @pytest.mark.parametrize("lang", LANGS)
 def test_system_prompt_has_every_f6_rule(lang):
+    """P17: simple answers; no step counts or distances anywhere in the prompt."""
     p = system_prompt(lang)
-    assert "at most 2 short sentences" in p
-    assert "safety-relevant fact first" in p
+    assert "1 or 2 short sentences" in p
+    assert "Say only what was asked" in p
     assert "left, ahead or right" in p
-    assert HAZARDS in p
-    assert "auto-rickshaws" in p
     assert "Never guess who a person is" in p
     assert "aren't sure, say so" in p
+    for banned in ("kadam", "कदम", "அடி", "2 to 3 steps", "safety-relevant"):
+        assert banned not in p
 
 
 @pytest.mark.parametrize(
