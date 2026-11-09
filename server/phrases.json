@@ -89,6 +89,396 @@
     "en": "Stop sign",
     "ta": "நிறுத்தக் குறி"
   },
+  "obj.airplane": {
+    "hi-en": "Hawai jahaz",
+    "hi": "हवाई जहाज़",
+    "en": "Airplane",
+    "ta": "விமானம்"
+  },
+  "obj.train": {
+    "hi-en": "Train",
+    "hi": "ट्रेन",
+    "en": "Train",
+    "ta": "ரயில்"
+  },
+  "obj.boat": {
+    "hi-en": "Naav",
+    "hi": "नाव",
+    "en": "Boat",
+    "ta": "படகு"
+  },
+  "obj.traffic_light": {
+    "hi-en": "Traffic light",
+    "hi": "ट्रैफ़िक लाइट",
+    "en": "Traffic light",
+    "ta": "போக்குவரத்து விளக்கு"
+  },
+  "obj.parking_meter": {
+    "hi-en": "Parking meter",
+    "hi": "पार्किंग मीटर",
+    "en": "Parking meter",
+    "ta": "பார்க்கிங் மீட்டர்"
+  },
+  "obj.bird": {
+    "hi-en": "Chidiya",
+    "hi": "चिड़िया",
+    "en": "Bird",
+    "ta": "பறவை"
+  },
+  "obj.cat": {
+    "hi-en": "Billi",
+    "hi": "बिल्ली",
+    "en": "Cat",
+    "ta": "பூனை"
+  },
+  "obj.horse": {
+    "hi-en": "Ghoda",
+    "hi": "घोड़ा",
+    "en": "Horse",
+    "ta": "குதிரை"
+  },
+  "obj.sheep": {
+    "hi-en": "Bhed",
+    "hi": "भेड़",
+    "en": "Sheep",
+    "ta": "ஆடு"
+  },
+  "obj.elephant": {
+    "hi-en": "Haathi",
+    "hi": "हाथी",
+    "en": "Elephant",
+    "ta": "யானை"
+  },
+  "obj.bear": {
+    "hi-en": "Bhaalu",
+    "hi": "भालू",
+    "en": "Bear",
+    "ta": "கரடி"
+  },
+  "obj.zebra": {
+    "hi-en": "Zebra",
+    "hi": "ज़ेबरा",
+    "en": "Zebra",
+    "ta": "வரிக்குதிரை"
+  },
+  "obj.giraffe": {
+    "hi-en": "Giraffe",
+    "hi": "जिराफ़",
+    "en": "Giraffe",
+    "ta": "ஒட்டகச்சிவிங்கி"
+  },
+  "obj.backpack": {
+    "hi-en": "Bag",
+    "hi": "बैग",
+    "en": "Backpack",
+    "ta": "முதுகுப் பை"
+  },
+  "obj.umbrella": {
+    "hi-en": "Chhata",
+    "hi": "छाता",
+    "en": "Umbrella",
+    "ta": "குடை"
+  },
+  "obj.handbag": {
+    "hi-en": "Handbag",
+    "hi": "हैंडबैग",
+    "en": "Handbag",
+    "ta": "கைப்பை"
+  },
+  "obj.tie": {
+    "hi-en": "Tie",
+    "hi": "टाई",
+    "en": "Tie",
+    "ta": "டை"
+  },
+  "obj.suitcase": {
+    "hi-en": "Suitcase",
+    "hi": "सूटकेस",
+    "en": "Suitcase",
+    "ta": "சூட்கேஸ்"
+  },
+  "obj.frisbee": {
+    "hi-en": "Frisbee",
+    "hi": "फ़्रिस्बी",
+    "en": "Frisbee",
+    "ta": "ஃப்ரிஸ்பீ"
+  },
+  "obj.skis": {
+    "hi-en": "Ski",
+    "hi": "स्की",
+    "en": "Skis",
+    "ta": "ஸ்கீ"
+  },
+  "obj.snowboard": {
+    "hi-en": "Snowboard",
+    "hi": "स्नोबोर्ड",
+    "en": "Snowboard",
+    "ta": "ஸ்னோபோர்டு"
+  },
+  "obj.sports_ball": {
+    "hi-en": "Ball",
+    "hi": "गेंद",
+    "en": "Ball",
+    "ta": "பந்து"
+  },
+  "obj.kite": {
+    "hi-en": "Patang",
+    "hi": "पतंग",
+    "en": "Kite",
+    "ta": "பட்டம்"
+  },
+  "obj.baseball_bat": {
+    "hi-en": "Bat",
+    "hi": "बैट",
+    "en": "Bat",
+    "ta": "மட்டை"
+  },
+  "obj.baseball_glove": {
+    "hi-en": "Glove",
+    "hi": "दस्ताना",
+    "en": "Glove",
+    "ta": "கையுறை"
+  },
+  "obj.skateboard": {
+    "hi-en": "Skateboard",
+    "hi": "स्केटबोर्ड",
+    "en": "Skateboard",
+    "ta": "ஸ்கேட்போர்டு"
+  },
+  "obj.surfboard": {
+    "hi-en": "Surfboard",
+    "hi": "सर्फ़बोर्ड",
+    "en": "Surfboard",
+    "ta": "சர்ஃப்போர்டு"
+  },
+  "obj.tennis_racket": {
+    "hi-en": "Racket",
+    "hi": "रैकेट",
+    "en": "Racket",
+    "ta": "ராக்கெட்"
+  },
+  "obj.bottle": {
+    "hi-en": "Bottle",
+    "hi": "बोतल",
+    "en": "Bottle",
+    "ta": "பாட்டில்"
+  },
+  "obj.wine_glass": {
+    "hi-en": "Glass",
+    "hi": "गिलास",
+    "en": "Glass",
+    "ta": "கிளாஸ்"
+  },
+  "obj.cup": {
+    "hi-en": "Cup",
+    "hi": "कप",
+    "en": "Cup",
+    "ta": "கோப்பை"
+  },
+  "obj.fork": {
+    "hi-en": "Kaanta",
+    "hi": "काँटा",
+    "en": "Fork",
+    "ta": "முள்கரண்டி"
+  },
+  "obj.knife": {
+    "hi-en": "Chaaku",
+    "hi": "चाकू",
+    "en": "Knife",
+    "ta": "கத்தி"
+  },
+  "obj.spoon": {
+    "hi-en": "Chammach",
+    "hi": "चम्मच",
+    "en": "Spoon",
+    "ta": "கரண்டி"
+  },
+  "obj.bowl": {
+    "hi-en": "Katori",
+    "hi": "कटोरी",
+    "en": "Bowl",
+    "ta": "கிண்ணம்"
+  },
+  "obj.banana": {
+    "hi-en": "Kela",
+    "hi": "केला",
+    "en": "Banana",
+    "ta": "வாழைப்பழம்"
+  },
+  "obj.apple": {
+    "hi-en": "Seb",
+    "hi": "सेब",
+    "en": "Apple",
+    "ta": "ஆப்பிள்"
+  },
+  "obj.sandwich": {
+    "hi-en": "Sandwich",
+    "hi": "सैंडविच",
+    "en": "Sandwich",
+    "ta": "சாண்ட்விச்"
+  },
+  "obj.orange": {
+    "hi-en": "Santra",
+    "hi": "संतरा",
+    "en": "Orange",
+    "ta": "ஆரஞ்சு"
+  },
+  "obj.broccoli": {
+    "hi-en": "Broccoli",
+    "hi": "ब्रोकली",
+    "en": "Broccoli",
+    "ta": "ப்ரோக்கோலி"
+  },
+  "obj.carrot": {
+    "hi-en": "Gaajar",
+    "hi": "गाजर",
+    "en": "Carrot",
+    "ta": "கேரட்"
+  },
+  "obj.hot_dog": {
+    "hi-en": "Hot dog",
+    "hi": "हॉट डॉग",
+    "en": "Hot dog",
+    "ta": "ஹாட் டாக்"
+  },
+  "obj.pizza": {
+    "hi-en": "Pizza",
+    "hi": "पिज़्ज़ा",
+    "en": "Pizza",
+    "ta": "பீட்சா"
+  },
+  "obj.donut": {
+    "hi-en": "Donut",
+    "hi": "डोनट",
+    "en": "Donut",
+    "ta": "டோனட்"
+  },
+  "obj.cake": {
+    "hi-en": "Cake",
+    "hi": "केक",
+    "en": "Cake",
+    "ta": "கேக்"
+  },
+  "obj.bed": {
+    "hi-en": "Bistar",
+    "hi": "बिस्तर",
+    "en": "Bed",
+    "ta": "படுக்கை"
+  },
+  "obj.toilet": {
+    "hi-en": "Toilet",
+    "hi": "टॉयलेट",
+    "en": "Toilet",
+    "ta": "கழிப்பறை"
+  },
+  "obj.tv": {
+    "hi-en": "TV",
+    "hi": "टीवी",
+    "en": "TV",
+    "ta": "டிவி"
+  },
+  "obj.laptop": {
+    "hi-en": "Laptop",
+    "hi": "लैपटॉप",
+    "en": "Laptop",
+    "ta": "லேப்டாப்"
+  },
+  "obj.mouse": {
+    "hi-en": "Mouse",
+    "hi": "माउस",
+    "en": "Mouse",
+    "ta": "மவுஸ்"
+  },
+  "obj.remote": {
+    "hi-en": "Remote",
+    "hi": "रिमोट",
+    "en": "Remote",
+    "ta": "ரிமோட்"
+  },
+  "obj.keyboard": {
+    "hi-en": "Keyboard",
+    "hi": "कीबोर्ड",
+    "en": "Keyboard",
+    "ta": "கீபோர்டு"
+  },
+  "obj.cell_phone": {
+    "hi-en": "Phone",
+    "hi": "फ़ोन",
+    "en": "Phone",
+    "ta": "போன்"
+  },
+  "obj.microwave": {
+    "hi-en": "Microwave",
+    "hi": "माइक्रोवेव",
+    "en": "Microwave",
+    "ta": "மைக்ரோவேவ்"
+  },
+  "obj.oven": {
+    "hi-en": "Oven",
+    "hi": "ओवन",
+    "en": "Oven",
+    "ta": "அடுப்பு"
+  },
+  "obj.toaster": {
+    "hi-en": "Toaster",
+    "hi": "टोस्टर",
+    "en": "Toaster",
+    "ta": "டோஸ்டர்"
+  },
+  "obj.sink": {
+    "hi-en": "Sink",
+    "hi": "सिंक",
+    "en": "Sink",
+    "ta": "சிங்க்"
+  },
+  "obj.refrigerator": {
+    "hi-en": "Fridge",
+    "hi": "फ़्रिज",
+    "en": "Fridge",
+    "ta": "ஃப்ரிட்ஜ்"
+  },
+  "obj.book": {
+    "hi-en": "Kitaab",
+    "hi": "किताब",
+    "en": "Book",
+    "ta": "புத்தகம்"
+  },
+  "obj.clock": {
+    "hi-en": "Ghadi",
+    "hi": "घड़ी",
+    "en": "Clock",
+    "ta": "கடிகாரம்"
+  },
+  "obj.vase": {
+    "hi-en": "Phooldaan",
+    "hi": "फूलदान",
+    "en": "Vase",
+    "ta": "பூச்சாடி"
+  },
+  "obj.scissors": {
+    "hi-en": "Kainchi",
+    "hi": "कैंची",
+    "en": "Scissors",
+    "ta": "கத்தரிக்கோல்"
+  },
+  "obj.teddy_bear": {
+    "hi-en": "Teddy bear",
+    "hi": "टेडी बियर",
+    "en": "Teddy bear",
+    "ta": "டெடி பியர்"
+  },
+  "obj.hair_drier": {
+    "hi-en": "Hair dryer",
+    "hi": "हेयर ड्रायर",
+    "en": "Hair dryer",
+    "ta": "ஹேர் ட்ரையர்"
+  },
+  "obj.toothbrush": {
+    "hi-en": "Toothbrush",
+    "hi": "टूथब्रश",
+    "en": "Toothbrush",
+    "ta": "பல் துலக்கி"
+  },
   "dir.left": {
     "hi-en": "left mein",
     "hi": "बाएँ",
@@ -138,10 +528,10 @@
     "ta": "முன்னால் உள்ள கார், நாற்காலி, மனிதர்கள் போன்றவற்றை நானே சொல்வேன்."
   },
   "sys.tutorial_2": {
-    "hi-en": "Kuch poochna ho to screen dabaakar rakhiye, boliye, phir chhod dijiye.",
-    "hi": "कुछ पूछना हो तो स्क्रीन दबाकर रखिए, बोलिए, फिर छोड़ दीजिए।",
-    "en": "To ask something, press and hold the screen, speak, then let go.",
-    "ta": "ஏதாவது கேட்க, திரையை அழுத்திப் பிடித்துப் பேசுங்கள், பிறகு விடுங்கள்."
+    "hi-en": "Kuch poochna ho to Drishti boliye, phir apna sawaal poochiye. Ya screen dabaakar rakhiye, boliye, phir chhod dijiye.",
+    "hi": "कुछ पूछना हो तो दृष्टि बोलिए, फिर अपना सवाल पूछिए। या स्क्रीन दबाकर रखिए, बोलिए, फिर छोड़ दीजिए।",
+    "en": "To ask something, say Drishti, then ask your question. Or press and hold the screen, speak, then let go.",
+    "ta": "ஏதாவது கேட்க, திருஷ்டி என்று சொல்லி உங்கள் கேள்வியைக் கேளுங்கள். அல்லது திரையை அழுத்திப் பிடித்துப் பேசுங்கள், பிறகு விடுங்கள்."
   },
   "sys.tutorial_3": {
     "hi-en": "Jaise poochiye, saamne kya hai, ya ye padho.",
@@ -222,10 +612,10 @@
     "ta": "மீண்டும் சொல்ல எதுவும் இல்லை"
   },
   "sys.quiet_on": {
-    "hi-en": "Quiet mode chalu. Sirf gaadiyan aur paas ki cheezein bataungi.",
-    "hi": "शांत मोड चालू। सिर्फ़ गाड़ियाँ और पास की चीज़ें बताऊँगी।",
-    "en": "Quiet mode on. I'll only announce vehicles and things close by.",
-    "ta": "அமைதி முறை இயக்கப்பட்டது. வாகனங்களையும் அருகில் உள்ளவற்றையும் மட்டும் சொல்வேன்."
+    "hi-en": "Quiet mode chalu. Sirf gaadiyan bataungi.",
+    "hi": "शांत मोड चालू। सिर्फ़ गाड़ियाँ बताऊँगी।",
+    "en": "Quiet mode on. I'll only announce vehicles.",
+    "ta": "அமைதி முறை இயக்கப்பட்டது. வாகனங்களை மட்டும் சொல்வேன்."
   },
   "sys.quiet_off": {
     "hi-en": "Quiet mode band",

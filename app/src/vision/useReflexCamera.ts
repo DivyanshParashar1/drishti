@@ -10,7 +10,6 @@ import { loadWithFallback } from '../models/loadModel';
 import { VISION, type DetectorId } from './config';
 import { decodeEfficientDet, decodeYolo } from './decode';
 import { embedFaces, type MlFace } from './faceWorklet';
-import { YOLO_ALERT_MASK } from './labels';
 import { letterbox, meanLuma, toInputTensor, toLetterboxTensor, unletterbox } from './preprocess';
 import type { FrameResult } from './reflexLane';
 
@@ -139,9 +138,8 @@ export function useReflexCamera(
   );
   const size = VISION.inputSize;
   const every = VISION.everyNthFrame;
-  const minScore = VISION.minScore;
+  const minScore = VISION.decodeScore; // the lane filters at VISION.minScore before announcing
   const yoloIou = VISION.yoloIou;
-  const mask = YOLO_ALERT_MASK;
   const faceCfg = FACE_CFG;
 
   const onFrame = useCallback(
@@ -188,7 +186,7 @@ export function useReflexCamera(
         let detections =
           detector === 'efficientdet_lite0'
             ? decodeEfficientDet(views, minScore)
-            : decodeYolo(views[0], views[0].length / 84, minScore, yoloIou, 20, mask);
+            : decodeYolo(views[0], views[0].length / 84, minScore, yoloIou, 20);
         if (lb) detections = detections.map((d) => ({ label: d.label, score: d.score, box: unletterbox(d.box, lb) }));
         const t3 = now();
         // F3: faces only when a person is in view; ML Kit reads the (YUV) frame itself.
@@ -231,7 +229,6 @@ export function useReflexCamera(
       size,
       minScore,
       yoloIou,
-      mask,
       faceCfg,
       onResult,
       onError,

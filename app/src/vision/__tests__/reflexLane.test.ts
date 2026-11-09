@@ -24,17 +24,13 @@ test('a new chair is enqueued once with reflex metrics backdated to the frame', 
   lane.handle(frame([chair], 2));
   expect(enqueued).toHaveLength(1);
   const u = enqueued[0];
-  expect(u.parts).toEqual([
-    { kind: 'clip', key: 'obj.chair' },
-    { kind: 'clip', key: 'dir.ahead' },
-    { kind: 'clip', key: 'dist.far' },
-  ]);
+  expect(u.parts).toEqual([{ kind: 'clip', key: 'obj.chair' }]);
   expect(u.priority).toBe(2);
   expect(u.createdAt).toBe(960); // 1000 - 40 ms worklet time
   expect(metrics.get(u.id)!.stages).toEqual({ frame_ts: 0, detect_done: 40, enqueued: 40 });
 });
 
-test('filters run before tracking: low score, tiny boxes and non-alert classes are ignored', () => {
+test('filters run before tracking: low score and tiny boxes are ignored; any YOLO class counts', () => {
   const { lane, enqueued, frame } = setup();
   lane.handle(
     frame([
@@ -43,8 +39,8 @@ test('filters run before tracking: low score, tiny boxes and non-alert classes a
       { label: 'laptop', score: 0.9, box: [0.4, 0.3, 0.6, 0.6] },
     ]),
   );
-  expect(enqueued).toHaveLength(0);
-  expect(lane.visible).toHaveLength(0);
+  expect(enqueued.map((u) => u.parts[0])).toEqual([{ kind: 'clip', key: 'obj.laptop' }]);
+  expect(lane.visible.map((t) => t.label)).toEqual(['laptop']);
 });
 
 test('alerts from one frame share a frameId, vehicle first and P0', () => {
@@ -56,7 +52,7 @@ test('alerts from one frame share a frameId, vehicle first and P0', () => {
   ]);
 });
 
-test('quiet mode mutes far non-vehicles', () => {
+test('quiet mode mutes non-vehicles', () => {
   const { lane, enqueued, frame } = setup();
   lane.quiet = true;
   lane.handle(frame([chair, car]));

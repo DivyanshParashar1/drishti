@@ -1,4 +1,4 @@
-/** Reflex-lane tunables (spec F1/F2). Tune on device: DT-6.1 (detector), DT-6.4 (near/far). */
+/** Reflex-lane tunables (spec F1/F2, simplified in P17: object names only, no near/far). */
 export type DetectorId = 'efficientdet_lite0' | 'yolo11n';
 
 export const VISION = {
@@ -13,10 +13,9 @@ export const VISION = {
   // the frame directly; the RGB conversion for the detector still works (CameraX toBitmap).
   frameResolution: { width: 1280, height: 720 },
   everyNthFrame: 2, // run the detector on every 2nd frame (F1: 2nd–3rd)
-  minScore: 0.4, // YOLO11n scores real objects 0.35–0.7; 0.5 missed many
-  minArea: 0.03, // ignore boxes smaller than 3% of the frame
-  nearHeight: 0.45, // near if box height > 45% of the frame…
-  nearBottom: 0.85, // …or its bottom edge is in the lowest 15%
+  decodeScore: 0.25, // decoded and shown in the menu's live list (Ultralytics' default conf)
+  minScore: 0.4, // announced from here: YOLO11n scores real objects 0.35–0.7; 0.5 missed many
+  minArea: 0.005, // ignore boxes under 0.5% of the frame (a bottle on a table at ~1 m is 1–3%)
   directionHysteresis: 0.04, // a tracked object must cross a third-line by this much to switch
   trackIou: 0.3,
   trackTtlMs: 3000, // absent longer than this → forgotten; coming back is a new alert

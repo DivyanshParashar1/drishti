@@ -4,26 +4,22 @@ import type { Lang } from '../core/lang';
 import { ALERT_CLASSES, ANIMALS, isAlertClass, VEHICLES } from './labels';
 import type { Alert } from './tracker';
 
-/**
- * F1 priority, high to low: vehicles > any near object > animals > far people > other far
- * objects. Lower rank = more urgent.
- */
-export function rank(label: string, dist: 'near' | 'far'): number {
-  if (isAlertClass(label) && VEHICLES.has(label)) return 0;
-  if (dist === 'near') return 1;
-  if (isAlertClass(label) && ANIMALS.has(label)) return 2;
-  if (label === 'person') return 3;
-  return 4;
+/** Alert order when several objects appear on one frame: vehicles > people > animals > the rest. */
+export function rank(label: string): number {
+  if (VEHICLES.has(label)) return 0;
+  if (label === 'person') return 1;
+  if (ANIMALS.has(label)) return 2;
+  return 3;
 }
 
-/** F9: vehicles and near hazards are P0 (interrupt anything); other alerts are P2. */
-export function schedulerPriority(label: string, dist: 'near' | 'far'): Priority {
-  return rank(label, dist) <= 1 ? 0 : 2;
+/** F9: vehicles are P0 (they interrupt an answer); every other object is P2 (waits its turn). */
+export function schedulerPriority(label: string): Priority {
+  return VEHICLES.has(label) ? 0 : 2;
 }
 
-/** Quiet mode (F5) mutes far non-vehicle alerts; vehicles and near objects still speak. */
-export function passesQuietMode(label: string, dist: 'near' | 'far', quiet: boolean): boolean {
-  return !quiet || rank(label, dist) <= 1;
+/** Quiet mode (F5): only vehicles are announced. */
+export function passesQuietMode(label: string, quiet: boolean): boolean {
+  return !quiet || VEHICLES.has(label);
 }
 
 export interface FrameInfo {
@@ -32,8 +28,9 @@ export interface FrameInfo {
 }
 
 /**
- * One utterance per alert, [object] + [direction] + [distance], most urgent first. They share the
- * frameId so the scheduler coalesces them (max 2 per frame).
+ * One utterance per alert, just the object's name ("Bottle", "Car"; P17: no direction or
+ * distance), most important first. They share the frameId so the scheduler coalesces them
+ * (max 2 per frame).
  */
 export function buildAlertUtterances(
   alerts: Alert[],
@@ -42,22 +39,18 @@ export function buildAlertUtterances(
   opts: { quiet: boolean; newId: () => string },
 ): Utterance[] {
   return alerts
-    .filter((a) => isAlertClass(a.track.label) && passesQuietMode(a.track.label, a.track.dist, opts.quiet))
-    .sort((a, b) => rank(a.track.label, a.track.dist) - rank(b.track.label, b.track.dist))
+    .filter((a) => isAlertClass(a.track.label) && passesQuietMode(a.track.label, opts.quiet))
+    .sort((a, b) => rank(a.track.label) - rank(b.track.label))
     .map((a) => {
       const t = a.track;
       return {
         id: opts.newId(),
-        priority: schedulerPriority(t.label, t.dist),
+        priority: schedulerPriority(t.label),
         source: 'reflex' as const,
         lang,
         createdAt: frame.frameTs,
         frameId: frame.frameId,
-        parts: [
-          { kind: 'clip' as const, key: ALERT_CLASSES[t.label as keyof typeof ALERT_CLASSES] as ClipKey },
-          { kind: 'clip' as const, key: `dir.${t.dir}` as ClipKey },
-          { kind: 'clip' as const, key: `dist.${t.dist}` as ClipKey },
-        ],
+        parts: [{ kind: 'clip' as const, key: ALERT_CLASSES[t.label] as ClipKey }],
       };
     });
 }

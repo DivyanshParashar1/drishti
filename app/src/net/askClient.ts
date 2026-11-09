@@ -5,7 +5,6 @@ import { SseParser } from './sse';
 export interface AskDetection {
   cls: string;
   dir: string;
-  dist: string;
 }
 
 export interface AskRequest {

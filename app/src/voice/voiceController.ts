@@ -291,7 +291,7 @@ export class VoiceController {
     // follows the answer; if it hasn't started when sentence 1 lands, it's dropped.
     const lookingId = `${id}:looking`;
     this.enqueue(lookingId, 3, 'system', [{ kind: 'clip', key: 'sys.looking' }], lang);
-    const detections = this.d.reflex.visible.map((t) => ({ cls: t.label, dir: t.dir, dist: t.dist }));
+    const detections = this.d.reflex.visible.map((t) => ({ cls: t.label, dir: t.dir }));
     const answer: AudioPart[][] = [];
     const byIndex = new Map<number, AudioPart>(); // for an English line that comes later
     let chain = Promise.resolve(); // sentence files are written in order, then enqueued in order

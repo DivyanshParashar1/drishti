@@ -1,4 +1,4 @@
-import { area, direction, distance, filterDetections } from '../geometry';
+import { area, direction, filterDetections } from '../geometry';
 import type { Box } from '../types';
 
 const boxAt = (cx: number, w = 0.1, y1 = 0.3, y2 = 0.5): Box => [cx - w / 2, y1, cx + w / 2, y2];
@@ -23,25 +23,18 @@ test('hysteresis keeps the previous direction near a third-line', () => {
   expect(direction(boxAt(0.64), 'right')).toBe('right');
 });
 
-test.each([
-  ['tall box', [0.4, 0.2, 0.6, 0.7], 'near'],
-  ['exactly 45% tall is far', [0.4, 0.3, 0.6, 0.75], 'far'],
-  ['bottom in lowest 15%', [0.4, 0.8, 0.6, 0.9], 'near'],
-  ['small, high up', [0.4, 0.2, 0.5, 0.4], 'far'],
-] as const)('%s → %s', (_, box, d) => {
-  expect(distance(box as unknown as Box)).toBe(d);
-});
-
-test('filters: alert classes, score ≥ 0.4, area ≥ 3%', () => {
+test('filters: any YOLO class, score ≥ 0.4, area ≥ 0.5%', () => {
   const big: Box = [0, 0, 0.3, 0.3]; // 9%
-  const tiny: Box = [0, 0, 0.1, 0.1]; // 1%
+  const small: Box = [0, 0, 0.1, 0.1]; // 1%: a bottle on a table
+  const tiny: Box = [0, 0, 0.05, 0.05]; // 0.25%
   const dets = [
     { label: 'chair', score: 0.6, box: big },
     { label: 'chair', score: 0.39, box: big },
-    { label: 'chair', score: 0.9, box: tiny },
+    { label: 'bottle', score: 0.5, box: small },
+    { label: 'cup', score: 0.9, box: tiny },
     { label: 'laptop', score: 0.9, box: big },
-    { label: 'dining table', score: 0.4, box: big },
+    { label: '???', score: 0.9, box: big },
   ];
-  expect(filterDetections(dets).map((d) => `${d.label}:${d.score}`)).toEqual(['chair:0.6', 'dining table:0.4']);
+  expect(filterDetections(dets).map((d) => `${d.label}:${d.score}`)).toEqual(['chair:0.6', 'bottle:0.5', 'laptop:0.9']);
   expect(area([0.2, 0.2, 0.1, 0.1])).toBe(0);
 });

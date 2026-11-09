@@ -4,7 +4,7 @@ import { CLIPS, type ClipKey } from '../audio/clips.generated';
 import type { Services } from '../core/services';
 import { passesQuietMode } from '../vision/alerts';
 import { boxToView, type Rect } from '../vision/boxLayout';
-import { ALERT_CLASSES, isAlertClass } from '../vision/labels';
+import { ALERT_CLASSES, isAlertClass, VEHICLES } from '../vision/labels';
 import type { Track } from '../vision/tracker';
 import { SAVED_TICK_MS, type HudState } from './hudStore';
 import { EyeSlash } from './parts';
@@ -90,20 +90,22 @@ export function DemoBoxes({ services, hud }: { services: Services; hud: HudState
 const DIR = { left: 'LEFT', ahead: 'AHEAD', right: 'RIGHT' } as const;
 
 function describe(t: Track, r: Rect, who: ReturnType<Services['faces']['identityOf']>, lang: HudState['lang'], quiet: boolean): Box {
-  const key = ALERT_CLASSES[t.label as keyof typeof ALERT_CLASSES] as ClipKey;
-  const dim = !passesQuietMode(t.label, t.dist, quiet);
+  const key = ALERT_CLASSES[t.label] as ClipKey;
+  const dim = !passesQuietMode(t.label, quiet);
   const base = { id: t.id, r, dim, word: null as string | null, pulseKey: null as ClipKey | null, person: t.label === 'person' };
   if (who?.kind === 'name') return { ...base, kind: 'known', tag: `${who.name.toUpperCase()} · ${DIR[t.dir]}` };
   if (who?.kind === 'unknown') return { ...base, kind: 'unknown', tag: 'UNKNOWN' };
+  if (t.label === 'person') return { ...base, kind: 'person', tag: 'PERSON' };
   const name = CLIPS.en[key].text.toUpperCase();
-  if (t.label === 'person' && t.dist === 'far') return { ...base, kind: 'person', tag: 'PERSON' };
   const spoken = CLIPS[lang][key].text;
+  // P17: no near/far. Vehicles (the only alerts that interrupt) are drawn red and pulse when spoken.
+  const vehicle = VEHICLES.has(t.label);
   return {
     ...base,
-    kind: t.dist === 'near' ? 'near' : 'far',
-    tag: `${name} · ${DIR[t.dir]} · ${t.dist === 'near' ? 'NEAR' : 'FAR'}`,
+    kind: vehicle ? 'near' : 'far',
+    tag: `${name} · ${DIR[t.dir]}`,
     word: lang !== 'en' && spoken.toUpperCase() !== name ? spoken : null,
-    pulseKey: t.dist === 'near' ? key : null,
+    pulseKey: vehicle ? key : null,
   };
 }
 
@@ -135,7 +137,7 @@ function Countdown({ capture, at, now }: { capture: NonNullable<HudState['captur
   );
 }
 
-/** One 300 ms pulse when the near alert for this box is spoken. */
+/** One 300 ms pulse when the vehicle alert for this box is spoken. */
 function Pulse() {
   const [p] = useState(() => new Animated.Value(0));
   useEffect(() => {

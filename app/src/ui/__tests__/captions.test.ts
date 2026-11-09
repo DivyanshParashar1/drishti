@@ -10,41 +10,31 @@ const u = (parts: AudioPart[], source: Source = 'system', priority: Priority = 4
   parts,
   createdAt: 0,
 });
-const alert = (obj: string, dir: string, dist: string, priority: Priority = 2, lang: Lang = 'hi-en') =>
-  u(
-    [
-      { kind: 'clip', key: `obj.${obj}` as never },
-      { kind: 'clip', key: `dir.${dir}` as never },
-      { kind: 'clip', key: `dist.${dist}` as never },
-    ],
-    'reflex',
-    priority,
-    lang,
-  );
+const alert = (obj: string, priority: Priority = 2, lang: Lang = 'hi-en') => u([{ kind: 'clip', key: `obj.${obj}` as never }], 'reflex', priority, lang);
 
-test('near alert: spoken line with comma, English line, red, the object pulses', () => {
-  const c = captionFor([alert('chair', 'ahead', 'near', 0)], 'hi-en');
-  expect(c).toMatchObject({ source: 'alert', tag: 'ALERT', tone: 'near', line1: 'Kursi aage, paas', line2: 'Chair ahead, close', urgent: ['obj.chair'] });
+test('vehicle alert (P0): just the object, English line, red, the object pulses', () => {
+  const c = captionFor([alert('car', 0)], 'hi-en');
+  expect(c).toMatchObject({ source: 'alert', tag: 'ALERT', tone: 'near', line1: 'Car', line2: 'Car', urgent: ['obj.car'] });
 });
 
-test('far alert is yellow; a vehicle (P0) far is still urgent', () => {
-  expect(captionFor([alert('chair', 'left', 'far')], 'hi-en')).toMatchObject({ tone: 'far', line2: 'Chair on the left, far', urgent: [] });
-  expect(captionFor([alert('car', 'right', 'far', 0)], 'hi-en')).toMatchObject({ tone: 'near', urgent: ['obj.car'] });
+test('other objects are yellow and not urgent', () => {
+  expect(captionFor([alert('chair')], 'hi-en')).toMatchObject({ tone: 'far', line1: 'Kursi', line2: 'Chair', urgent: [] });
+  expect(captionFor([alert('bottle')], 'hi-en')).toMatchObject({ tag: 'ALERT', line1: 'Bottle' });
 });
 
 test('coalesced alerts share one caption', () => {
-  const c = captionFor([alert('car', 'left', 'near', 0), alert('chair', 'ahead', 'far')], 'hi-en');
-  expect(c.line1).toBe('Car left mein, paas · Kursi aage, door');
-  expect(c.line2).toBe('Car on the left, close · Chair ahead, far');
+  const c = captionFor([alert('car', 0), alert('chair')], 'hi-en');
+  expect(c.line1).toBe('Car · Kursi');
+  expect(c.line2).toBe('Car · Chair');
 });
 
 test('Hindi in Devanagari, Tamil in Tamil script', () => {
-  expect(captionFor([alert('chair', 'ahead', 'near', 0, 'hi')], 'hi')).toMatchObject({ line1: 'कुर्सी आगे, पास', script: 'devanagari' });
-  expect(captionFor([alert('chair', 'ahead', 'near', 0, 'ta')], 'ta').script).toBe('tamil');
+  expect(captionFor([alert('chair', 2, 'hi')], 'hi')).toMatchObject({ line1: 'कुर्सी', script: 'devanagari' });
+  expect(captionFor([alert('chair', 2, 'ta')], 'ta').script).toBe('tamil');
 });
 
 test('English: no second line', () => {
-  expect(captionFor([alert('chair', 'ahead', 'near', 0, 'en')], 'en')).toMatchObject({ line1: 'Chair ahead, close', line2: null });
+  expect(captionFor([alert('chair', 2, 'en')], 'en')).toMatchObject({ line1: 'Chair', line2: null });
 });
 
 test('known person: name line + direction, green', () => {

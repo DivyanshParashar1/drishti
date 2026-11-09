@@ -104,9 +104,9 @@ export function ReflexScreen({
           const r = boxToView(t.box, reflex.frameSize, view);
           const who = t.label === 'person' ? faces.decisionOf(t.id) : null;
           return (
-            <View key={t.id} pointerEvents="none" style={[styles.box, r, t.dist === 'near' && styles.near]}>
+            <View key={t.id} pointerEvents="none" style={[styles.box, r]}>
               <Text style={styles.boxLabel}>
-                #{t.id} {t.label} {t.dir} {t.dist} {(t.score * 100).toFixed(0)}%
+                #{t.id} {t.label} {t.dir} {(t.score * 100).toFixed(0)}%
                 {who ? ` · ${who.label}${who.sim !== null ? ` ${who.sim.toFixed(2)}` : ''}` : ''}
               </Text>
             </View>
@@ -138,7 +138,6 @@ export function ReflexScreen({
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#000' },
   box: { position: 'absolute', borderWidth: 2, borderColor: '#ffd400' },
-  near: { borderColor: '#ff3b30', borderWidth: 3 },
   face: { position: 'absolute', borderWidth: 2, borderColor: '#34c759' },
   faceSmall: { borderColor: '#8e8e93', borderStyle: 'dashed' },
   faceLabel: { color: '#000', backgroundColor: '#34c759', fontSize: 10, alignSelf: 'flex-start', paddingHorizontal: 2 },

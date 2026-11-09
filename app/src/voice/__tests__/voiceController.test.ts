@@ -31,7 +31,7 @@ function setup(
   let lang: Lang = 'hi-en';
   const metrics = new Metrics(200, () => now);
   const reflex = {
-    visible: [{ label: 'chair', dir: 'ahead', dist: 'near' } as Track],
+    visible: [{ label: 'chair', dir: 'ahead' } as Track],
     quiet: false,
     setQuiet(on: boolean) {
       this.quiet = on;
@@ -150,7 +150,7 @@ test('press and release: haptics, earcons, mic → stt, then the answer is queue
   await t.talk();
   expect(t.log).toEqual(['haptic', 'stopAll', 'earcon:listen_start', 'mic.start', 'haptic', 'earcon:listen_stop', 'mic.stop', 'grab:ask']);
   expect(t.pushed).toEqual([1280, 1280, 1280]);
-  expect(t.asks[0]).toMatchObject({ question: 'Saamne kya hai?', lang: 'hi-en', imageUri: 'file:///ask.jpg', detections: [{ cls: 'chair', dir: 'ahead', dist: 'near' }] });
+  expect(t.asks[0]).toMatchObject({ question: 'Saamne kya hai?', lang: 'hi-en', imageUri: 'file:///ask.jpg', detections: [{ cls: 'chair', dir: 'ahead' }] });
   // the "looking" cue was queued, then cancelled when sentence 1 arrived (fake queue never plays)
   expect(t.cancelled).toEqual([expect.stringMatching(/:looking$/)]);
   expect(t.said()).toEqual(['file:///ans-AAA.mp3', 'speak:Dhyan se.']);

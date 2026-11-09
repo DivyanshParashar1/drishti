@@ -72,14 +72,10 @@ function setup() {
 }
 
 const utt = (id: string, parts: AudioPart[], source: Source = 'system', priority: Priority = 4): Utterance => ({ id, priority, source, lang: 'hi-en', parts, createdAt: now });
-const chairNear = (id: string) =>
+const carAlert = (id: string) =>
   utt(
     id,
-    [
-      { kind: 'clip', key: 'obj.chair' },
-      { kind: 'clip', key: 'dir.ahead' },
-      { kind: 'clip', key: 'dist.near' },
-    ],
+    [{ kind: 'clip', key: 'obj.car' }],
     'reflex',
     0,
   );
@@ -92,12 +88,12 @@ test('a played alert becomes the caption with its measured latency; it stays 6 s
   const id = t.metrics.start('reflex', 'frame_ts');
   now = 38;
   t.metrics.mark(id, 'play_start');
-  const u = chairNear(id);
+  const u = carAlert(id);
   t.play(u);
   const s = t.store.get();
-  expect(s.caption).toMatchObject({ tag: 'ALERT', tone: 'near', line1: 'Kursi aage, paas', speaking: true, visible: true });
+  expect(s.caption).toMatchObject({ tag: 'ALERT', tone: 'near', line1: 'Car', speaking: true, visible: true });
   expect(s.latency).toEqual({ label: 'ALERT', tone: 'near', ms: 38, where: 'on device', p50: 38, p95: 38 });
-  expect(s.pulse?.keys).toEqual(['obj.chair']);
+  expect(s.pulse?.keys).toEqual(['obj.car']);
 
   t.end(u);
   expect(t.store.get().caption?.speaking).toBe(false);
@@ -138,8 +134,8 @@ test('an urgent alert interrupting an answer: the answer is struck through above
   const a = utt('a1', [{ kind: 'speak', text: 'Saamne ek chaudi gali hai.' }], 'answer', 3);
   t.play(a);
   t.end(a, 'interrupted');
-  t.play(utt('r1', [{ kind: 'clip', key: 'sys.step_drop' }], 'reflex', 0));
-  expect(t.store.get()).toMatchObject({ cut: 'Saamne ek chaudi gali hai.', flash: true, caption: { tag: 'ALERT', line1: 'Aage seedhi ya girav' } });
+  t.play(utt('r1', [{ kind: 'clip', key: 'obj.bus' }], 'reflex', 0));
+  expect(t.store.get()).toMatchObject({ cut: 'Saamne ek chaudi gali hai.', flash: true, caption: { tag: 'ALERT', line1: 'Bus' } });
   jest.advanceTimersByTime(FLASH_MS);
   expect(t.store.get().flash).toBe(false);
   t.play(utt('s1', [{ kind: 'clip', key: 'sys.saved' }]));
@@ -241,7 +237,7 @@ test('right temple: repeat replays the last entry as a non-urgent, untimed line;
   expect(t.store.get().feedback).toBe('repeat');
   jest.advanceTimersByTime(600);
   expect(t.store.get().feedback).toBeNull();
-  const u = chairNear('r1');
+  const u = carAlert('r1');
   t.play({ ...u, frameId: 4 });
   t.store.repeatLast();
   expect(t.enqueued).toHaveLength(1);

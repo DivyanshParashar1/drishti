@@ -5,7 +5,7 @@ jest.mock('expo-constants', () => ({ expoConfig: { extra: { serverUrl: 'http://s
 const REQ: AskRequest = {
   question: 'Saamne kya hai?',
   lang: 'hi-en',
-  detections: [{ cls: 'chair', dir: 'ahead', dist: 'near' }],
+  detections: [{ cls: 'chair', dir: 'ahead' }],
   names: ['Rahul'],
   imageUri: 'file:///cache/ask-1.jpg',
 };

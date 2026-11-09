@@ -1,65 +1,57 @@
 import { buildAlertUtterances, passesQuietMode, rank, schedulerPriority } from '../alerts';
 import type { Alert, Track } from '../tracker';
 
-const track = (label: string, dist: 'near' | 'far', dir: 'left' | 'ahead' | 'right' = 'ahead'): Track => ({
-  id: 1, label, score: 0.9, box: [0, 0, 1, 1], dir, dist, firstSeen: 0, lastSeen: 0, announced: null,
+const track = (label: string, dir: 'left' | 'ahead' | 'right' = 'ahead'): Track => ({
+  id: 1, label, score: 0.9, box: [0, 0, 1, 1], dir, firstSeen: 0, lastSeen: 0, announced: true,
 });
-const alert = (label: string, dist: 'near' | 'far', dir?: 'left' | 'ahead' | 'right'): Alert => ({
-  track: track(label, dist, dir),
-  reason: 'new',
+const alert = (label: string, dir?: 'left' | 'ahead' | 'right'): Alert => ({ track: track(label, dir), reason: 'new' });
+
+test('order: vehicles, people, animals, everything else', () => {
+  const sorted = ['bottle', 'person', 'dog', 'bench', 'bicycle'].sort((a, b) => rank(a) - rank(b));
+  expect(sorted).toEqual(['bicycle', 'person', 'dog', 'bottle', 'bench']);
 });
 
-test('F1 priority order', () => {
-  const order = [
-    ['bench', 'far'],
-    ['person', 'far'],
-    ['dog', 'far'],
-    ['chair', 'near'],
-    ['bicycle', 'far'],
-  ] as const;
-  const sorted = [...order].sort((a, b) => rank(a[0], a[1]) - rank(b[0], b[1]));
-  expect(sorted.map((x) => x[0])).toEqual(['bicycle', 'chair', 'dog', 'person', 'bench']);
-  expect(rank('person', 'near')).toBe(1);
-  expect(rank('car', 'far')).toBe(0);
+test('scheduler priority: vehicles are P0, everything else P2', () => {
+  expect(schedulerPriority('truck')).toBe(0);
+  expect(schedulerPriority('chair')).toBe(2);
+  expect(schedulerPriority('person')).toBe(2);
+  expect(schedulerPriority('bottle')).toBe(2);
 });
 
-test('scheduler priority: vehicles and near hazards are P0, others P2', () => {
-  expect(schedulerPriority('truck', 'far')).toBe(0);
-  expect(schedulerPriority('chair', 'near')).toBe(0);
-  expect(schedulerPriority('cow', 'far')).toBe(2);
-  expect(schedulerPriority('person', 'far')).toBe(2);
+test('quiet mode keeps vehicles only', () => {
+  expect(passesQuietMode('person', true)).toBe(false);
+  expect(passesQuietMode('motorcycle', true)).toBe(true);
+  expect(passesQuietMode('person', false)).toBe(true);
 });
 
-test('quiet mode keeps vehicles and near objects only', () => {
-  expect(passesQuietMode('person', 'far', true)).toBe(false);
-  expect(passesQuietMode('person', 'near', true)).toBe(true);
-  expect(passesQuietMode('motorcycle', 'far', true)).toBe(true);
-  expect(passesQuietMode('person', 'far', false)).toBe(true);
-});
-
-test('utterances: [obj][dir][dist], most urgent first, sharing the frame', () => {
+test('utterances: just the object name, vehicles first, sharing the frame', () => {
   let n = 0;
   const us = buildAlertUtterances(
-    [alert('chair', 'far', 'right'), alert('dining table', 'near', 'left'), alert('car', 'far', 'left')],
+    [alert('chair', 'right'), alert('bottle', 'left'), alert('car', 'left')],
     { frameId: 42, frameTs: 1234 },
     'hi-en',
     { quiet: false, newId: () => `r${++n}` },
   );
-  expect(us.map((u) => u.parts.map((p) => (p.kind === 'clip' ? p.key : '')).join(' '))).toEqual([
-    'obj.car dir.left dist.far',
-    'obj.dining_table dir.left dist.near',
-    'obj.chair dir.right dist.far',
+  expect(us.map((u) => u.parts)).toEqual([
+    [{ kind: 'clip', key: 'obj.car' }],
+    [{ kind: 'clip', key: 'obj.chair' }],
+    [{ kind: 'clip', key: 'obj.bottle' }],
   ]);
-  expect(us.map((u) => u.priority)).toEqual([0, 0, 2]);
+  expect(us.map((u) => u.priority)).toEqual([0, 2, 2]);
   expect(us.every((u) => u.frameId === 42 && u.createdAt === 1234 && u.source === 'reflex')).toBe(true);
   expect(us.map((u) => u.id)).toEqual(['r1', 'r2', 'r3']);
 });
 
-test('quiet mode drops far non-vehicles from the utterances', () => {
-  const us = buildAlertUtterances([alert('person', 'far'), alert('bus', 'far')], { frameId: 1, frameTs: 0 }, 'en', {
-    quiet: true,
-    newId: () => 'x',
-  });
+test('every YOLO class has a clip key, so any object can be announced', () => {
+  const us = buildAlertUtterances([alert('cell phone'), alert('teddy bear')], { frameId: 1, frameTs: 0 }, 'en', { quiet: false, newId: () => 'x' });
+  expect(us.map((u) => u.parts[0])).toEqual([
+    { kind: 'clip', key: 'obj.cell_phone' },
+    { kind: 'clip', key: 'obj.teddy_bear' },
+  ]);
+});
+
+test('quiet mode drops non-vehicles from the utterances', () => {
+  const us = buildAlertUtterances([alert('person'), alert('bus')], { frameId: 1, frameTs: 0 }, 'en', { quiet: true, newId: () => 'x' });
   expect(us).toHaveLength(1);
   expect(us[0].parts[0]).toEqual({ kind: 'clip', key: 'obj.bus' });
 });
