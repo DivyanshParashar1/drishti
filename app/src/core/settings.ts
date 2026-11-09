@@ -1,7 +1,10 @@
 import type { SqlDb } from '../identity/store';
 import { LANGS, type Lang } from './lang';
 
-/** Small persisted settings (F8 language, F10 first run, F12 demo mode) in the app's SQLite database. */
+export type Flag = 'frontCamera' | 'wakeWord' | 'faces' | 'quiet';
+export const FLAG_DEFAULTS: Record<Flag, boolean> = { frontCamera: false, wakeWord: true, faces: true, quiet: false };
+
+/** Small persisted settings (F8 language, F10 first run, F12 demo mode, P17 menu toggles) in the app's SQLite database. */
 export class SettingsStore {
   private values = new Map<string, string>();
 
@@ -30,6 +33,16 @@ export class SettingsStore {
 
   setDemoMode(on: boolean): Promise<void> {
     return this.set('demo_mode', on ? '1' : '0');
+  }
+
+  /** P17 demo-menu toggles (camera, wake word, faces, quiet): the saved value or the default. */
+  flag(name: Flag): boolean {
+    const v = this.values.get(`flag.${name}`);
+    return v === undefined ? FLAG_DEFAULTS[name] : v === '1';
+  }
+
+  setFlag(name: Flag, on: boolean): Promise<void> {
+    return this.set(`flag.${name}`, on ? '1' : '0');
   }
 
   setLang(lang: Lang): Promise<void> {

@@ -18,6 +18,8 @@ export interface FrameResult {
   luma?: number; // mean luminance 0–1 of the detector input (F10 dark / blocked camera)
   frameWidth: number; // upright frame size, for drawing boxes
   frameHeight: number;
+  /** P17 front camera: the pixels are unmirrored but the preview is mirrored; boxes get flipped. */
+  mirrored?: boolean;
   preprocessMs: number; // convert + resize + tensor
   inferMs: number;
   faceMs?: number; // ML Kit + crop/align/embed; −1 when the face step didn't run
@@ -55,6 +57,8 @@ export class ReflexLane {
   stats: LaneStats = { frames: 0, lastInferMs: 0, lastTotalMs: 0, lastFaceMs: -1, faces: 0, detectionsPerSec: 0, top: '–' };
   faces?: FaceSink;
   lastFaces: FaceObs[] = []; // for the debug overlay
+  /** Every decoded detection on the last frame, before the alert filters (P17 menu: what YOLO sees). */
+  lastRaw: Detection[] = [];
   readonly blocked = new CameraBlockedMonitor();
   private frameTimes: number[] = [];
   private listeners: (() => void)[] = [];
@@ -68,9 +72,13 @@ export class ReflexLane {
     this.lang = lang;
   }
 
-  /** Quiet mode (F5): mute far non-vehicle alerts. Wired to a voice command in P7. */
+  /** P17: told when quiet mode changes (voice or menu), so it can be saved. */
+  onQuietChange?: (on: boolean) => void;
+
+  /** Quiet mode (F5): only vehicles are announced. Set by voice ("quiet mode") or the menu. */
   setQuiet(on: boolean): void {
     this.quiet = on;
+    this.onQuietChange?.(on);
   }
 
   onUpdate(cb: () => void): () => void {
@@ -80,11 +88,13 @@ export class ReflexLane {
     };
   }
 
-  handle(r: FrameResult): void {
+  handle(input: FrameResult): void {
+    const r = input.mirrored ? mirror(input) : input;
     const now = this.clock();
     const frameTs = now - r.totalMs;
     const { visible, alerts } = this.tracker.update(filterDetections(r.detections, VISION), now);
     this.visible = visible;
+    this.lastRaw = r.detections;
     this.lastFaces = r.faces ?? [];
     this.frameSize = { width: r.frameWidth, height: r.frameHeight };
     this.updateStats(now, r);
@@ -129,4 +139,15 @@ export class ReflexLane {
         : '–',
     };
   }
+}
+
+const flipX = (b: Detection['box']): Detection['box'] => [1 - b[2], b[1], 1 - b[0], b[3]];
+
+/** Boxes in preview space for a mirrored (front) camera, so directions match the screen. */
+export function mirror(r: FrameResult): FrameResult {
+  return {
+    ...r,
+    detections: r.detections.map((d) => ({ ...d, box: flipX(d.box) })),
+    faces: r.faces?.map((f) => ({ ...f, box: flipX(f.box) })),
+  };
 }

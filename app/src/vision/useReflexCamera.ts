@@ -197,9 +197,11 @@ export function useReflexCamera(
           faces = embedFaces(found, image, boxedEmbedder ? boxedEmbedder.unbox() : null, faceCfg);
           faceMs = now() - t3;
         }
+        const mirrored = frame.isMirrored;
         frame.dispose();
         disposed = true;
         scheduleOnRN(onResult, {
+          mirrored,
           frameNo: n,
           detections,
           faces,

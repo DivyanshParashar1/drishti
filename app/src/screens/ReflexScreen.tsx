@@ -18,6 +18,7 @@ export function ReflexScreen({
   detector,
   debug,
   facesOn,
+  front,
   hasPermission,
   onStatus,
 }: {
@@ -25,6 +26,8 @@ export function ReflexScreen({
   detector: DetectorId;
   debug: boolean;
   facesOn: boolean;
+  /** P17: front camera (demo menu), for testing faces and objects on a desk. */
+  front: boolean;
   hasPermission: boolean;
   onStatus?: (state: ModelState['state']) => void;
 }) {
@@ -77,6 +80,12 @@ export function ReflexScreen({
     onStatus?.(status.state);
   }, [status.state, speakFailure, onStatus]);
 
+  // A new camera means new objects: forget the old tracks so nothing carries over.
+  useEffect(() => {
+    reflex.tracker.reset();
+    faces.reset();
+  }, [front, reflex, faces]);
+
   useEffect(() => reflex.onUpdate(() => debug && setTick((n) => n + 1)), [reflex, debug]);
 
   const onLayout = (e: LayoutChangeEvent) => setView(e.nativeEvent.layout);
@@ -97,7 +106,7 @@ export function ReflexScreen({
 
   return (
     <View style={styles.root} onLayout={onLayout}>
-      {hasPermission && <Camera style={StyleSheet.absoluteFill} device="back" isActive outputs={[frameOutput]} />}
+      {hasPermission && <Camera style={StyleSheet.absoluteFill} device={front ? 'front' : 'back'} isActive outputs={[frameOutput]} />}
       {debug &&
         reflex.frameSize.width > 0 &&
         reflex.visible.map((t) => {

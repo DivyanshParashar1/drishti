@@ -9,6 +9,7 @@ import { createTapCounter } from './src/debug/tapCounter';
 import { IDENTITY } from './src/identity/config';
 import { ReflexScreen } from './src/screens/ReflexScreen';
 import { DemoBoxes } from './src/ui/DemoBoxes';
+import { DemoMenu, type WakeInfo } from './src/ui/DemoMenu';
 import { TwoFingerHold } from './src/ui/gestures';
 import { Hud } from './src/ui/Hud';
 import { HudStore } from './src/ui/hudStore';
@@ -29,6 +30,8 @@ export default function App() {
   const [detector, setDetector] = useState<DetectorId>(VISION.detector);
   const [detectorState, setDetectorState] = useState<ModelState['state']>('loading');
   const [facesOn, setFacesOn] = useState(true);
+  const [front, setFront] = useState(false);
+  const [menu, setMenu] = useState(false);
   const [demo, setDemo] = useState(services.demoMode);
   const tap = useRef(createTapCounter()).current;
   const templeTouch = useRef(false);
@@ -63,7 +66,11 @@ export default function App() {
   useEffect(() => {
     let cleanup: (() => void) | undefined;
     startServices(services)
-      .then((c) => (cleanup = c))
+      .then((c) => {
+        cleanup = c;
+        setFacesOn(services.settings.flag('faces')); // P17: menu toggles are saved
+        setFront(services.settings.flag('frontCamera'));
+      })
       .catch((e) => console.warn('startServices failed', e));
     return () => cleanup?.();
   }, [services]);
@@ -74,8 +81,21 @@ export default function App() {
       templeTouch.current = false; // right-temple taps never count towards the debug triple-tap
       return;
     }
-    if (hold.countsAsTap && tap()) setDebug((d) => !d);
+    if (menu) return; // taps on the menu's own buttons never count towards the triple-tap
+    if (hold.countsAsTap && tap()) setMenu(true); // P17: triple-tap opens the demo menu
   };
+
+  const toggleFaces = () =>
+    setFacesOn((f) => {
+      void services.settings.setFlag('faces', !f).catch(() => undefined);
+      return !f;
+    });
+  const flipCamera = () =>
+    setFront((f) => {
+      void services.settings.setFlag('frontCamera', !f).catch(() => undefined);
+      return !f;
+    });
+  const wake: WakeInfo = { on: false, status: 'not set up yet', toggle: () => undefined };
 
   return (
     <View
@@ -85,7 +105,7 @@ export default function App() {
       onTouchCancel={() => hold.touches(0)}
     >
       <StatusBar style="light" />
-      <ReflexScreen services={services} detector={detector} debug={debug} facesOn={facesOn} hasPermission={perms.camera.granted} onStatus={setDetectorState} />
+      <ReflexScreen services={services} detector={detector} debug={debug} facesOn={facesOn} front={front} hasPermission={perms.camera.granted} onStatus={setDetectorState} />
       {demo && !debug && <BoxesLayer services={services} store={store} />}
       <TalkSurface voice={voice} />
       <Hud services={services} voice={voice} store={store} demo={demo} detector={detectorState} facesOn={facesOn} onTempleTouch={() => (templeTouch.current = true)} />
@@ -96,7 +116,23 @@ export default function App() {
           detector={detector}
           onSwitchDetector={() => setDetector((d) => (d === 'yolo11n' ? 'efficientdet_lite0' : 'yolo11n'))}
           facesOn={facesOn}
-          onToggleFaces={() => setFacesOn((f) => !f)}
+          onToggleFaces={toggleFaces}
+        />
+      )}
+      {menu && (
+        <DemoMenu
+          services={services}
+          onClose={() => setMenu(false)}
+          detector={detector}
+          detectorState={detectorState}
+          onSwitchDetector={() => setDetector((d) => (d === 'yolo11n' ? 'efficientdet_lite0' : 'yolo11n'))}
+          front={front}
+          onFlipCamera={flipCamera}
+          facesOn={facesOn}
+          onToggleFaces={toggleFaces}
+          debug={debug}
+          onToggleDebug={() => setDebug((d) => !d)}
+          wake={wake}
         />
       )}
       {perms.screen && <PermissionScreen kind={perms.screen.kind} canRequest={perms.screen.canRequest} onRequest={perms.screen.request} onSkip={perms.screen.skip} say={services.say} />}

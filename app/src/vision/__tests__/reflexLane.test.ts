@@ -104,3 +104,15 @@ test('a dark frame stream for 2 s → "Camera saaf nahi dikh raha" at P1, repeat
   lane.handle({ ...frame([], 99), luma: 0.6 });
   expect(lane.blocked.blocked).toBe(false);
 });
+
+test('front camera: mirrored frames are flipped into preview space; raw detections are kept', () => {
+  const { lane, enqueued, frame } = setup();
+  const leftChair: Detection = { label: 'chair', score: 0.8, box: [0.0, 0.3, 0.2, 0.6] };
+  const faint: Detection = { label: 'bottle', score: 0.3, box: [0.4, 0.4, 0.5, 0.5] };
+  lane.handle({ ...frame([leftChair, faint]), mirrored: true, faces: [{ box: [0.1, 0.3, 0.2, 0.4], widthPx: 90, embedding: null }] });
+  expect(lane.visible[0].box).toEqual([0.8, 0.3, 1.0, 0.6]);
+  expect(lane.visible[0].dir).toBe('right');
+  expect(lane.lastFaces[0].box[0]).toBeCloseTo(0.8);
+  expect(lane.lastRaw.map((d) => d.label)).toEqual(['chair', 'bottle']); // the 0.3 bottle is seen, not announced
+  expect(enqueued).toHaveLength(1);
+});

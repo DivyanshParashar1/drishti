@@ -70,3 +70,15 @@ test('first run plays the tutorial once, across restarts', async () => {
   expect(TUTORIAL[0]).toBe('sys.welcome');
   expect(TUTORIAL).toContain('sys.cane');
 });
+
+test('menu flags: defaults until set, then saved across restarts', async () => {
+  const db = memoryDb();
+  const s1 = new SettingsStore(db);
+  await s1.init();
+  expect([s1.flag('frontCamera'), s1.flag('wakeWord'), s1.flag('faces'), s1.flag('quiet')]).toEqual([false, true, true, false]);
+  await s1.setFlag('frontCamera', true);
+  await s1.setFlag('wakeWord', false);
+  const s2 = new SettingsStore(db);
+  await s2.init();
+  expect([s2.flag('frontCamera'), s2.flag('wakeWord')]).toEqual([true, false]);
+});

@@ -163,6 +163,8 @@ export async function startServices(s: Services): Promise<() => void> {
   s.lang = s.settings.lang ?? DEFAULT_LANG;
   s.reflex.lang = s.lang;
   s.langChanged.emit(s.lang);
+  s.reflex.quiet = s.settings.flag('quiet'); // P17: saved from the menu or voice
+  s.reflex.onQuietChange = (on) => void s.settings.setFlag('quiet', on).catch(() => undefined);
   s.demoMode = s.settings.demoMode;
   s.demoChanged.emit(s.demoMode, false);
   await s.phrases.load(s.lang); // Timbre phrases saved on earlier runs
