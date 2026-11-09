@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<title>360 dp check of frame 07</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--brand:#4CCFE6;--scrim:rgba(0,0,0,.78);--scrim-l:rgba(0,0,0,.55);--t2:#C7C7CC;--t3:#A8A8AE}
+body{margin:0;background:#000}
+.s{position:relative;width:360px;height:800px;overflow:hidden;background:#000;color:#fff;font-family:'Noto Sans','Noto Sans Devanagari','Noto Sans Tamil',system-ui,sans-serif}
+.s,.s *{box-sizing:border-box}
+.scene{position:absolute;left:0;top:0;width:360px;height:800px;display:block}
+.ov{position:absolute}
+.strip{position:absolute;left:16px;right:16px;top:40px;min-height:44px;padding:8px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;background:var(--scrim);border-radius:12px}
+.wm{font-size:16px;font-weight:700;color:var(--brand);letter-spacing:.2px;margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:999px;border:1.5px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}
+.chip.on{color:#30D158;border-color:rgba(48,209,88,.55)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor}
+.mic{margin-left:auto;color:var(--t2);display:flex}
+.bx{position:absolute;border:2px solid #fff;border-radius:4px}
+.bx.far{border-color:#FFD400}
+.bx.near{border-color:#FF3B30;border-width:3px}
+.tg{position:absolute;left:-2px;bottom:calc(100% + 4px);padding:3px 7px;border-radius:4px;background:#fff;color:#000;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;line-height:1.25}
+.tg.far{background:#FFD400}.tg.near{background:#FF3B30}
+.tp{position:absolute;top:100px;width:48px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 0;background:var(--scrim-l);border:0;color:#fff;font-family:inherit}
+.tp.l{left:0;border-radius:0 12px 12px 0}.tp.r{right:0;border-radius:12px 0 0 12px}
+.rg i{display:block;width:18px;height:2px;margin:5px 0;border-radius:1px;background:rgba(255,255,255,.45)}
+.vl{writing-mode:vertical-rl;font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;white-space:nowrap}
+.lat{position:absolute;top:100px;right:56px;width:168px;padding:10px 12px;background:var(--scrim);border-radius:12px}
+.lat .lr{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.lat .lk{display:flex;align-items:center;gap:6px}
+.lat .sq{width:8px;height:8px;border-radius:2px}
+.lat .lp{color:var(--t2);font-weight:600;font-size:11px;letter-spacing:.3px}
+.lat .lh{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;font-weight:600;margin-top:4px;line-height:1.2}
+.lat .lh span{font-size:13px;font-weight:500;color:var(--t2);margin-left:4px}
+.lat .ls{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:var(--t2);margin-top:2px}
+.dock{position:absolute;left:16px;right:16px;bottom:28px;display:flex;flex-direction:column;gap:8px}
+.bub{align-self:flex-start;max-width:100%;padding:8px 14px;border-radius:12px;background:var(--scrim);font-size:15px;font-weight:500;line-height:1.35}
+.bub b{color:var(--t2);font-weight:600;margin-right:4px}
+.bub em{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--brand);margin-left:8px;white-space:nowrap}
+.cap{position:relative;overflow:hidden;background:var(--scrim);border-radius:12px;padding:12px 14px 14px}
+.th{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.src{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:var(--brand);color:#000;font-size:12px;font-weight:800;letter-spacing:.6px;line-height:1}
+.l1{font-size:26px;font-weight:600;line-height:1.45}
+.l2{font-size:18px;font-weight:400;color:var(--t2);line-height:1.35;margin-top:2px}
+.prev{font-size:18px;font-weight:400;line-height:1.5;color:var(--t2);margin-bottom:8px}
+</style>
+</helmet>
+<div class="s">
+  <img class="scene" src="./scene.svg" alt="">
+
+  <div class="bx far" style="left:215px;top:290px;width:94px;height:84px"><div class="tg far">Car · Right · Far</div></div>
+  <div class="bx" style="left:159px;top:346px;width:45px;height:87px"><div class="tg">Person</div></div>
+  <div class="bx" style="left:49px;top:353px;width:87px;height:185px"><div class="tg">Person</div></div>
+  <img class="ov" src="./chair.svg" alt="" style="left:110px;top:467px;width:121px;height:110px">
+  <div class="bx near" style="left:110px;top:467px;width:121px;height:110px"><div class="tg near">Chair · Ahead · Near</div></div>
+
+  <div class="strip">
+    <span class="wm">Drishti</span>
+    <span class="chip">हिंदी</span>
+    <span class="chip on"><i class="dot"></i>Online</span>
+    <span class="mic" aria-label="Idle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+  </div>
+
+  <div class="lat">
+    <div class="lr"><span class="lk"><i class="sq" style="background:#4CCFE6"></i>Answer</span><span class="lp">cloud</span></div>
+    <div class="lh">1.4<span>s</span></div>
+    <div class="ls">p50 1.3 · p95 2.1 s</div>
+  </div>
+
+  <button class="tp l" style="bottom:372px" aria-label="Talk to Drishti. Hold to talk.">
+    <div class="rg"><i></i><i></i><i></i></div>
+    <div class="vl">Hold to talk</div>
+    <div class="rg"><i></i><i></i><i></i></div>
+  </button>
+  <button class="tp r" style="bottom:372px" aria-label="Repeat. Double tap twice to stop.">
+    <div class="rg"><i></i><i></i><i></i></div>
+    <div class="vl">Tap repeat · 2× stop</div>
+    <div class="rg"><i></i><i></i><i></i></div>
+  </button>
+
+  <div class="dock">
+    <div class="bub"><b>You</b>“सामने क्या है?”<em>→ describe</em></div>
+    <div class="cap">
+      <div class="th"><span class="src">ANSWER</span></div>
+      <div class="prev">आपके सामने एक चौड़ी गली है और दाईं तरफ़ एक ऑटो खड़ा है।</div>
+      <div class="l1">बाईं ओर एक आदमी खड़ा है, और बीच में कुर्सी रखी है।</div>
+      <div class="l2">A man is standing on the left, and a chair is in the middle.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

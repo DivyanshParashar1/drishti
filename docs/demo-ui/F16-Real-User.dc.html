@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Real-user mode</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0;background:#000}
+.s{position:relative;width:412px;height:915px;overflow:hidden;background:#000;color:#fff;font-family:'Noto Sans',system-ui,sans-serif}
+.s,.s *{box-sizing:border-box}
+.wm{position:absolute;left:0;top:0;width:412px;height:915px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:600;letter-spacing:.5px;color:rgba(142,142,147,.3)}
+</style>
+</helmet>
+<div class="s">
+  <div class="wm">Drishti</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

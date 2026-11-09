@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Urgent alert interrupts answer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--brand:#4CCFE6;--scrim:rgba(0,0,0,.78);--scrim-l:rgba(0,0,0,.55);--t2:#C7C7CC;--t3:#A8A8AE}
+body{margin:0;background:#000}
+.s{position:relative;width:412px;height:915px;overflow:hidden;background:#000;color:#fff;font-family:'Noto Sans','Noto Sans Devanagari','Noto Sans Tamil',system-ui,sans-serif}
+.s,.s *{box-sizing:border-box}
+.scene{position:absolute;left:0;top:0;width:412px;height:915px;display:block}
+.ov{position:absolute}
+.strip{position:absolute;left:16px;right:16px;top:40px;min-height:44px;padding:8px 12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;background:var(--scrim);border-radius:12px}
+.wm{font-size:16px;font-weight:700;color:var(--brand);letter-spacing:.2px;margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:999px;border:1.5px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}
+.chip.on{color:#30D158;border-color:rgba(48,209,88,.55)}
+.chip.off{color:#FF9F0A;border-color:#FF9F0A}
+.chip.red{background:#FF3B30;border-color:#FF3B30;color:#000}
+.chip.vs{margin-left:auto}
+.chip.lis{color:var(--brand);border-color:var(--brand)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor}
+.mic{margin-left:auto;color:var(--t2);display:flex}
+.bx{position:absolute;border:2px solid #fff;border-radius:4px}
+.bx.far{border-color:#FFD400}
+.bx.near{border-color:#FF3B30;border-width:3px}
+.bx.known{border-color:#34C759;border-width:3px}
+.bx.unk{border-color:#A8A8AE;border-style:dashed}
+.bx.dim{opacity:.4}
+.tg{position:absolute;left:-2px;bottom:calc(100% + 4px);padding:3px 7px;border-radius:4px;background:#fff;color:#000;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;line-height:1.25}
+.tg.far{background:#FFD400}.tg.near{background:#FF3B30}.tg.known{background:#34C759;font-size:15px}.tg.unk{background:#A8A8AE}
+.tg small{display:block;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none}
+.pulse{position:absolute;border:2px solid rgba(255,59,48,.5);border-radius:10px}
+.tp{position:absolute;top:100px;width:48px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 0;background:var(--scrim-l);border:0;color:#fff;font-family:inherit}
+.tp.l{left:0;border-radius:0 12px 12px 0}.tp.r{right:0;border-radius:12px 0 0 12px}
+.rg i{display:block;width:18px;height:2px;margin:5px 0;border-radius:1px;background:rgba(255,255,255,.45)}
+.vl{writing-mode:vertical-rl;font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;white-space:nowrap}
+.lat{position:absolute;top:100px;right:56px;width:168px;padding:10px 12px;background:var(--scrim);border-radius:12px}
+.lat .lr{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.lat .lk{display:flex;align-items:center;gap:6px}
+.lat .sq{width:8px;height:8px;border-radius:2px}
+.lat .lp{color:var(--t2);font-weight:600;font-size:11px;letter-spacing:.3px}
+.lat .lh{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;font-weight:600;margin-top:4px;line-height:1.2}
+.lat .lh span{font-size:13px;font-weight:500;color:var(--t2);margin-left:4px}
+.lat .ls{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:var(--t2);margin-top:2px}
+.dock{position:absolute;left:16px;right:16px;bottom:28px;display:flex;flex-direction:column;gap:8px}
+.bub{align-self:flex-start;max-width:100%;padding:8px 14px;border-radius:12px;background:var(--scrim);font-size:15px;font-weight:500;line-height:1.35}
+.bub b{color:var(--t2);font-weight:600;margin-right:4px}
+.bub em{font-style:normal;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;color:var(--brand);margin-left:8px;white-space:nowrap}
+.cap{position:relative;overflow:hidden;background:var(--scrim);border-radius:12px;padding:12px 14px 14px}
+.cap.flash{box-shadow:0 0 0 2px #FF3B30;overflow:visible}
+.cap.dim>*{opacity:.4}
+.th{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.src{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:#fff;color:#000;font-size:12px;font-weight:800;letter-spacing:.6px;line-height:1}
+.src.a{background:#FFD400}.src.n{background:#FF3B30}.src.nm{background:#34C759}.src.an{background:var(--brand)}.src.sy{background:#A8A8AE}
+.meta{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--t2)}
+.l1{font-size:26px;font-weight:600;line-height:1.3}
+.l1.dv{line-height:1.45}.l1.ta{line-height:1.5}
+.l2{font-size:18px;font-weight:400;color:var(--t2);line-height:1.35;margin-top:2px}
+.cut{align-self:stretch;display:flex;align-items:center;gap:8px;margin:0 18px;padding:6px 10px;border-radius:12px;background:var(--scrim);font-size:15px;color:var(--t2);white-space:nowrap;overflow:hidden}
+.cut s{overflow:hidden;text-overflow:ellipsis}
+.ind{position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.18)}
+.ind i{position:absolute;top:0;left:32%;width:36%;height:3px;background:var(--brand)}
+</style>
+</helmet>
+<div class="s">
+  <img class="scene" src="./scene.svg" alt="">
+
+  <div class="bx far" style="left:246px;top:332px;width:108px;height:96px"><div class="tg far">Car · Right · Far</div></div>
+  <div class="bx" style="left:182px;top:396px;width:52px;height:100px"><div class="tg">Person</div></div>
+  <div class="bx" style="left:56px;top:404px;width:100px;height:212px"><div class="tg">Person</div></div>
+  <img class="ov" src="./step.svg" alt="" style="left:100px;top:650px;width:232px;height:66px">
+  <div class="pulse" style="left:92px;top:642px;width:248px;height:82px"></div>
+  <div class="bx near" style="left:100px;top:650px;width:232px;height:66px"><div class="tg near">Step · Ahead · Near</div></div>
+
+  <div class="strip">
+    <span class="wm">Drishti</span>
+    <span class="chip">Hinglish</span>
+    <span class="chip on"><i class="dot"></i>Online</span>
+    <span class="mic" aria-label="Idle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+  </div>
+
+  <div class="lat">
+    <div class="lr"><span class="lk"><i class="sq" style="background:#FF3B30"></i>Alert</span><span class="lp">on device</span></div>
+    <div class="lh">36<span>ms</span></div>
+    <div class="ls">p50 41 · p95 77 ms</div>
+  </div>
+
+  <button class="tp l" style="bottom:196px" aria-label="Talk to Drishti. Hold to talk.">
+    <div class="rg"><i></i><i></i><i></i></div>
+    <div class="vl">Hold to talk</div>
+    <div class="rg"><i></i><i></i><i></i></div>
+  </button>
+  <button class="tp r" style="bottom:196px" aria-label="Repeat. Double tap twice to stop.">
+    <div class="rg"><i></i><i></i><i></i></div>
+    <div class="vl">Tap repeat · 2× stop</div>
+    <div class="rg"><i></i><i></i><i></i></div>
+  </button>
+
+  <div class="dock">
+    <div class="cut"><span class="src an">ANSWER</span><s>Saamne ek chaudi gali hai aur daayein taraf ek auto…</s></div>
+    <div class="cap flash">
+      <div class="th"><span class="src n">ALERT</span></div>
+      <div class="l1">Aage seedhi ya girav</div>
+      <div class="l2">Step or drop ahead</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":412,"height":915}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

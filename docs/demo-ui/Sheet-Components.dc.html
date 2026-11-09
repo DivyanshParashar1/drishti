@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Component sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+:root{--brand:#4CCFE6;--scrim:rgba(0,0,0,.78);--scrim-l:rgba(0,0,0,.55);--t2:#C7C7CC;--t3:#A8A8AE}
+body{margin:0;background:#101012}
+.sh{width:1560px;min-height:2500px;padding:48px;background:#101012;color:#fff;font-family:'Noto Sans','Noto Sans Devanagari','Noto Sans Tamil',system-ui,sans-serif}
+.sh,.sh *{box-sizing:border-box}
+.sh h1{margin:0 0 6px;font-size:30px;font-weight:700}
+.sh .sub{margin:0 0 40px;font-size:15px;color:var(--t2);max-width:760px;line-height:1.5}
+.sh h2{margin:48px 0 16px;font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--brand)}
+.row{display:flex;flex-wrap:wrap;gap:28px 28px;align-items:flex-start}
+.it{display:flex;flex-direction:column;gap:8px}
+.lbl{font-size:13px;font-weight:600;color:var(--t2)}
+.stg{position:relative;border-radius:8px;overflow:hidden}
+.fd{background:#aeb8bf}
+.fk{background:#23282d}
+.strip{position:relative;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;min-height:44px;padding:8px 12px;background:var(--scrim);border-radius:12px}
+.wm{font-size:16px;font-weight:700;color:var(--brand);letter-spacing:.2px;margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:999px;border:1.5px solid rgba(255,255,255,.4);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;color:#fff;line-height:1}
+.chip.on{color:#30D158;border-color:rgba(48,209,88,.55)}
+.chip.off{color:#FF9F0A;border-color:#FF9F0A}
+.chip.red{background:#FF3B30;border-color:#FF3B30;color:#000}
+.chip.vs{margin-left:auto}
+.chip.lis{color:var(--brand);border-color:var(--brand)}
+.chip.mono{font-family:'JetBrains Mono',ui-monospace,monospace;text-transform:none;letter-spacing:0}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor}
+.mic{margin-left:auto;color:var(--t2);display:flex}
+.brk{flex-basis:100%;height:0}
+.vpb{height:3px;margin:4px 12px 0;background:rgba(255,255,255,.35);border-radius:2px;position:relative}
+.vpb i{position:absolute;left:0;top:0;height:3px;width:56%;background:var(--brand);border-radius:2px}
+.badge{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px 0 7px;border-radius:999px;border:1.5px solid var(--brand);color:var(--brand);background:var(--scrim);font-size:12px;font-weight:800;letter-spacing:.6px;line-height:1;text-transform:uppercase}
+.bx{position:absolute;border:2px solid #fff;border-radius:4px}
+.bx.far{border-color:#FFD400}
+.bx.near{border-color:#FF3B30;border-width:3px}
+.bx.known{border-color:#34C759;border-width:3px}
+.bx.unk{border-color:#A8A8AE;border-style:dashed}
+.bx.dim{opacity:.4}
+.tg{position:absolute;left:-2px;bottom:calc(100% + 4px);padding:3px 7px;border-radius:4px;background:#fff;color:#000;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;line-height:1.25}
+.tg.far{background:#FFD400}.tg.near{background:#FF3B30}.tg.known{background:#34C759;font-size:15px}.tg.unk{background:#A8A8AE}
+.tg small{display:block;font-size:11px;font-weight:600;letter-spacing:0;text-transform:none}
+.pulse{position:absolute;border:2px solid rgba(255,59,48,.5);border-radius:10px}
+.tick{position:absolute;right:-2px;top:-2px;width:26px;height:26px;border-radius:50%;background:#34C759;color:#000;display:flex;align-items:center;justify-content:center}
+.cnt{position:absolute;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#000;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.cap{position:relative;overflow:hidden;background:var(--scrim);border-radius:12px;padding:12px 14px 14px}
+.cap.flash{box-shadow:0 0 0 2px #FF3B30;overflow:visible}
+.cap.dim>*{opacity:.4}
+.th{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.src{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:999px;background:#fff;color:#000;font-size:12px;font-weight:800;letter-spacing:.6px;line-height:1}
+.src.a{background:#FFD400}.src.n{background:#FF3B30}.src.nm{background:#34C759}.src.an{background:var(--brand)}.src.sy{background:#A8A8AE}
+.meta{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:var(--t2)}
+.l1{font-size:26px;font-weight:600;line-height:1.3}
+.l1.dv{line-height:1.45}.l1.ta{line-height:1.5}
+.l2{font-size:18px;font-weight:400;color:var(--t2);line-height:1.35;margin-top:2px}
+.prev{font-size:18px;font-weight:400;line-height:1.5;color:var(--t2);margin-bottom:8px}
+.ind{position:absolute;left:0;right:0;top:0;height:3px;background:rgba(255,255,255,.18)}
+.ind i{position:absolute;top:0;left:32%;width:36%;height:3px;background:var(--brand)}
+.cut{display:flex;align-items:center;gap:8px;margin:0 18px 8px;padding:6px 10px;border-radius:12px;background:var(--scrim);font-size:15px;color:var(--t2);white-space:nowrap;overflow:hidden}
+.cut s{overflow:hidden;text-overflow:ellipsis}
+.tp{position:relative;width:48px;height:320px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:14px 0;background:var(--scrim-l);border:0;color:#fff;font-family:inherit}
+.tp.l{border-radius:0 12px 12px 0;margin-left:0}.tp.r{border-radius:12px 0 0 12px;margin-left:auto}
+.tp.held{background:var(--brand);color:#000}
+.tp.ripple{background:rgba(255,255,255,.35)}
+.rg i{display:block;width:18px;height:2px;margin:5px 0;border-radius:1px;background:rgba(255,255,255,.45)}
+.vl{writing-mode:vertical-rl;font-size:12px;font-weight:700;letter-spacing:1.6px;text-transform:uppercase;white-space:nowrap}
+.wv{display:flex;flex-direction:column;align-items:center;gap:6px}
+.wv i{display:block;height:3px;border-radius:2px;background:#000}
+.fb{position:absolute;right:58px;top:140px;height:34px;padding:0 12px;display:flex;align-items:center;gap:6px;border-radius:999px;background:var(--scrim);font-size:13px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+.lat{position:relative;width:168px;padding:10px 12px;background:var(--scrim);border-radius:12px}
+.lat .lr{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.lat .lk{display:flex;align-items:center;gap:6px}
+.lat .sq{width:8px;height:8px;border-radius:2px}
+.lat .lp{color:var(--t2);font-weight:600;font-size:11px;letter-spacing:.3px}
+.lat .lh{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:22px;font-weight:600;margin-top:4px;line-height:1.2}
+.lat .lh span{font-size:13px;font-weight:500;color:var(--t2);margin-left:4px}
+.lat .ls{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;font-weight:500;color:var(--t2);margin-top:2px}
+.toast{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:999px;background:var(--scrim);font-size:13px;font-weight:700;letter-spacing:.4px}
+</style>
+</helmet>
+<div class="sh">
+  <h1>Drishti demo UI · components</h1>
+  <p class="sub">Every piece sits on its own scrim or tag, so it is shown here over a bright feed (the worst case for contrast) and, where it matters, a dark one. Latency numbers and phrases are illustrative.</p>
+
+  <h2>Status strip</h2>
+  <div class="row">
+    <div class="it"><div class="lbl">Default · Hinglish, online, idle</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">Hinglish</span><span class="chip on"><i class="dot"></i>Online</span><span class="mic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div></div></div>
+    <div class="it"><div class="lbl">Listening</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">Hinglish</span><span class="chip on"><i class="dot"></i>Online</span><span class="chip vs lis"><i class="dot"></i>Listening</span></div></div></div>
+    <div class="it"><div class="lbl">Thinking · connectivity still checking</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">English</span><span class="chip">…</span><span class="chip vs"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>Thinking</span></div></div></div>
+    <div class="it"><div class="lbl">Offline · wraps to a second row</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">हिंदी</span><span class="mic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><span class="brk"></span><span class="chip off"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 14l9-3V5a1 1 0 0 1 2 0v6l9 3v2l-9-2v4l2 2v1l-3-1-3 1v-1l2-2v-4l-9 2z"/></svg>Offline · alerts on device</span></div></div></div>
+    <div class="it"><div class="lbl">Mode chips · quiet, reading, faces off, saving</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">Hinglish</span><span class="chip on"><i class="dot"></i>Online</span><span class="brk"></span><span class="chip">Quiet</span><span class="chip">Reading 2/5</span><span class="chip">Faces off</span><span class="chip">Saving…</span></div></div></div>
+    <div class="it"><div class="lbl">Starting, with voice pack download</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">Hinglish</span><span class="chip">Starting…</span><span class="chip mono vs">Voice pack 34/61</span></div><div class="vpb"><i></i></div></div></div>
+    <div class="it"><div class="lbl">Detector failed</div><div class="stg fd" style="width:412px;padding:16px"><div class="strip"><span class="wm">Drishti</span><span class="chip">Hinglish</span><span class="chip red">Alerts off</span></div></div></div>
+    <div class="it"><div class="lbl">Consent badge (caption tag row)</div><div class="stg fd" style="width:412px;padding:16px"><span class="badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>Consent needed</span></div></div>
+  </div>
+
+  <h2>Detection box tags</h2>
+  <div class="row">
+    <div class="it"><div class="lbl">Object, far</div><div class="stg fd" style="width:196px;height:150px"><div class="bx far" style="left:24px;top:48px;width:110px;height:84px"><div class="tg far">Car · Right · Far</div></div></div></div>
+    <div class="it"><div class="lbl">Object, near (pulses once)</div><div class="stg fd" style="width:196px;height:150px"><div class="pulse" style="left:16px;top:40px;width:126px;height:100px"></div><div class="bx near" style="left:24px;top:48px;width:110px;height:84px"><div class="tg near">Chair · Ahead · Near</div></div></div></div>
+    <div class="it"><div class="lbl">With spoken word</div><div class="stg fd" style="width:196px;height:150px"><div class="bx far" style="left:24px;top:66px;width:110px;height:70px"><div class="tg far">Chair · Ahead · Far<small>कुर्सी</small></div></div></div></div>
+    <div class="it"><div class="lbl">Known person</div><div class="stg fd" style="width:196px;height:150px"><div class="bx known" style="left:24px;top:48px;width:110px;height:84px"><div class="tg known">Rahul · Left</div></div></div></div>
+    <div class="it"><div class="lbl">Unknown person (dashed)</div><div class="stg fd" style="width:196px;height:150px"><div class="bx unk" style="left:24px;top:48px;width:110px;height:84px"><div class="tg unk">Unknown</div></div></div></div>
+    <div class="it"><div class="lbl">Person, face too small</div><div class="stg fd" style="width:196px;height:150px"><div class="bx" style="left:24px;top:48px;width:110px;height:84px"><div class="tg">Person</div></div></div></div>
+    <div class="it"><div class="lbl">Quiet mode, far non-vehicle (40%)</div><div class="stg fd" style="width:196px;height:150px"><div class="bx dim" style="left:24px;top:48px;width:110px;height:84px"><div class="tg">Person</div></div></div></div>
+    <div class="it"><div class="lbl">Enrolment done</div><div class="stg fd" style="width:196px;height:150px"><div class="bx known" style="left:24px;top:48px;width:110px;height:84px"><div class="tg known">Priya · Ahead</div><div class="tick"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></div></div></div></div>
+    <div class="it"><div class="lbl">Enrolment countdown ring</div><div class="stg fd" style="width:196px;height:150px"><svg style="position:absolute;left:54px;top:32px" width="88" height="88" viewBox="0 0 88 88" role="img" aria-label="Countdown ring"><circle cx="44" cy="44" r="34" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="7"/><circle cx="44" cy="44" r="34" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="4"/><circle cx="44" cy="44" r="34" fill="none" stroke="#4CCFE6" stroke-width="5" stroke-linecap="round" stroke-dasharray="142.4 71.2" transform="rotate(-90 44 44)"/></svg><div class="cnt" style="left:86px;top:56px">2</div></div></div>
+  </div>
+
+  <h2>Caption panel, one per source</h2>
+  <div class="row">
+    <div class="it"><div class="lbl">ALERT · far (yellow)</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src a">ALERT</span></div><div class="l1">Car aage, door</div><div class="l2">Car ahead, far</div></div></div></div>
+    <div class="it"><div class="lbl">ALERT · near or urgent (red)</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src n">ALERT</span></div><div class="l1">Kursi aage, paas</div><div class="l2">Chair ahead, close</div></div></div></div>
+    <div class="it"><div class="lbl">NAME · recognised (green)</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src nm">NAME</span></div><div class="l1">Rahul aapke saamne hai, left mein</div><div class="l2">Rahul is ahead of you, on the left</div></div></div></div>
+    <div class="it"><div class="lbl">NAME · unknown (grey)</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src sy">NAME</span></div><div class="l1">Koi anjaan vyakti saamne hai</div><div class="l2">An unknown person is ahead</div></div></div></div>
+    <div class="it"><div class="lbl">ANSWER · streaming, previous sentence above</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src an">ANSWER</span></div><div class="prev">आपके सामने एक चौड़ी गली है और दाईं तरफ़ एक ऑटो खड़ा है।</div><div class="l1 dv">बाईं ओर एक आदमी खड़ा है, और बीच में कुर्सी रखी है।</div><div class="l2">A man is standing on the left, and a chair is in the middle.</div></div></div></div>
+    <div class="it"><div class="lbl">THINKING · indeterminate bar on the panel</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="ind"><i></i></div><div class="th"><span class="src an">ANSWER</span></div><div class="l1">Dekh rahi hoon</div><div class="l2">Let me look</div></div></div></div>
+    <div class="it"><div class="lbl">READING · no English line</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src">READING</span><span class="meta">para 2 · chunk 3/5</span></div><div class="l1 dv">यहाँ पार्किंग निषेध है। कृपया वाहन बाहर खड़े करें।</div></div></div></div>
+    <div class="it"><div class="lbl">SYSTEM (grey) · Tamil fit check</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src sy">SYSTEM</span></div><div class="l1 ta">இணையம் இல்லை</div><div class="l2">No internet</div></div></div></div>
+    <div class="it"><div class="lbl">SYSTEM · red, detector failed</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap"><div class="th"><span class="src n">SYSTEM</span></div><div class="l1" style="color:#FF6B63">Obstacle alerts could not start. Please reopen the app.</div></div></div></div>
+    <div class="it"><div class="lbl">Interruption · answer collapses, red flash</div><div class="stg fd" style="width:412px;padding:16px"><div class="cut"><span class="src an">ANSWER</span><s>Saamne ek chaudi gali hai aur daayein taraf…</s></div><div class="cap flash"><div class="th"><span class="src n">ALERT</span></div><div class="l1">Aage seedhi ya girav</div><div class="l2">Step or drop ahead</div></div></div></div>
+    <div class="it"><div class="lbl">Listening · caption dims to 40%</div><div class="stg fd" style="width:412px;padding:16px"><div class="cap dim"><div class="th"><span class="src nm">NAME</span></div><div class="l1">Rahul aapke saamne hai, left mein</div><div class="l2">Rahul is ahead of you, on the left</div></div></div></div>
+    <div class="it"><div class="lbl">Transcript bubble</div><div class="stg fk" style="width:412px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start"><div style="padding:8px 14px;border-radius:12px;background:var(--scrim);font-size:15px;font-weight:500;line-height:1.35;border:1px solid rgba(255,255,255,.15)"><b style="color:var(--t2);font-weight:600;margin-right:4px">You</b>“saamne kya hai?”<em style="font-style:normal;font-family:'JetBrains Mono',monospace;font-size:13px;color:#4CCFE6;margin-left:8px">→ describe</em></div><div style="padding:8px 14px;border-radius:12px;background:var(--scrim);font-size:15px;font-weight:500;border:1px solid rgba(255,255,255,.15)">Didn't catch that</div></div></div>
+  </div>
+
+  <h2>Temple strips</h2>
+  <div class="row">
+    <div class="it"><div class="lbl">Left · rest</div><div class="stg fd" style="width:130px;height:340px;padding:10px 0"><button class="tp l" aria-label="Hold to talk"><div class="rg"><i></i><i></i><i></i></div><div class="vl">Hold to talk</div><div class="rg"><i></i><i></i><i></i></div></button></div></div>
+    <div class="it"><div class="lbl">Left · held (listening)</div><div class="stg fd" style="width:130px;height:340px;padding:10px 0"><button class="tp l held" aria-label="Listening"><div class="vl">Listening</div><div class="wv"><i style="width:10px"></i><i style="width:22px"></i><i style="width:30px"></i><i style="width:16px"></i><i style="width:34px"></i><i style="width:26px"></i><i style="width:12px"></i><i style="width:28px"></i><i style="width:18px"></i></div><div class="vl">Release to send</div></button></div></div>
+    <div class="it"><div class="lbl">Right · rest</div><div class="stg fd" style="width:130px;height:340px;padding:10px 0;display:flex"><button class="tp r" aria-label="Repeat. Double tap twice to stop."><div class="rg"><i></i><i></i><i></i></div><div class="vl">Tap repeat · 2× stop</div><div class="rg"><i></i><i></i><i></i></div></button></div></div>
+    <div class="it"><div class="lbl">Right · tap, 600 ms feedback</div><div class="stg fd" style="width:240px;height:340px;padding:10px 0;display:flex"><div class="fb"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>Repeat</div><button class="tp r ripple" aria-label="Repeat"><div class="rg"><i></i><i></i><i></i></div><div class="vl">Tap repeat · 2× stop</div><div class="rg"><i></i><i></i><i></i></div></button></div></div>
+    <div class="it"><div class="lbl">Right · double-tap, 600 ms feedback</div><div class="stg fd" style="width:240px;height:340px;padding:10px 0;display:flex"><div class="fb"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>Stop</div><button class="tp r ripple" aria-label="Stop"><div class="rg"><i></i><i></i><i></i></div><div class="vl">Tap repeat · 2× stop</div><div class="rg"><i></i><i></i><i></i></div></button></div></div>
+  </div>
+
+  <h2>Latency card</h2>
+  <div class="row">
+    <div class="it"><div class="lbl">Before the first event</div><div class="stg fd" style="padding:16px"><div class="lat"><div class="lr">Latency</div><div class="lh">—</div><div class="ls" style="font-family:'Noto Sans',sans-serif">waiting for first alert</div></div></div></div>
+    <div class="it"><div class="lbl">Alert · frame to sound</div><div class="stg fd" style="padding:16px"><div class="lat"><div class="lr"><span class="lk"><i class="sq" style="background:#FF3B30"></i>Alert</span><span class="lp">on device</span></div><div class="lh">38<span>ms</span></div><div class="ls">p50 41 · p95 77 ms</div></div></div></div>
+    <div class="it"><div class="lbl">Name</div><div class="stg fd" style="padding:16px"><div class="lat"><div class="lr"><span class="lk"><i class="sq" style="background:#34C759"></i>Name</span><span class="lp">on device</span></div><div class="lh">210<span>ms</span></div><div class="ls">p50 190 · p95 240 ms</div></div></div></div>
+    <div class="it"><div class="lbl">Answer · release to first sentence</div><div class="stg fd" style="padding:16px"><div class="lat"><div class="lr"><span class="lk"><i class="sq" style="background:#4CCFE6"></i>Answer</span><span class="lp">cloud</span></div><div class="lh">1.4<span>s</span></div><div class="ls">p50 1.3 · p95 2.1 s</div></div></div></div>
+    <div class="it"><div class="lbl">Read</div><div class="stg fd" style="padding:16px"><div class="lat"><div class="lr"><span class="lk"><i class="sq" style="background:#fff"></i>Read</span><span class="lp">on device</span></div><div class="lh">0.9<span>s</span></div><div class="ls">p50 0.9 · p95 1.4 s</div></div></div></div>
+  </div>
+
+  <h2>Toasts</h2>
+  <div class="row">
+    <div class="it"><div class="lbl">Internet lost (3 s, under the strip)</div><div class="stg fd" style="padding:16px"><span class="toast" role="status" style="color:#FF9F0A">Internet lost. Alerts are still on.</span></div></div>
+    <div class="it"><div class="lbl">Internet back</div><div class="stg fd" style="padding:16px"><span class="toast" role="status" style="color:#30D158">Internet is back</span></div></div>
+    <div class="it"><div class="lbl">Mode switch (1 s)</div><div class="stg fd" style="padding:16px"><span class="toast" role="status" style="color:#4CCFE6;text-transform:uppercase;letter-spacing:.6px">Demo mode on</span></div></div>
+    <div class="it"><div class="lbl">Language change</div><div class="stg fd" style="padding:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start"><span class="chip" style="background:var(--scrim);border-color:#4CCFE6;color:#4CCFE6">English</span><span class="lbl" style="color:#1d1d1f">chip flashes for 300 ms, caption says “I’ll speak in English now”</span></div></div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1560,"height":2500}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

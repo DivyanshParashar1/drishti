@@ -224,8 +224,26 @@ One section per phase, written at the phase gate (see PLAN.md). Device tests the
   - L15.1 The write-up's on-device p50/p95 table is empty: no device measurements exist yet. The laptop numbers it quotes come from P2/P3/P8 entries. Fill the device rows only from an exported metrics file.
   - L15.2 Team contributions, video links and Gnani AI's exact handles are left for the team.
   - L15.3 Name: "Drishti" conflicts with "Drishti Nepal" (Play Store, a currency-recognition app for blind users) and Accenture's Drishti for the visually impaired in India. Fine as a working name; choose another before any store release.
-  - L15.4 The spec's demo storyboard assumes captions with an English line and an on-screen latency readout (F12). There's no F12 phase in PLAN.md (see "Still open"); the shot list uses the debug overlay plus captions added in editing.
+  - L15.4 The spec's demo storyboard assumes captions with an English line and an on-screen latency readout (F12). There's no F12 phase in PLAN.md (see "Still open"); the shot list uses the debug overlay plus captions added in editing. — plan: P16 builds F12; update the shot list after DT-16.1.
 - **Measurements:** none new.
+
+## P16 — Demo UI (F12) (2026-11-10)
+- **Status:** built from the design handoff (`docs/demo-ui/`). Automated tests pass (Jest 448, pytest 210); typecheck and lint clean; the Android export bundles. No native module added, so no APK rebuild: it hot-reloads on the current dev build. **Nothing has been seen on a device yet (DT-16.1).**
+- **Limitations:**
+  - L16.1 Fonts are the system sans-serif (Android falls back to Noto Sans Devanagari / Tamil per glyph) and `monospace`, not the design's Noto Sans and JetBrains Mono. Bundling fonts needs expo-font and a rebuild. — plan: accepted; revisit with the next rebuild.
+  - L16.2 No SVG library, so icons are drawn with Views (mic, eye with a slash, cane, consent tick). The airplane is the ✈ text glyph, which some phones may draw as a colour emoji. The enrolment countdown is a ring of 24 dots, not a stroked arc. — plan: accepted.
+  - L16.3 The countdown shows the real capture window (4 s, `IDENTITY.enrollCaptureMs`), not the "three seconds" in the spoken line and design. — plan: accepted (honest timing).
+  - L16.4 The answer's English line depends on the VLM following the brace format. If it doesn't, line 2 is hidden; nothing extra is spoken either way. Outside English the gloss adds up to 50 output tokens per answer (cost, not latency: audio never waits for it). Unverified on the live model (X-16.1).
+  - L16.5 Right-temple tap replays the last thing played, of any kind, as a non-urgent line that isn't timed. The voice "phir se bolo" still replays the last answer only.
+  - L16.6 The near-box pulse matches by object class, not by track: two near chairs both pulse when "Kursi aage, paas" plays.
+  - L16.7 Real-user mode covers the preview with black, but the camera and detector run at full rate. The only battery saving is the black screen itself.
+  - L16.8 The microphone screen has a "Not now" link (a second control, against "one button") so someone who refuses the mic isn't stuck; alerts work without it. The camera screen has no skip.
+  - L16.9 Boxes are re-rendered in React on every processed frame. The cost on the detector's frame rate is unmeasured (DT-16.5).
+  - L16.10 No safe-area library: the strip sits at status bar height + 12 dp (min 40) and the dock 28 dp from the bottom. On a phone with a 3-button nav bar the dock may sit close to it.
+  - L16.11 The internet lost/back toast shows on the change itself, while the spoken line waits for the 3 s hold, so a short blip shows a toast but stays silent.
+  - L16.12 With the two-finger toggle, the first finger starts a talk (listening earcon, speech stops) before the second lands and cancels it.
+- **Unverified assumptions:** layout matches frames F01–F20 on the Realme 11 Pro and at 360 dp; dashed borders render on Android; captions stay readable in a compressed, muted recording.
+- **Measurements:** none.
 
 ## Deferred tests and checks (run at the end)
 
@@ -248,6 +266,7 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | X-13.4 | P13 | EAS preview env (SERVER_URL, APP_TOKEN) and preview APK build | `eas env:create …`; `eas build --profile preview --platform android` | needs X-13.1; EAS build minutes |
 | X-14.1 | P14 | Rebuild the development APK with expo-speech-recognition; download the offline Hindi model | `eas build --profile development --platform android`; overlay "Offline speech model" | native module added |
 | X-4.4 | P4 | Re-check Gnani credits used after the packs (L2.9) | Gnani dashboard | needs X-4.1/X-4.2 |
+| X-16.1 | P16 | One /ask each in hi, hi-en and ta: the model writes `{English}` after each sentence, nothing in braces is spoken, and `en`/`gloss` arrive (L16.4) | `scripts/ask_probe.py --lang hi …` (×3) | spends VLM and Gnani credits |
 
 ## Pending device tests
 
@@ -288,4 +307,11 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-13.2 | The first question after 10 min idle has no cold-start delay | P13 | pending | | |
 | DT-13.3 | Rerun DT-7.2 (release → first audio) against the deployed server | P13 | pending | | |
 | DT-14.1 | Airplane mode: "ye padho", "ruko" and "quiet mode" work by voice (needs X-14.1) | P14 | pending | | |
+| DT-16.1 | Go through frames F01–F20 of `docs/demo-ui/` on the phone (and a 360 dp emulator for F20); screenshot each state | P16 | pending | | |
+| DT-16.2 | Captions and box tags are readable in a muted 1080p screen recording viewed at LinkedIn feed size | P16 | pending | | |
+| DT-16.3 | Holding anywhere and holding the left temple both talk; right temple tap repeats, double-tap stops; right-temple taps never open the debug overlay, triple-tap elsewhere does | P16 | pending | | |
+| DT-16.4 | Two-finger 2 s hold and "demo mode band karo / chalu karo" switch modes without sending a question; the mode survives a restart | P16 | pending | | |
+| DT-16.5 | Detector det/s and alert latency with the demo UI on vs real-user mode (overlay); note any drop | P16 | pending | | |
+| DT-16.6 | Fresh install: deny the camera → screen and spoken line → Allow works; deny again → "Open settings" opens app settings; the mic screen's "Not now" skips | P16 | pending | | |
+| DT-16.7 | TalkBack: each temple is its own button with its label; the middle is still the talk button | P16 | pending | | |
 | DT-15.1 | Record the 60-second and ~3-minute videos (`docs/demo-checklist.md`); export metrics after the last take | P15 | pending | | |

@@ -65,6 +65,7 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | P13 | Deploy + preview APK | P12 | Yes (preview profile) |
 | P14 | Stretch: offline STT for commands | P13 | Yes |
 | P15 | Contest deliverables | P13 | No |
+| P16 | Demo UI (F12) | P12 | No |
 
 ---
 
@@ -343,6 +344,20 @@ Automated tests: none. Check that every number in the write-up traces to an expo
 Device checks:
 - DT-15.1 Record the 60-second and ~3-minute videos.
 
+## P16 — Demo UI (F12)
+
+Brief: `docs/demo-ui-design.md`. Design handoff: `docs/demo-ui/` (frames F01–F20, component sheet, `tokens.ts`).
+
+Work:
+- The demo UI is the default: status strip (language, online/offline, mode chips, voice state, voice-pack progress), detection boxes with plain tags, temple strips (left hold to talk; right tap = repeat, double-tap = stop), latency card (measured p50/p95 only), caption panel (spoken line + English line), transcript bubble, listening glow, thinking bar, enrolment consent badge and countdown, camera-blocked overlay, toasts, first-run steps.
+- Real-user mode: a black screen with a dim wordmark; the whole screen still talks. Switched by voice ("demo mode band karo / chalu karo") or a two-finger 2 s hold; saved.
+- Permission screens for the camera and microphone, spoken as well as shown.
+- Server: `/ask` asks the VLM for an English gloss per sentence (in braces, stripped before TTS), sent as `en` on the sentence or a later `gloss` event.
+
+Automated tests: caption text per source and language, the HUD store (caption hold and fade, interruption strip, bubble, latency, toasts, reading, enrolment, repeat), gestures, the demo command, gloss parsing in the app and on the server.
+
+Device checks: DT-16.1 to DT-16.7 in LIMITATIONS.md.
+
 ---
 
 ## Still open (not blocking the plan)
@@ -350,7 +365,7 @@ Device checks:
 - Which VLM model to use. Once the app is complete, benchmark on OpenRouter (open-source preferred) with `bench_vlm.py` and DT-7.2. Interim: `google/gemini-3.5-flash-lite`.
 - Which detector is the default. Decided by DT-6.1.
 - The F3 threshold and frame resolution. Decided by DT-8.1 and DT-8.2 (L8.2, L8.3).
-- **F11 (simulated depth) and F12 (demo UI: status strip, captions with an English line, latency readout, temple-style buttons, real-user mode) from spec rev 17 have no phase here.** F12 matters for a muted demo video (L15.4). Decide whether to add a phase for them.
+- **F11 (simulated depth) from spec rev 17 has no phase here.** F12 (demo UI) is P16.
 - The final app name: "Drishti" is taken by other assistive projects (L15.3).
 - The Gnani credit-to-minute rate. Estimated in P2 live checks, or ask on Gnani's Discord.
 - YOLO11n AGPL-3.0 in a public repo. Accepting it means the app code is effectively AGPL. If EfficientDet wins DT-6.1, drop the YOLO weights.

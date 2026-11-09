@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Design tokens, final values</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+body{margin:0;background:#101012}
+.sh{width:1000px;min-height:2400px;padding:48px;background:#101012;color:#fff;font-family:'Noto Sans',system-ui,sans-serif}
+.sh,.sh *{box-sizing:border-box}
+.sh h1{margin:0 0 6px;font-size:30px;font-weight:700}
+.sub{margin:0 0 8px;font-size:15px;color:#C7C7CC;line-height:1.5;max-width:760px}
+.sh h2{margin:44px 0 14px;font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:#4CCFE6}
+.hd,.rw{display:grid;grid-template-columns:44px 140px 250px minmax(0,1fr) 170px;gap:16px;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.hd{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#A8A8AE;padding-top:0}
+.sw{width:44px;height:32px;border-radius:6px;border:1px solid rgba(255,255,255,.3)}
+.mn{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;font-weight:500}
+.us{font-size:14px;line-height:1.4;color:#E5E5EA}
+.cr{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;color:#C7C7CC;line-height:1.4}
+.t3{grid-template-columns:150px 150px minmax(0,1fr);}
+.t3.rw,.t3.hd{grid-template-columns:150px 170px minmax(0,1fr)}
+.ch{margin-top:12px;padding-left:20px;font-size:14px;line-height:1.55;color:#E5E5EA}
+.ch li{margin-bottom:6px}
+</style>
+</helmet>
+<div class="sh">
+  <h1>Design tokens · final values</h1>
+  <p class="sub">Starting point from the brief, adjusted where a value failed contrast over a bright feed. Contrast is measured on the worst case: scrim over pure white.</p>
+
+  <h2>Colour</h2>
+  <div class="hd"><span></span><span>Token</span><span>Value</span><span>Use</span><span>Contrast</span></div>
+  <div class="rw"><div class="sw" style="background:#000000"></div><div class="mn">bg</div><div class="mn">#000000</div><div class="us">Behind the camera; real-user mode</div><div class="cr">—</div></div>
+  <div class="rw"><div class="sw" style="background:rgba(0,0,0,.78);background-image:linear-gradient(45deg,#777 25%,transparent 25%,transparent 75%,#777 75%),linear-gradient(45deg,#777 25%,#aaa 25%,#aaa 75%,#777 75%);background-size:10px 10px;background-position:0 0,5px 5px"></div><div class="mn">scrim</div><div class="mn">rgba(0,0,0,0.78)</div><div class="us">Caption panel, status strip, latency card, bubbles, toasts. Brief said 0.72; raised so grey text passes over white.</div><div class="cr">White text 11.7:1</div></div>
+  <div class="rw"><div class="sw" style="background:rgba(0,0,0,.55)"></div><div class="mn">scrim-light</div><div class="mn">rgba(0,0,0,0.55)</div><div class="us">Temple strips at rest. Brief said 0.45; raised so the vertical labels reach 4.5:1.</div><div class="cr">White text 4.7:1</div></div>
+  <div class="rw"><div class="sw" style="background:#FFFFFF"></div><div class="mn">text</div><div class="mn">#FFFFFF</div><div class="us">Primary text; spoken line</div><div class="cr">11.7:1</div></div>
+  <div class="rw"><div class="sw" style="background:#C7C7CC"></div><div class="mn">text-2</div><div class="mn">#C7C7CC</div><div class="us">English line, previous answer sentence, secondary labels</div><div class="cr">7.0:1</div></div>
+  <div class="rw"><div class="sw" style="background:#A8A8AE"></div><div class="mn">text-3</div><div class="mn">#A8A8AE</div><div class="us">Hints, units, real-user wordmark (at 30%). Brief said #8E8E93, which fails over white.</div><div class="cr">5.0:1</div></div>
+  <div class="rw"><div class="sw" style="background:#4CCFE6"></div><div class="mn">brand</div><div class="mn">#4CCFE6</div><div class="us">Wordmark, listening, answer tag, thinking bar. Cyan, so it is never mistaken for the yellow, red or green alert colours, or for the orange offline badge.</div><div class="cr">6.4:1 · black on it 11.4:1</div></div>
+  <div class="rw"><div class="sw" style="background:#FFD400"></div><div class="mn">alert-far</div><div class="mn">#FFD400</div><div class="us">Detection, far (caution). Box 2 dp. Tag text is black.</div><div class="cr">8.2:1 · black on it 14.7:1</div></div>
+  <div class="rw"><div class="sw" style="background:#FF3B30"></div><div class="mn">alert-near</div><div class="mn">#FF3B30</div><div class="us">Detection, near; urgent alerts. Box 3 dp. Always a fill with black text or an outline, never red text on the feed.</div><div class="cr">black on it 5.9:1</div></div>
+  <div class="rw"><div class="sw" style="background:#34C759"></div><div class="mn">known</div><div class="mn">#34C759</div><div class="us">Recognised saved person. Box 3 dp, name in a 15 sp tag.</div><div class="cr">5.3:1 · black on it 9.5:1</div></div>
+  <div class="rw"><div class="sw" style="background:#A8A8AE"></div><div class="mn">unknown</div><div class="mn">#A8A8AE</div><div class="us">Person not recognised. Dashed outline, so colour is not the only signal.</div><div class="cr">black on it 8.9:1</div></div>
+  <div class="rw"><div class="sw" style="background:#4CCFE6"></div><div class="mn">listen</div><div class="mn">= brand</div><div class="us">Edge glow, left temple fill, waveform</div><div class="cr">—</div></div>
+  <div class="rw"><div class="sw" style="background:#FF9F0A"></div><div class="mn">offline</div><div class="mn">#FF9F0A</div><div class="us">OFFLINE badge, internet-lost toast</div><div class="cr">5.7:1</div></div>
+  <div class="rw"><div class="sw" style="background:#30D158"></div><div class="mn">online</div><div class="mn">#30D158</div><div class="us">Online dot and label, internet-back toast</div><div class="cr">5.8:1</div></div>
+  <div class="rw"><div class="sw" style="background:#000000;border-color:#fff"></div><div class="mn">tag-ink</div><div class="mn">#000000</div><div class="us">New. Text on every filled tag and source pill (all fills above pass 5.9:1 or better).</div><div class="cr">—</div></div>
+
+  <h2>Type (sp)</h2>
+  <div class="hd t3"><span>Token</span><span>Size / weight</span><span>Use</span></div>
+  <div class="rw t3"><div class="mn">caption-1</div><div class="mn">26 / 600</div><div class="us">Spoken line in the current script. Line height 1.3 Latin, 1.45 Devanagari, 1.5 Tamil. Max 3 lines; earlier sentences truncate, the current one never does.</div></div>
+  <div class="rw t3"><div class="mn">caption-2</div><div class="mn">18 / 400</div><div class="us">English line (hidden when the language is English or while reading); previous answer sentence</div></div>
+  <div class="rw t3"><div class="mn">label</div><div class="mn">12 / 700, caps, +0.5</div><div class="us">Chips, badges, box tags, source pills, temple labels. Brief said 13; 12 keeps the strip on one row at 360 dp.</div></div>
+  <div class="rw t3"><div class="mn">tag-known</div><div class="mn">15 / 700, caps, +0.5</div><div class="us">Name on a known-person box</div></div>
+  <div class="rw t3"><div class="mn">mono</div><div class="mn">12–13 / 500</div><div class="us">p50 / p95 line, chunk counter, router result. JetBrains Mono.</div></div>
+  <div class="rw t3"><div class="mn">mono-lg</div><div class="mn">22 / 600</div><div class="us">The hero latency number</div></div>
+  <div class="rw t3"><div class="mn">bubble</div><div class="mn">15 / 500</div><div class="us">New. Transcript bubble. “You” in text-2, router result in mono, brand colour.</div></div>
+  <div class="rw t3"><div class="mn">title</div><div class="mn">20 / 700</div><div class="us">Permission and first-run screens. Cane line on first run is enlarged to 30 / 700 with a 20 / 400 English line.</div></div>
+  <div class="rw t3"><div class="mn">Families</div><div class="mn">Noto Sans · Noto Sans Devanagari · Noto Sans Tamil · JetBrains Mono</div><div class="us">Listed in that order in one stack, so each script falls through to its own face.</div></div>
+
+  <h2>Shape and layout (dp)</h2>
+  <div class="hd t3"><span>Token</span><span>Value</span><span>Use</span></div>
+  <div class="rw t3"><div class="mn">radius-panel</div><div class="mn">12</div><div class="us">Strip, latency card, caption panel, bubble, temples (inner corners)</div></div>
+  <div class="rw t3"><div class="mn">radius-chip</div><div class="mn">999</div><div class="us">Chips, source pills, toasts</div></div>
+  <div class="rw t3"><div class="mn">radius-box</div><div class="mn">4</div><div class="us">Detection boxes and tags</div></div>
+  <div class="rw t3"><div class="mn">stroke</div><div class="mn">2 far · 3 near, known</div><div class="us">Unknown is dashed at 2</div></div>
+  <div class="rw t3"><div class="mn">margin</div><div class="mn">16</div><div class="us">Screen edge to strip, caption panel, dock. Strip sits 40 below the top edge, clear of the status bar.</div></div>
+  <div class="rw t3"><div class="mn">strip</div><div class="mn">44 min height</div><div class="us">Wraps to a second row on 360 dp or when the offline badge is shown; the wordmark is the first thing to go if space runs out.</div></div>
+  <div class="rw t3"><div class="mn">temple</div><div class="mn">48 wide</div><div class="us">Flush to the screen edge, from below the strip to above the dock. Only buttons on the screen; nothing tappable in the middle.</div></div>
+  <div class="rw t3"><div class="mn">latency card</div><div class="mn">168 wide</div><div class="us">56 from the right edge so it clears the right temple. Not interactive.</div></div>
+  <div class="rw t3"><div class="mn">dock</div><div class="mn">bottom 28</div><div class="us">Bubble (when present) above the caption panel, 8 apart, above the gesture bar</div></div>
+
+  <h2>Motion</h2>
+  <div class="hd t3"><span>Token</span><span>Duration</span><span>Use</span></div>
+  <div class="rw t3"><div class="mn">caption-in</div><div class="mn">150 ms</div><div class="us">A new utterance replaces the old one at once</div></div>
+  <div class="rw t3"><div class="mn">caption-out</div><div class="mn">250 ms</div><div class="us">Fade after 6 s of silence</div></div>
+  <div class="rw t3"><div class="mn">alert-pulse</div><div class="mn">300 ms, once</div><div class="us">Near box ring when its alert is spoken; red flash on the panel border when an urgent alert interrupts an answer</div></div>
+  <div class="rw t3"><div class="mn">listen-glow</div><div class="mn">1.2 s loop</div><div class="us">Only while the screen is held. The only loop in the UI; the thinking bar runs only while a request is in flight.</div></div>
+  <div class="rw t3"><div class="mn">feedback</div><div class="mn">600 ms</div><div class="us">REPEAT or STOP pill beside the right temple</div></div>
+  <div class="rw t3"><div class="mn">toast</div><div class="mn">3 s · mode toast 1 s</div><div class="us">Internet lost or back; DEMO MODE ON / OFF</div></div>
+  <div class="rw t3"><div class="mn">chip-flash</div><div class="mn">300 ms</div><div class="us">Language chip after a voice change</div></div>
+
+  <h2>Notes for engineering</h2>
+  <ul class="ch">
+    <li>No blur anywhere. Scrims are flat alpha fills; the listening glow is an edge gradient or a 3 dp stroke, not a shadow.</li>
+    <li>Every filled tag uses black text, so alert colours are never the only carrier: words (NEAR, FAR), shape (solid vs dashed) and position back them up.</li>
+    <li>The cane line, the consent badge and the OFFLINE badge are the three places where the UI states a safety or privacy fact; each has its own treatment.</li>
+  </ul>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1000,"height":2400}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>
