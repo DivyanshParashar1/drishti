@@ -2,7 +2,12 @@ import { EFFDET_LABELS, YOLO_LABELS } from './labels';
 import type { Box, Detection } from './types';
 
 type Num = ArrayLike<number>;
-const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+// Every function here runs inside the camera's frame worklet, so each needs 'worklet' (a plain
+// helper throws "Tried to synchronously call a Remote Function" on the first detection).
+function clamp01(v: number): number {
+  'worklet';
+  return v < 0 ? 0 : v > 1 ? 1 : v;
+}
 
 /**
  * EfficientDet-Lite0 with its built-in NMS. Outputs in model order:
