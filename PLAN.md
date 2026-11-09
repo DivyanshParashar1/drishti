@@ -66,6 +66,7 @@ The app is built in 16 phases (P0–P15), ordered by dependency. Each phase ends
 | P14 | Stretch: offline STT for commands | P13 | Yes |
 | P15 | Contest deliverables | P13 | No |
 | P16 | Demo UI (F12) | P12 | No |
+| P17 | Simplify alerts, wake word, demo menu | P16 | Yes (Porcupine native module) |
 
 ---
 
@@ -358,6 +359,20 @@ Automated tests: caption text per source and language, the HUD store (caption ho
 
 Device checks: DT-16.1 to DT-16.7 in LIMITATIONS.md.
 
+## P17 — Simplify alerts, wake word, demo menu (user, 2026-11-10)
+
+Device testing showed objects like a bottle on a table were never announced: only 15 hazard classes were decoded. The user asked for simple object detection, a wake word, and a menu for testing.
+
+Work:
+- Obstacle alerts become plain object detection: all 80 YOLO classes, announced by name only ("Bottle", "Car"), once per object. No direction or near/far in alerts, no re-announce on approach or direction change. A second object of the same class within 4 s is skipped. Vehicles stay P0. Quiet mode keeps vehicles only. Decode at score 0.25 (shown in the menu), announce at ≥ 0.4 with a box ≥ 0.5% of the frame. Stale-alert window 1.5 s.
+- `/ask` answers are plain: 1–2 short sentences answering the question, with no step counts, distances or hazard sweep.
+- Wake word "Drishti" (Porcupine, on device): while on, it owns the mic and feeds turns to STT; a turn ends after 0.9 s of quiet. Hold-to-talk stays.
+- Demo menu (triple-tap): language, back/front camera, wake word, demo UI, faces, quiet, debug overlay, detector, actions, and a live list of what the detector sees. Toggles are saved.
+
+Automated tests: tracker and alert rules, every class has a phrase, mirroring for the front camera, saved flags, the end-of-speech detector, the wake service (turns, no-speech, self-name, refractory gap, hold-to-talk tap, offline hand-off, errors), the prompt has no step counts.
+
+Device checks: DT-17.1 to DT-17.6 in LIMITATIONS.md.
+
 ---
 
 ## Still open (not blocking the plan)
@@ -365,7 +380,7 @@ Device checks: DT-16.1 to DT-16.7 in LIMITATIONS.md.
 - Which VLM model to use. Once the app is complete, benchmark on OpenRouter (open-source preferred) with `bench_vlm.py` and DT-7.2. Interim: `google/gemini-3.5-flash-lite`.
 - Which detector is the default. Decided by DT-6.1.
 - The F3 threshold and frame resolution. Decided by DT-8.1 and DT-8.2 (L8.2, L8.3).
-- **F11 (simulated depth) from spec rev 17 has no phase here.** F12 (demo UI) is P16.
+- **F11 (simulated depth) from spec rev 17 has no phase here.** F12 (demo UI) is P16. P17 dropped near/far from alerts (user, 2026-11-10).
 - The final app name: "Drishti" is taken by other assistive projects (L15.3).
 - The Gnani credit-to-minute rate. Estimated in P2 live checks, or ask on Gnani's Discord.
 - YOLO11n AGPL-3.0 in a public repo. Accepting it means the app code is effectively AGPL. If EfficientDet wins DT-6.1, drop the YOLO weights.

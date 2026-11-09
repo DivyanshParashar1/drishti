@@ -268,6 +268,22 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | X-4.4 | P4 | Re-check Gnani credits used after the packs (L2.9) | Gnani dashboard | needs X-4.1/X-4.2 |
 | X-16.1 | P16 | One /ask each in hi, hi-en and ta: the model writes `{English}` after each sentence, nothing in braces is spoken, and `en`/`gloss` arrive (L16.4) | `scripts/ask_probe.py --lang hi …` (×3) | spends VLM and Gnani credits |
 
+## P17 — Simplify alerts, wake word, demo menu (2026-11-10)
+- **Status:** automated tests pass (Jest 461, pytest 210); typecheck and lint clean; the Android export bundles. **Needs an APK rebuild** for the wake word (Porcupine and VoiceProcessor are native); everything else hot-reloads. Nothing has run on the phone yet.
+- **Limitations:**
+  - L17.1 Root cause of "YOLO detects nothing": the decoder only kept the 15 hazard classes (no bottle, cup, laptop…), and the 3% area floor dropped small objects. Both fixed; whether YOLO itself runs correctly on the phone is still unverified (DT-17.1, using the menu's live list).
+  - L17.2 Wake word needs a Picovoice AccessKey (`PICOVOICE_ACCESS_KEY`, shipped in the APK like `APP_TOKEN`) and a keyword file `app/assets/wake/drishti_android.ppn` trained in the Picovoice Console (English model, phrase "Drishti"). Without them the menu says "not set up" and hold-to-talk still works.
+  - L17.3 End of speech is loudness-based (threshold = max(0.06, 2.5 × room noise)). Loud streets may end turns late or never (10 s cap); a soft voice may read as no speech. Plan: tune on device (DT-17.3).
+  - L17.4 No pre-roll: words said in the same breath as "Drishti" (before the earcon) may be clipped. The tutorial says "say Drishti, then ask".
+  - L17.5 Offline, the on-device recognizer owns the mic, so a wake turn is a fixed 5 s window, and the mic switches between VoiceProcessor and the recognizer (a short gap).
+  - L17.6 The wake word is ignored while the app plays a line containing "Drishti" and for 1.5 s after a turn. The speaker can still self-trigger on other audio that sounds like it.
+  - L17.7 The mic is open all the time while the wake word is on (battery, and Android's mic-in-use indicator stays on).
+  - L17.8 The 65 new object names (Hindi, Tamil) were written without a native-speaker check (as L4.2). They are fetched from Timbre once per language when online (about 65 short calls per language), else spoken by expo-speech.
+  - L17.9 The front camera's pixels are unmirrored; boxes are flipped to match the mirrored preview. Faces enrolled on the front camera are mirror images of the back camera's view; matching across cameras is untested.
+  - L17.10 The debug overlay no longer opens by triple-tap: triple-tap opens the demo menu, which has a debug toggle.
+- **Unverified assumptions:** Porcupine 4.0.0 runs with React Native 0.88 / New Architecture; `frame.isMirrored` is true for the front camera's frame output.
+- **Measurements:** none yet.
+
 ## Pending device tests
 
 | ID | Check | Phase | Result | Date | Notes |
@@ -315,3 +331,9 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-16.6 | Fresh install: deny the camera → screen and spoken line → Allow works; deny again → "Open settings" opens app settings; the mic screen's "Not now" skips | P16 | pending | | |
 | DT-16.7 | TalkBack: each temple is its own button with its label; the middle is still the talk button | P16 | pending | | |
 | DT-15.1 | Record the 60-second and ~3-minute videos (`docs/demo-checklist.md`); export metrics after the last take | P15 | pending | | |
+| DT-17.1 | Menu → live list: a bottle, cup and laptop on a table and a car on a screen show up with scores; ones marked ● are announced once by name | P17 | pending | | |
+| DT-17.2 | Front camera: boxes line up with the preview; a face on the left of the screen gets a LEFT tag | P17 | pending | | |
+| DT-17.3 | "Drishti, saamne kya hai?" (with and without a pause): one answer; quiet room and street; note misses and false wakes over 10 min | P17 | pending | | |
+| DT-17.4 | "Drishti" then silence → "Samajh nahi aaya" after ~5 s; the tutorial saying "Drishti" never wakes it | P17 | pending | | |
+| DT-17.5 | Hold-to-talk with the wake word on and off; both send the question; no mic errors | P17 | pending | | |
+| DT-17.6 | Airplane mode: "Drishti, ruko" works through the offline recognizer; the wake word resumes after | P17 | pending | | |
