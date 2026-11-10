@@ -33,6 +33,8 @@ export class PhraseCache {
   private uris: Partial<Record<Lang, Partial<Record<ClipKey, string>>>> = {};
   private running: Promise<void> | null = null;
   private queued = new Set<Lang>();
+  /** Phrases the app needed but didn't have yet (P17): fetched before the rest. */
+  private wanted: Partial<Record<Lang, Set<ClipKey>>> = {};
   lastError: string | null = null;
 
   constructor(
@@ -50,6 +52,16 @@ export class PhraseCache {
   /** The saved Timbre file for a phrase, if any. */
   uri(lang: Lang, key: ClipKey): string | undefined {
     return this.uris[lang]?.[key];
+  }
+
+  /**
+   * A phrase was needed and isn't saved yet (an object alert spoken with the phone's voice):
+   * fetch it next, ahead of the rest, so what the user actually meets gets Gnani's voice first.
+   */
+  want(lang: Lang, key: ClipKey): void {
+    if (this.uri(lang, key) || CLIPS[lang][key].asset !== null) return;
+    (this.wanted[lang] ??= new Set()).add(key);
+    void this.sync(lang);
   }
 
   /** How many phrases of a language have Timbre audio (bundled or saved) / total. */
@@ -87,10 +99,21 @@ export class PhraseCache {
 
   private async syncOne(lang: Lang): Promise<void> {
     if (this.d.online() === false) return;
-    const missing = (Object.keys(CLIPS[lang]) as ClipKey[])
-      .filter((k) => CLIPS[lang][k].asset === null && !this.uri(lang, k))
-      .sort((a, b) => rank(a) - rank(b));
-    for (const key of missing) {
+    const needed = (k: ClipKey) => CLIPS[lang][k].asset === null && !this.uri(lang, k);
+    const missing = (Object.keys(CLIPS[lang]) as ClipKey[]).filter(needed).sort((a, b) => rank(a) - rank(b));
+    const next = (): ClipKey | undefined => {
+      const wanted = this.wanted[lang];
+      for (const k of wanted ?? []) {
+        wanted!.delete(k);
+        if (needed(k)) return k;
+      }
+      while (missing.length) {
+        const k = missing.shift()!;
+        if (needed(k)) return k;
+      }
+      return undefined;
+    };
+    for (let key = next(); key; key = next()) {
       const r = await this.d.tts(CLIPS[lang][key].text, lang);
       if (!r.ok) {
         this.lastError = r.code;

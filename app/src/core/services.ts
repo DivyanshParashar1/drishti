@@ -65,7 +65,12 @@ export function createServices(): Services {
   // Fixed phrases in Gnani Timbre's voice: fetched once per language when online, then played
   // from files (offline too). expo-speech only until a phrase is saved.
   const phrases = new PhraseCache({ tts: fetchTts, write: writePhrase, list: listPhrases, online: () => connectivity.online });
-  const player = new ClipPlayer(new ExpoAudioBackend(), (lang, key) => phrases.uri(lang, key));
+  // A phrase played without its Timbre file yet (spoken by the phone) is fetched next (P17).
+  const player = new ClipPlayer(new ExpoAudioBackend(), (lang, key) => {
+    const uri = phrases.uri(lang, key);
+    if (!uri) phrases.want(lang, key);
+    return uri;
+  });
   const scheduler = new SpeechScheduler(player, {
     onStart: (u, at) => metrics.mark(u.id, 'play_start', at),
     onEnd: (u, reason) => {

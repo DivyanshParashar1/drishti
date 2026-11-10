@@ -81,3 +81,26 @@ test('rate limited: the run stops and retries by itself later', async () => {
     jest.useRealTimers();
   }
 });
+
+test('a phrase the app needed jumps the queue, even mid-run', async () => {
+  const t = setup();
+  t.cache.want('hi-en', 'obj.bottle'); // starts a run with the bottle first
+  t.cache.want('hi-en', 'obj.teddy_bear'); // asked while the run is going: next after it
+  await t.cache.sync('hi-en');
+  expect(t.calls.slice(0, 2)).toEqual([`hi-en:${CLIPS['hi-en']['obj.bottle'].text}`, `hi-en:${CLIPS['hi-en']['obj.teddy_bear'].text}`]);
+  expect(t.calls).toHaveLength(total); // each phrase still fetched exactly once
+  t.cache.want('hi-en', 'obj.bottle'); // already saved: nothing to do
+  await t.cache.sync('hi-en');
+  expect(t.calls).toHaveLength(total);
+});
+
+test('offline, a wanted phrase waits for the next online sync', async () => {
+  const t = setup();
+  t.setOnline(false);
+  t.cache.want('hi-en', 'obj.cup');
+  await t.cache.sync('hi-en');
+  expect(t.calls).toEqual([]);
+  t.setOnline(true);
+  await t.cache.sync('hi-en');
+  expect(t.calls[0]).toBe(`hi-en:${CLIPS['hi-en']['obj.cup'].text}`);
+});
