@@ -4,13 +4,13 @@
 
 | # | Part | Length | Made by | Voice |
 | --- | --- | --- | --- | --- |
-| 1 | Intro | ~15 s | Divyansh and Nakshatra (shoot) | You two, and Drishti |
+| 1 | Intro | ~10–15 s | Divyansh (shoot) | Divyansh |
 | 2 | Animated explainer: the problem and the idea | ~25 s | Claude | Yashraj (Timbre v3.0) |
 | 3 | Demo: 7 features, each after a title card | 60 s footage + 14 s cards | You shoot; Claude adds cards and captions | Drishti (Shivani) and the user |
 | 4 | How it works: two paths, offline and online | ~55 s | Claude | Yashraj |
 | 5 | Credits | ~5 s | Claude | — |
 
-Three voices, so viewers always know who is talking: you two (Part 1), the app's own voice Shivani (Parts 1 and 3), and the narrator Yashraj (Parts 2 and 4).
+The video is in English. Three voices, so viewers always know who is talking: Divyansh (Part 1), the app's own voice Shivani (Part 3), and the narrator Yashraj (Parts 2 and 4).
 
 ---
 
@@ -25,12 +25,23 @@ Three voices, so viewers always know who is talking: you two (Part 1), the app's
 
 ---
 
-## Part 1 — Intro (~15 s) · you shoot
+## Part 1 — Intro (~10–15 s) · you shoot
 
-**Setup:** demo menu → front camera on. Save both of you beforehand: "Isko Divyansh ke naam se save karo", then the same for Nakshatra.
+The whole video is in **English**. Only the voice commands in the demo are in Hindi or Hinglish, with English captions.
 
-| Time | On screen | Audio |
-| --- | --- | --- |
+**Setup:** Divyansh to camera (selfie or front camera), plain background, good light.
+
+| Time | Audio |
+| --- | --- |
+| 0–4 s | **Divyansh:** "Hi, I'm Divyansh, and together with Nakshatra, I built Drishti." |
+| 4–12 s | **Divyansh (the one-liner):** "Drishti is an app that sees for blind people and tells them what's around them, in their own language." |
+| cut | Straight to Part 2 |
+
+Other one-liners, if you prefer:
+- "Drishti turns your phone into a pair of eyes that speaks your language."
+- "Drishti watches the road for blind people, and tells them what's ahead, in Hindi, Tamil, English and eight more languages."
+
+--- | --- | --- |
 | 0–4 s | Front camera, both of you in frame; name boxes appear | **Drishti:** "Divyansh aapke saamne hai… Nakshatra aapke saamne hai." |
 | 4–9 s | Same shot | **Divyansh:** "Haan! Main Divyansh, aur ye hai Nakshatra." |
 | 9–15 s | Same shot | **Nakshatra:** "Aur ye hai Drishti: ek app jo blind logon ke liye dekhti hai, aur unki bhasha mein bolti hai." |
