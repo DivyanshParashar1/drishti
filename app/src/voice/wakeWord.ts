@@ -80,7 +80,7 @@ export const REFRACTORY_MS = 1500;
 /** Offline hands-free turns get a fixed window: the recognizer owns the mic, so no loudness. */
 export const OFFLINE_TURN_MS = 5000;
 /** The app saying its own name ("Namaste, main Drishti hoon") must not wake itself. */
-export const SELF_NAME = /drishti|दृष्टि|திருஷ்டி/i;
+export const SELF_NAME = /drishti|दृष्टि|दृष्टी|திருஷ்டி|দৃষ্টি|దృష్టి|ದೃಷ್ಟಿ|ദൃഷ്ടി|દ્રષ્ટિ|ਦ੍ਰਿਸ਼ਟੀ/i;
 
 const frameLevel = (frame: number[]): number => {
   let sum = 0;

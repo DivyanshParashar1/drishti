@@ -1,4 +1,5 @@
 import type { Lang } from '../core/lang';
+import { INDIC_FILLER, INDIC_NO, INDIC_YES, routeIndic } from './indicRouter';
 
 /**
  * F5 command router: fixed keyword rules on the transcript; anything else is a question for the
@@ -56,6 +57,13 @@ const LANG_WORDS: [RegExp, Lang][] = [
   [/\b(tamil)\b|தமிழ/, 'ta'],
   [/\b(english|angrezi|inglish)\b|ஆங்கில|இங்கிலீஷ்/, 'en'],
   [/\b(hindi)\b|இந்தி|ஹிந்தி/, 'hi'],
+  [/\b(bengali|bangla)\b/, 'bn'],
+  [/\b(telugu)\b/, 'te'],
+  [/\b(kannada)\b/, 'kn'],
+  [/\b(malayalam)\b/, 'ml'],
+  [/\b(marathi)\b/, 'mr'],
+  [/\b(gujarati)\b/, 'gu'],
+  [/\b(punjabi|panjabi)\b/, 'pa'],
 ];
 
 /** Clean a captured name: drop filler words, title-case. Null if nothing usable is left. */
@@ -65,6 +73,7 @@ export function cleanName(raw: string | undefined): string | null {
     ...['naam', 'name', 'se', 'the', 'this', 'isko', 'usko', 'inko', 'as', 'ko', 'mera', 'my', 'friend', 'dost', 'hai', 'is', 'karo', 'kar', 'kijiye'],
     ...['इसको', 'इसे', 'उसको', 'नाम', 'से', 'को', 'मेरा', 'है', 'करो'],
     ...['இவரை', 'இவனை', 'இவளை', 'பெயர்', 'என்', 'இவர்'],
+    ...INDIC_FILLER,
   ]);
   const parts = raw.split(' ').filter((w) => w && !filler.has(w));
   if (parts.length === 0 || parts.length > 3) return null;
@@ -74,6 +83,10 @@ export function cleanName(raw: string | undefined): string | null {
 export function route(transcript: string): Command {
   const t = normalize(transcript);
   if (!t) return { kind: 'empty' };
+
+  // P17: Bengali, Telugu, Kannada, Malayalam, Marathi, Gujarati and Punjabi phrasings.
+  const indic = routeIndic(t, transcript, cleanName);
+  if (indic) return indic;
 
   // F12 demo mode: "demo mode band karo" / "demo mode chalu karo", "demo mode off/on". First, so
   // "demo band karo" isn't taken for "band karo" (stop).
@@ -184,8 +197,8 @@ export function spokenName(transcript: string): string | null {
 /** F4 consent: yes only on a clear yes; any no-word wins ("haan nahi" → no). */
 export function consentAnswer(transcript: string): 'yes' | 'no' {
   const t = normalize(transcript);
-  if (has(t, 'nahi', 'nahin', 'na', 'no', 'mat', 'nope', 'नहीं', 'ना', 'மாட்டேன்', 'இல்லை', 'வேண்டாம்')) return 'no';
-  return has(t, 'haan', 'haa', 'ha', 'han', 'haanji', 'ji', 'ji haan', 'yes', 'yeah', 'yep', 'ok', 'okay', 'theek hai', 'thik hai', 'sure', 'हाँ', 'हां', 'जी', 'ठीक है', 'ஆம்', 'சரி')
+  if (has(t, 'nahi', 'nahin', 'na', 'no', 'mat', 'nope', 'नहीं', 'ना', 'மாட்டேன்', 'இல்லை', 'வேண்டாம்', ...INDIC_NO)) return 'no';
+  return has(t, 'haan', 'haa', 'ha', 'han', 'haanji', 'ji', 'ji haan', 'yes', 'yeah', 'yep', 'ok', 'okay', 'theek hai', 'thik hai', 'sure', 'हाँ', 'हां', 'जी', 'ठीक है', 'ஆம்', 'சரி', ...INDIC_YES)
     ? 'yes'
     : 'no';
 }

@@ -1,7 +1,8 @@
 import type { ClipLang } from '../audio/clips.generated';
 
 export type Lang = ClipLang;
-export const LANGS: readonly Lang[] = ['hi-en', 'hi', 'en', 'ta'];
+// P17: every language Gnani's STT and TTS support (docs.gnani.ai), plus Hinglish.
+export const LANGS: readonly Lang[] = ['hi-en', 'hi', 'en', 'ta', 'bn', 'te', 'kn', 'ml', 'mr', 'gu', 'pa'];
 export const DEFAULT_LANG: Lang = 'hi-en';
 
 /**
@@ -13,4 +14,11 @@ export const SPEECH_LOCALE: Record<Lang, string> = {
   hi: 'hi-IN',
   en: 'en-IN',
   ta: 'ta-IN',
+  bn: 'bn-IN',
+  te: 'te-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+  mr: 'mr-IN',
+  gu: 'gu-IN',
+  pa: 'pa-IN',
 };

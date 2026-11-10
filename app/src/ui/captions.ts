@@ -33,10 +33,19 @@ const LANG_SWITCHED_EN: Record<Lang, string> = {
   hi: "I'll speak in Hindi now",
   en: "I'll speak in English now",
   ta: "I'll speak in Tamil now",
+  bn: "I'll speak in Bengali now",
+  te: "I'll speak in Telugu now",
+  kn: "I'll speak in Kannada now",
+  ml: "I'll speak in Malayalam now",
+  mr: "I'll speak in Marathi now",
+  gu: "I'll speak in Gujarati now",
+  pa: "I'll speak in Punjabi now",
 };
 
 export function scriptOf(text: string): Script {
-  if (/[஀-௿]/.test(text)) return 'tamil';
+  // Telugu, Kannada, Malayalam stack as tall as Tamil; Bengali, Gurmukhi, Gujarati as Devanagari.
+  if (/[஀-௿ఀ-౿ಀ-೿ഀ-ൿ]/.test(text)) return 'tamil';
+  if (/[ঀ-৿਀-੿઀-૿]/.test(text)) return 'devanagari';
   if (/[ऀ-ॿ]/.test(text)) return 'devanagari';
   return 'latin';
 }

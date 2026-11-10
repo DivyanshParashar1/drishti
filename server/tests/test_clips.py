@@ -90,6 +90,10 @@ SMALL = {
     "obj.car": {"hi-en": "Car", "hi": "कार", "en": "Car", "ta": "கார்"},
     "dir.left": {"hi-en": "left mein", "hi": "बाएँ", "en": "on the left", "ta": "இடது பக்கம்"},
 }
+# P17: the other languages reuse the real phrases (only hi-en/hi are asserted on).
+for _key, _texts in SMALL.items():
+    for _lang in LANGS:
+        _texts.setdefault(_lang, PHRASES[_key][_lang])
 
 
 async def test_builds_pack_and_manifest(tmp_path):
@@ -182,3 +186,21 @@ def test_committed_typescript_is_up_to_date():
         pytest.skip("clips.generated.ts not written yet")
     expected = gen_clips.render_ts(PHRASES, gen_clips.CLIPS_DIR, gen_clips.TS_PATH)
     assert gen_clips.TS_PATH.read_text() == expected, "rerun scripts/gen_clips.py"
+
+
+# P17: each added language in its own script (Marathi shares Devanagari with Hindi).
+SCRIPTS = {
+    "bn": r"[ঀ-৿]",
+    "te": r"[ఀ-౿]",
+    "kn": r"[ಀ-೿]",
+    "ml": r"[ഀ-ൿ]",
+    "mr": r"[ऀ-ॿ]",
+    "gu": r"[઀-૿]",
+    "pa": r"[਀-੿]",
+}
+
+
+@pytest.mark.parametrize("lang", sorted(SCRIPTS))
+def test_added_languages_use_their_script(lang):
+    wrong = [k for k, t in PHRASES.items() if not re.search(SCRIPTS[lang], t[lang])]
+    assert wrong == []

@@ -31,6 +31,16 @@ LANGUAGE_RULES: dict[Lang, str] = {
     "ta": (
         "Answer in Tamil, written in Tamil script. Say directions as இடது, முன்னால், வலது."
     ),
+    "bn": "Answer in Bengali, written in Bengali script. Say directions as বাঁদিকে, সামনে, ডানদিকে.",
+    "te": "Answer in Telugu, written in Telugu script. Say directions as ఎడమవైపు, ముందు, కుడివైపు.",
+    "kn": "Answer in Kannada, written in Kannada script. Say directions as ಎಡಕ್ಕೆ, ಮುಂದೆ, ಬಲಕ್ಕೆ.",
+    "ml": (
+        "Answer in Malayalam, written in Malayalam script. "
+        "Say directions as ഇടതുവശത്ത്, മുന്നിൽ, വലതുവശത്ത്."
+    ),
+    "mr": "Answer in Marathi, written in Devanagari script. Say directions as डावीकडे, समोर, उजवीकडे.",
+    "gu": "Answer in Gujarati, written in Gujarati script. Say directions as ડાબી બાજુ, આગળ, જમણી બાજુ.",
+    "pa": "Answer in Punjabi, written in Gurmukhi script. Say directions as ਖੱਬੇ ਪਾਸੇ, ਅੱਗੇ, ਸੱਜੇ ਪਾਸੇ.",
 }
 
 

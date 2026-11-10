@@ -12,7 +12,19 @@ export interface Recognizer {
 }
 
 /** Android recognizer locale per app language. Hinglish uses the Hindi model (Devanagari output). */
-export const OFFLINE_LOCALE: Record<Lang, string> = { 'hi-en': 'hi-IN', hi: 'hi-IN', en: 'en-IN', ta: 'ta-IN' };
+export const OFFLINE_LOCALE: Record<Lang, string> = {
+  'hi-en': 'hi-IN',
+  hi: 'hi-IN',
+  en: 'en-IN',
+  ta: 'ta-IN',
+  bn: 'bn-IN',
+  te: 'te-IN',
+  kn: 'kn-IN',
+  ml: 'ml-IN',
+  mr: 'mr-IN',
+  gu: 'gu-IN',
+  pa: 'pa-IN',
+};
 
 export const OFFLINE_FINAL_TIMEOUT_MS = 3000;
 

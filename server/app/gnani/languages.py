@@ -12,13 +12,19 @@ Checked against docs.gnani.ai on 2026-11-06:
   Hinglish voice (Poorvi, language "hi-en").
 - Timbre normalises digits itself when `language` is explicit ("42" → "बयालीस"),
   so the server does not convert numbers to words.
+- P17 (docs.gnani.ai "Supported languages" / "Available Voices", 2026-11-10): Prisma v2.5/v3.0
+  and Timbre v3.0 both cover bn, en, gu, hi, kn, ml, mr, pa, ta, te; every v3.0 voice speaks all
+  ten, so the seven added languages use Shivani like hi/en/ta, and STT returns native script
+  (`verbatim`).
 """
 
 from dataclasses import dataclass
 from typing import Literal
 
-Lang = Literal["hi", "hi-en", "en", "ta"]
-LANGS: tuple[Lang, ...] = ("hi", "hi-en", "en", "ta")
+Lang = Literal["hi", "hi-en", "en", "ta", "bn", "te", "kn", "ml", "mr", "gu", "pa"]
+LANGS: tuple[Lang, ...] = ("hi", "hi-en", "en", "ta", "bn", "te", "kn", "ml", "mr", "gu", "pa")
+# P17: languages added with only a locale; script output and voice as for Tamil.
+_NATIVE: tuple[Lang, ...] = ("bn", "te", "kn", "ml", "mr", "gu", "pa")
 DEFAULT_LANG: Lang = "hi-en"
 
 
@@ -40,6 +46,7 @@ STT: dict[Lang, SttConfig] = {
     "hi-en": SttConfig("hi-IN", "transliterate"),
     "en": SttConfig("en-IN", "verbatim"),
     "ta": SttConfig("ta-IN", "verbatim"),
+    **{lang: SttConfig(f"{lang}-IN", "verbatim") for lang in _NATIVE},
 }
 
 # One v3.0 voice across hi/en/ta keeps the app's voice consistent; Hinglish needs v2.5.
@@ -48,6 +55,7 @@ TTS: dict[Lang, TtsConfig] = {
     "hi-en": TtsConfig("timbre-v2.5", "Poorvi", "hi-en"),
     "en": TtsConfig("timbre-v3.0", "Shivani", "en-IN"),
     "ta": TtsConfig("timbre-v3.0", "Shivani", "ta-IN"),
+    **{lang: TtsConfig("timbre-v3.0", "Shivani", f"{lang}-IN") for lang in _NATIVE},
 }
 
 

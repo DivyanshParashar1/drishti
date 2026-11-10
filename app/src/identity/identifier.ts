@@ -49,6 +49,13 @@ export const NAME_TEMPLATE: Record<Lang, (name: string) => string> = {
   hi: (n) => `${n} आपके सामने है`,
   en: (n) => `${n} is here`,
   ta: (n) => `${n} இருக்கிறார்`,
+  bn: (n) => `${n} আপনার সামনে আছেন`,
+  te: (n) => `${n} మీ ముందు ఉన్నారు`,
+  kn: (n) => `${n} ನಿಮ್ಮ ಮುಂದೆ ಇದ್ದಾರೆ`,
+  ml: (n) => `${n} നിങ്ങളുടെ മുന്നിലുണ്ട്`,
+  mr: (n) => `${n} तुमच्या समोर आहेत`,
+  gu: (n) => `${n} તમારી સામે છે`,
+  pa: (n) => `${n} ਤੁਹਾਡੇ ਸਾਹਮਣੇ ਹਨ`,
 };
 
 export function nameParts(p: NamedPerson, lang: Lang, dir: Direction): AudioPart[] {

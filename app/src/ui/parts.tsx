@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { Animated, Easing, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
+import type { Lang } from '../core/lang';
 import type { Tone } from './captions';
 import type { HudState, HudStore } from './hudStore';
 import { colors, fonts, shape } from './tokens';
@@ -21,7 +22,19 @@ export const TONE: Record<Tone, string> = {
   error: colors.alertNear,
 };
 
-export const LANG_CHIP = { 'hi-en': 'HINGLISH', hi: 'हिंदी', en: 'ENGLISH', ta: 'தமிழ்' } as const;
+export const LANG_CHIP: Record<Lang, string> = {
+  'hi-en': 'HINGLISH',
+  hi: 'हिंदी',
+  en: 'ENGLISH',
+  ta: 'தமிழ்',
+  bn: 'বাংলা',
+  te: 'తెలుగు',
+  kn: 'ಕನ್ನಡ',
+  ml: 'മലയാളം',
+  mr: 'मराठी',
+  gu: 'ગુજરાતી',
+  pa: 'ਪੰਜਾਬੀ',
+};
 
 /** Outlined status chip (strip). */
 export function Chip({ children, color = colors.text, border, fill, mono, style }: { children: ReactNode; color?: string; border?: string; fill?: string; mono?: boolean; style?: StyleProp<ViewStyle> }) {
