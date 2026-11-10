@@ -18,8 +18,8 @@ import { WakeService, type WakeControl, type WakeEngine } from './wakeWord';
 import { VoskWake, type VoskApi } from './voskWake';
 import { OwwEngine } from './oww';
 import { RecorderFrameSource } from './recorderSource';
-import { loadTensorflowModel } from 'react-native-fast-tflite';
 import { WAKE_FEATURE_ASSETS, WAKE_PHRASE, WAKE_WORD_ASSET } from '../models/detectorAssets';
+import { loadBundledModel } from '../models/loadModel';
 
 const MIC = { sampleRate: 16000, channels: 1, encoding: 'pcm_16bit', interval: 40 } as const;
 
@@ -40,9 +40,9 @@ class MicBridge {
 /** openWakeWord's three models on the app's TFLite runtime (CPU), as one engine. */
 async function createOwwEngine(): Promise<WakeEngine> {
   const [mel, emb, ww] = await Promise.all([
-    loadTensorflowModel(WAKE_FEATURE_ASSETS.melspec, []),
-    loadTensorflowModel(WAKE_FEATURE_ASSETS.embedding, []),
-    loadTensorflowModel(WAKE_WORD_ASSET, []),
+    loadBundledModel(WAKE_FEATURE_ASSETS.melspec, []),
+    loadBundledModel(WAKE_FEATURE_ASSETS.embedding, []),
+    loadBundledModel(WAKE_WORD_ASSET, []),
   ]);
   const f32 = (b: ArrayBuffer) => new Float32Array(b);
   const copy = (x: Float32Array) => x.slice().buffer as ArrayBuffer;

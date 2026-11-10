@@ -2,6 +2,10 @@ import { loadTensorflowModel } from 'react-native-fast-tflite';
 import { describeTensors, loadWithFallback } from '../loadModel';
 
 jest.mock('react-native-fast-tflite', () => ({ loadTensorflowModel: jest.fn() }));
+jest.mock('expo-asset', () => ({
+  Asset: { fromModule: (id: number) => ({ downloadAsync: async () => ({ localUri: `file:///cache/${id}.tflite`, uri: 'raw' }) }) },
+}));
+const url = (id: number) => ({ url: `file:///cache/${id}.tflite` });
 const load = loadTensorflowModel as jest.Mock;
 
 const fakeModel = {
@@ -15,14 +19,14 @@ test('uses the GPU delegate when it loads', async () => {
   load.mockResolvedValueOnce(fakeModel);
   const r = await loadWithFallback(1);
   expect(r.delegate).toBe('android-gpu');
-  expect(load).toHaveBeenCalledWith(1, ['android-gpu']);
+  expect(load).toHaveBeenCalledWith(url(1), ['android-gpu']);
 });
 
 test('falls back to CPU when the GPU delegate fails', async () => {
   load.mockRejectedValueOnce(new Error('no gpu')).mockResolvedValueOnce(fakeModel);
   const r = await loadWithFallback(1);
   expect(r.delegate).toBe('cpu');
-  expect(load).toHaveBeenLastCalledWith(1, []);
+  expect(load).toHaveBeenLastCalledWith(url(1), []);
 });
 
 test('propagates the error when CPU also fails', async () => {
@@ -41,5 +45,5 @@ test('cpu preference never tries the GPU delegate', async () => {
   const r = await loadWithFallback(1, () => 0, 'cpu');
   expect(r.delegate).toBe('cpu');
   expect(load).toHaveBeenCalledTimes(1);
-  expect(load).toHaveBeenCalledWith(1, []);
+  expect(load).toHaveBeenCalledWith(url(1), []);
 });

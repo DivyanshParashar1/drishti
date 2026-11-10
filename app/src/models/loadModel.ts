@@ -3,6 +3,19 @@ import {
   type TensorflowModelDelegate,
   type TfliteModel,
 } from 'react-native-fast-tflite';
+import { Asset } from 'expo-asset';
+
+/**
+ * Load a bundled `.tflite` (a `require(...)` id) with the given delegates. fast-tflite 3 reads the
+ * model with `java.net.URL`, which works in dev (Metro serves an http URL) but not in release, where
+ * the asset resolves to a bare Android resource name ("no protocol"). expo-asset copies the resource
+ * into the cache and gives a file:// URI that URL can read in both.
+ */
+export async function loadBundledModel(source: number, delegates: TensorflowModelDelegate[]): Promise<TfliteModel> {
+  const asset = await Asset.fromModule(source).downloadAsync();
+  const url = asset.localUri ?? asset.uri;
+  return loadTensorflowModel({ url }, delegates);
+}
 
 export interface LoadedModel {
   model: TfliteModel;
@@ -21,14 +34,14 @@ export async function loadWithFallback(
 ): Promise<LoadedModel> {
   const start = now();
   if (prefer === 'cpu') {
-    const model = await loadTensorflowModel(source, []);
+    const model = await loadBundledModel(source, []);
     return { model, delegate: 'cpu', loadMs: now() - start };
   }
   try {
-    const model = await loadTensorflowModel(source, ['android-gpu']);
+    const model = await loadBundledModel(source, ['android-gpu']);
     return { model, delegate: 'android-gpu', loadMs: now() - start };
   } catch {
-    const model = await loadTensorflowModel(source, []);
+    const model = await loadBundledModel(source, []);
     return { model, delegate: 'cpu', loadMs: now() - start };
   }
 }
