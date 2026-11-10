@@ -748,5 +748,71 @@
     "hi": "सेटिंग्स खोलिए और कैमरा की अनुमति दीजिए।",
     "en": "Open Settings and allow the camera.",
     "ta": "அமைப்புகளைத் திறந்து கேமராவை அனுமதிக்கவும்."
+  },
+  "sys.tour_1": {
+    "hi-en": "Drishti mein aapka swagat hai. Ye tour batayega ki app kaise kaam karta hai.",
+    "hi": "दृष्टि में आपका स्वागत है। यह टूर बताएगा कि ऐप कैसे काम करता है।",
+    "en": "Welcome to Drishti. This tour shows how the app works.",
+    "ta": "திருஷ்டிக்கு வரவேற்கிறோம். இந்தச் சுற்றுலா செயலி எப்படி வேலை செய்கிறது என்பதைக் காட்டும்."
+  },
+  "sys.tour_2": {
+    "hi-en": "Drishti camera se dekhti hai aur saamne ki cheezon ke naam batati hai, jaise kursi ya car.",
+    "hi": "दृष्टि कैमरे से देखती है और सामने की चीज़ों के नाम बताती है, जैसे कुर्सी या कार।",
+    "en": "Drishti watches through the camera and names the things in front of you, like a chair or a car.",
+    "ta": "திருஷ்டி கேமரா மூலம் பார்த்து, முன்னால் உள்ள பொருட்களின் பெயர்களைச் சொல்லும், நாற்காலி அல்லது கார் போல."
+  },
+  "sys.tour_3": {
+    "hi-en": "Drishti jo bhi bolti hai, woh yahan likha aata hai, neeche English mein bhi.",
+    "hi": "दृष्टि जो भी बोलती है, वह यहाँ लिखा आता है, नीचे अंग्रेज़ी में भी।",
+    "en": "Everything Drishti says appears here as text, with English below.",
+    "ta": "திருஷ்டி சொல்வது எல்லாம் இங்கே எழுத்தாக வரும், கீழே ஆங்கிலத்திலும்."
+  },
+  "sys.tour_4": {
+    "hi-en": "Kuch poochna ho to screen ya ye left patti dabaakar rakhiye, boliye, phir chhod dijiye.",
+    "hi": "कुछ पूछना हो तो स्क्रीन या यह बाईं पट्टी दबाकर रखिए, बोलिए, फिर छोड़ दीजिए।",
+    "en": "To ask something, hold the screen or this left strip, speak, then let go.",
+    "ta": "ஏதாவது கேட்க, திரையையோ இந்த இடது பட்டையையோ அழுத்திப் பிடித்துப் பேசுங்கள், பிறகு விடுங்கள்."
+  },
+  "sys.tour_5": {
+    "hi-en": "Ya Drishti boliye, thoda rukiye, phir apna sawaal poochiye.",
+    "hi": "या दृष्टि बोलिए, थोड़ा रुकिए, फिर अपना सवाल पूछिए।",
+    "en": "Or say Drishti, pause, then ask your question.",
+    "ta": "அல்லது திருஷ்டி என்று சொல்லி, சற்று நிறுத்தி, உங்கள் கேள்வியைக் கேளுங்கள்."
+  },
+  "sys.tour_6": {
+    "hi-en": "Pichhla jawab dobara sunne ke liye yahan ek baar tap kijiye. Bolna band karne ke liye do baar tap kijiye.",
+    "hi": "पिछला जवाब दोबारा सुनने के लिए यहाँ एक बार टैप कीजिए। बोलना बंद करने के लिए दो बार टैप कीजिए।",
+    "en": "Tap here once to hear the last answer again. Tap twice to stop speaking.",
+    "ta": "கடைசி பதிலை மீண்டும் கேட்க இங்கே ஒரு முறை தட்டுங்கள். பேச்சை நிறுத்த இரண்டு முறை தட்டுங்கள்."
+  },
+  "sys.tour_7": {
+    "hi-en": "Upar ki patti mein bhasha, internet aur Drishti abhi kya kar rahi hai, dikhta hai.",
+    "hi": "ऊपर की पट्टी में भाषा, इंटरनेट और दृष्टि अभी क्या कर रही है, दिखता है।",
+    "en": "The top bar shows the language, the internet, and what Drishti is doing.",
+    "ta": "மேலே உள்ள பட்டையில் மொழி, இணையம் மற்றும் திருஷ்டி இப்போது என்ன செய்கிறது என்பது தெரியும்."
+  },
+  "sys.tour_8": {
+    "hi-en": "Ye card dikhata hai ki har jawab kitni jaldi aaya, isi phone par naapa gaya.",
+    "hi": "यह कार्ड दिखाता है कि हर जवाब कितनी जल्दी आया, इसी फ़ोन पर मापा गया।",
+    "en": "This card shows how fast each answer came, measured on this phone.",
+    "ta": "ஒவ்வொரு பதிலும் எவ்வளவு வேகமாக வந்தது என்பதை இந்த அட்டை காட்டும், இந்த போனிலேயே அளக்கப்பட்டது."
+  },
+  "sys.tour_9": {
+    "hi-en": "Menu mein settings, voice commands aur saved chehre hain.",
+    "hi": "मेन्यू में सेटिंग्स, वॉइस कमांड और सेव किए गए चेहरे हैं।",
+    "en": "The menu has settings, voice commands and saved faces.",
+    "ta": "மெனுவில் அமைப்புகள், குரல் கட்டளைகள் மற்றும் சேமித்த முகங்கள் உள்ளன."
+  },
+  "sys.tour_10": {
+    "hi-en": "Kisi ko yaad rakhne ke liye boliye, isko Rahul ke naam se save karo. Pehle unki haan zaroori hai.",
+    "hi": "किसी को याद रखने के लिए बोलिए, इसको राहुल के नाम से सेव करो। पहले उनकी हाँ ज़रूरी है।",
+    "en": "To remember someone, say: save this as Rahul. They must agree first.",
+    "ta": "ஒருவரை நினைவில் வைக்க, இவரை ராகுல் என்று சேமி என்று சொல்லுங்கள். முதலில் அவரது சம்மதம் வேண்டும்."
+  },
+  "sys.tour_11": {
+    "hi-en": "Drishti aapki cane ke saath kaam karti hai, uski jagah nahi. Shukriya!",
+    "hi": "दृष्टि आपकी छड़ी के साथ काम करती है, उसकी जगह नहीं। धन्यवाद!",
+    "en": "Drishti works with your cane, not instead of it. Thank you!",
+    "ta": "திருஷ்டி உங்கள் கைத்தடியுடன் வேலை செய்யும், அதற்குப் பதிலாக அல்ல. நன்றி!"
   }
 }

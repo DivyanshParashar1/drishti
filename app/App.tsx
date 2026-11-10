@@ -11,6 +11,7 @@ import { DemoBoxes } from './src/ui/DemoBoxes';
 import { DemoMenu, type WakeInfo } from './src/ui/DemoMenu';
 import { VoiceCommands } from './src/ui/VoiceCommands';
 import { FacesManager } from './src/ui/FacesManager';
+import { AppTour } from './src/ui/AppTour';
 import { TwoFingerHold } from './src/ui/gestures';
 import { Hud } from './src/ui/Hud';
 import { HudStore } from './src/ui/hudStore';
@@ -62,6 +63,7 @@ export default function App() {
   );
   useEffect(() => () => store.dispose(), [store]);
   useEffect(() => services.demoChanged.on((on) => setDemo(on)), [services]);
+  useEffect(() => services.firstRunStart.on(() => setTour(true)), [services]); // before startServices below
 
   // F12: two fingers held 2 s anywhere toggle demo mode; the talk the first finger started is dropped.
   const hold = useMemo(() => new TwoFingerHold({ onTwo: () => void voice.cancel(), onFire: () => services.setDemoMode(!services.demoMode) }), [voice, services]);
@@ -154,6 +156,7 @@ export default function App() {
       )}
       {panel === 'faces' && <FacesManager services={services} onClose={() => setPanel('menu')} />}
       {panel === 'commands' && <VoiceCommands lang={services.lang} wakePhrase={wake.phrase} onClose={() => setPanel('menu')} />}
+      {tour && !perms.screen && <AppTour services={services} onDone={() => setTour(false)} />}
       {perms.screen && <PermissionScreen kind={perms.screen.kind} canRequest={perms.screen.canRequest} onRequest={perms.screen.request} onSkip={perms.screen.skip} say={services.say} />}
     </View>
   );

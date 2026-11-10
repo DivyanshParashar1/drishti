@@ -129,6 +129,17 @@ export type ClipKey =
   | "sys.perm_camera"
   | "sys.perm_mic"
   | "sys.perm_settings"
+  | "sys.tour_1"
+  | "sys.tour_2"
+  | "sys.tour_3"
+  | "sys.tour_4"
+  | "sys.tour_5"
+  | "sys.tour_6"
+  | "sys.tour_7"
+  | "sys.tour_8"
+  | "sys.tour_9"
+  | "sys.tour_10"
+  | "sys.tour_11"
 ;
 
 export interface Clip {
@@ -264,6 +275,17 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.perm_camera": { text: "दृष्टि को आगे देखने के लिए कैमरा चाहिए।", en: "Drishti needs the camera to see what's ahead.", asset: null },
     "sys.perm_mic": { text: "आपके सवाल सुनने के लिए दृष्टि को माइक्रोफ़ोन चाहिए।", en: "Drishti needs the microphone to hear your questions.", asset: null },
     "sys.perm_settings": { text: "सेटिंग्स खोलिए और कैमरा की अनुमति दीजिए।", en: "Open Settings and allow the camera.", asset: null },
+    "sys.tour_1": { text: "दृष्टि में आपका स्वागत है। यह टूर बताएगा कि ऐप कैसे काम करता है।", en: "Welcome to Drishti. This tour shows how the app works.", asset: null },
+    "sys.tour_2": { text: "दृष्टि कैमरे से देखती है और सामने की चीज़ों के नाम बताती है, जैसे कुर्सी या कार।", en: "Drishti watches through the camera and names the things in front of you, like a chair or a car.", asset: null },
+    "sys.tour_3": { text: "दृष्टि जो भी बोलती है, वह यहाँ लिखा आता है, नीचे अंग्रेज़ी में भी।", en: "Everything Drishti says appears here as text, with English below.", asset: null },
+    "sys.tour_4": { text: "कुछ पूछना हो तो स्क्रीन या यह बाईं पट्टी दबाकर रखिए, बोलिए, फिर छोड़ दीजिए।", en: "To ask something, hold the screen or this left strip, speak, then let go.", asset: null },
+    "sys.tour_5": { text: "या दृष्टि बोलिए, थोड़ा रुकिए, फिर अपना सवाल पूछिए।", en: "Or say Drishti, pause, then ask your question.", asset: null },
+    "sys.tour_6": { text: "पिछला जवाब दोबारा सुनने के लिए यहाँ एक बार टैप कीजिए। बोलना बंद करने के लिए दो बार टैप कीजिए।", en: "Tap here once to hear the last answer again. Tap twice to stop speaking.", asset: null },
+    "sys.tour_7": { text: "ऊपर की पट्टी में भाषा, इंटरनेट और दृष्टि अभी क्या कर रही है, दिखता है।", en: "The top bar shows the language, the internet, and what Drishti is doing.", asset: null },
+    "sys.tour_8": { text: "यह कार्ड दिखाता है कि हर जवाब कितनी जल्दी आया, इसी फ़ोन पर मापा गया।", en: "This card shows how fast each answer came, measured on this phone.", asset: null },
+    "sys.tour_9": { text: "मेन्यू में सेटिंग्स, वॉइस कमांड और सेव किए गए चेहरे हैं।", en: "The menu has settings, voice commands and saved faces.", asset: null },
+    "sys.tour_10": { text: "किसी को याद रखने के लिए बोलिए, इसको राहुल के नाम से सेव करो। पहले उनकी हाँ ज़रूरी है।", en: "To remember someone, say: save this as Rahul. They must agree first.", asset: null },
+    "sys.tour_11": { text: "दृष्टि आपकी छड़ी के साथ काम करती है, उसकी जगह नहीं। धन्यवाद!", en: "Drishti works with your cane, not instead of it. Thank you!", asset: null },
   },
   "hi-en": {
     "obj.person": { text: "Vyakti", en: "Person", asset: null },
@@ -391,6 +413,17 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.perm_camera": { text: "Drishti ko aage dekhne ke liye camera chahiye.", en: "Drishti needs the camera to see what's ahead.", asset: null },
     "sys.perm_mic": { text: "Aapke sawaal sunne ke liye Drishti ko microphone chahiye.", en: "Drishti needs the microphone to hear your questions.", asset: null },
     "sys.perm_settings": { text: "Settings kholiye aur camera ki anumati dijiye.", en: "Open Settings and allow the camera.", asset: null },
+    "sys.tour_1": { text: "Drishti mein aapka swagat hai. Ye tour batayega ki app kaise kaam karta hai.", en: "Welcome to Drishti. This tour shows how the app works.", asset: null },
+    "sys.tour_2": { text: "Drishti camera se dekhti hai aur saamne ki cheezon ke naam batati hai, jaise kursi ya car.", en: "Drishti watches through the camera and names the things in front of you, like a chair or a car.", asset: null },
+    "sys.tour_3": { text: "Drishti jo bhi bolti hai, woh yahan likha aata hai, neeche English mein bhi.", en: "Everything Drishti says appears here as text, with English below.", asset: null },
+    "sys.tour_4": { text: "Kuch poochna ho to screen ya ye left patti dabaakar rakhiye, boliye, phir chhod dijiye.", en: "To ask something, hold the screen or this left strip, speak, then let go.", asset: null },
+    "sys.tour_5": { text: "Ya Drishti boliye, thoda rukiye, phir apna sawaal poochiye.", en: "Or say Drishti, pause, then ask your question.", asset: null },
+    "sys.tour_6": { text: "Pichhla jawab dobara sunne ke liye yahan ek baar tap kijiye. Bolna band karne ke liye do baar tap kijiye.", en: "Tap here once to hear the last answer again. Tap twice to stop speaking.", asset: null },
+    "sys.tour_7": { text: "Upar ki patti mein bhasha, internet aur Drishti abhi kya kar rahi hai, dikhta hai.", en: "The top bar shows the language, the internet, and what Drishti is doing.", asset: null },
+    "sys.tour_8": { text: "Ye card dikhata hai ki har jawab kitni jaldi aaya, isi phone par naapa gaya.", en: "This card shows how fast each answer came, measured on this phone.", asset: null },
+    "sys.tour_9": { text: "Menu mein settings, voice commands aur saved chehre hain.", en: "The menu has settings, voice commands and saved faces.", asset: null },
+    "sys.tour_10": { text: "Kisi ko yaad rakhne ke liye boliye, isko Rahul ke naam se save karo. Pehle unki haan zaroori hai.", en: "To remember someone, say: save this as Rahul. They must agree first.", asset: null },
+    "sys.tour_11": { text: "Drishti aapki cane ke saath kaam karti hai, uski jagah nahi. Shukriya!", en: "Drishti works with your cane, not instead of it. Thank you!", asset: null },
   },
   "en": {
     "obj.person": { text: "Person", en: "Person", asset: null },
@@ -518,6 +551,17 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.perm_camera": { text: "Drishti needs the camera to see what's ahead.", en: "Drishti needs the camera to see what's ahead.", asset: null },
     "sys.perm_mic": { text: "Drishti needs the microphone to hear your questions.", en: "Drishti needs the microphone to hear your questions.", asset: null },
     "sys.perm_settings": { text: "Open Settings and allow the camera.", en: "Open Settings and allow the camera.", asset: null },
+    "sys.tour_1": { text: "Welcome to Drishti. This tour shows how the app works.", en: "Welcome to Drishti. This tour shows how the app works.", asset: null },
+    "sys.tour_2": { text: "Drishti watches through the camera and names the things in front of you, like a chair or a car.", en: "Drishti watches through the camera and names the things in front of you, like a chair or a car.", asset: null },
+    "sys.tour_3": { text: "Everything Drishti says appears here as text, with English below.", en: "Everything Drishti says appears here as text, with English below.", asset: null },
+    "sys.tour_4": { text: "To ask something, hold the screen or this left strip, speak, then let go.", en: "To ask something, hold the screen or this left strip, speak, then let go.", asset: null },
+    "sys.tour_5": { text: "Or say Drishti, pause, then ask your question.", en: "Or say Drishti, pause, then ask your question.", asset: null },
+    "sys.tour_6": { text: "Tap here once to hear the last answer again. Tap twice to stop speaking.", en: "Tap here once to hear the last answer again. Tap twice to stop speaking.", asset: null },
+    "sys.tour_7": { text: "The top bar shows the language, the internet, and what Drishti is doing.", en: "The top bar shows the language, the internet, and what Drishti is doing.", asset: null },
+    "sys.tour_8": { text: "This card shows how fast each answer came, measured on this phone.", en: "This card shows how fast each answer came, measured on this phone.", asset: null },
+    "sys.tour_9": { text: "The menu has settings, voice commands and saved faces.", en: "The menu has settings, voice commands and saved faces.", asset: null },
+    "sys.tour_10": { text: "To remember someone, say: save this as Rahul. They must agree first.", en: "To remember someone, say: save this as Rahul. They must agree first.", asset: null },
+    "sys.tour_11": { text: "Drishti works with your cane, not instead of it. Thank you!", en: "Drishti works with your cane, not instead of it. Thank you!", asset: null },
   },
   "ta": {
     "obj.person": { text: "ஒருவர்", en: "Person", asset: null },
@@ -645,6 +689,17 @@ export const CLIPS: Record<ClipLang, Record<ClipKey, Clip>> = {
     "sys.perm_camera": { text: "முன்னால் உள்ளதைப் பார்க்க திருஷ்டிக்கு கேமரா தேவை.", en: "Drishti needs the camera to see what's ahead.", asset: null },
     "sys.perm_mic": { text: "உங்கள் கேள்விகளைக் கேட்க திருஷ்டிக்கு மைக்ரோஃபோன் தேவை.", en: "Drishti needs the microphone to hear your questions.", asset: null },
     "sys.perm_settings": { text: "அமைப்புகளைத் திறந்து கேமராவை அனுமதிக்கவும்.", en: "Open Settings and allow the camera.", asset: null },
+    "sys.tour_1": { text: "திருஷ்டிக்கு வரவேற்கிறோம். இந்தச் சுற்றுலா செயலி எப்படி வேலை செய்கிறது என்பதைக் காட்டும்.", en: "Welcome to Drishti. This tour shows how the app works.", asset: null },
+    "sys.tour_2": { text: "திருஷ்டி கேமரா மூலம் பார்த்து, முன்னால் உள்ள பொருட்களின் பெயர்களைச் சொல்லும், நாற்காலி அல்லது கார் போல.", en: "Drishti watches through the camera and names the things in front of you, like a chair or a car.", asset: null },
+    "sys.tour_3": { text: "திருஷ்டி சொல்வது எல்லாம் இங்கே எழுத்தாக வரும், கீழே ஆங்கிலத்திலும்.", en: "Everything Drishti says appears here as text, with English below.", asset: null },
+    "sys.tour_4": { text: "ஏதாவது கேட்க, திரையையோ இந்த இடது பட்டையையோ அழுத்திப் பிடித்துப் பேசுங்கள், பிறகு விடுங்கள்.", en: "To ask something, hold the screen or this left strip, speak, then let go.", asset: null },
+    "sys.tour_5": { text: "அல்லது திருஷ்டி என்று சொல்லி, சற்று நிறுத்தி, உங்கள் கேள்வியைக் கேளுங்கள்.", en: "Or say Drishti, pause, then ask your question.", asset: null },
+    "sys.tour_6": { text: "கடைசி பதிலை மீண்டும் கேட்க இங்கே ஒரு முறை தட்டுங்கள். பேச்சை நிறுத்த இரண்டு முறை தட்டுங்கள்.", en: "Tap here once to hear the last answer again. Tap twice to stop speaking.", asset: null },
+    "sys.tour_7": { text: "மேலே உள்ள பட்டையில் மொழி, இணையம் மற்றும் திருஷ்டி இப்போது என்ன செய்கிறது என்பது தெரியும்.", en: "The top bar shows the language, the internet, and what Drishti is doing.", asset: null },
+    "sys.tour_8": { text: "ஒவ்வொரு பதிலும் எவ்வளவு வேகமாக வந்தது என்பதை இந்த அட்டை காட்டும், இந்த போனிலேயே அளக்கப்பட்டது.", en: "This card shows how fast each answer came, measured on this phone.", asset: null },
+    "sys.tour_9": { text: "மெனுவில் அமைப்புகள், குரல் கட்டளைகள் மற்றும் சேமித்த முகங்கள் உள்ளன.", en: "The menu has settings, voice commands and saved faces.", asset: null },
+    "sys.tour_10": { text: "ஒருவரை நினைவில் வைக்க, இவரை ராகுல் என்று சேமி என்று சொல்லுங்கள். முதலில் அவரது சம்மதம் வேண்டும்.", en: "To remember someone, say: save this as Rahul. They must agree first.", asset: null },
+    "sys.tour_11": { text: "திருஷ்டி உங்கள் கைத்தடியுடன் வேலை செய்யும், அதற்குப் பதிலாக அல்ல. நன்றி!", en: "Drishti works with your cane, not instead of it. Thank you!", asset: null },
   },
 };
 

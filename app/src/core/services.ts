@@ -55,6 +55,8 @@ export interface Services {
   demoChanged: Signal<[on: boolean, byUser: boolean]>;
   /** True when this session played the first-run tutorial (F12 caption says "First run"). */
   firstRun: boolean;
+  /** P17: fired once ever, on first launch: the app opens the app tour (visual + spoken). */
+  firstRunStart: Signal<[]>;
   /** A fixed phrase as a P4 system line. */
   say(key: ClipKey): void;
 }
@@ -157,6 +159,7 @@ export function createServices(): Services {
     },
     demoChanged: new Signal<[boolean, boolean]>(),
     firstRun: false,
+    firstRunStart: new Signal<[]>(),
     say: (key: ClipKey) => speak([{ kind: 'clip', key }]),
   });
 }
@@ -176,7 +179,7 @@ export async function startServices(s: Services): Promise<() => void> {
   await ExpoAudioBackend.configure();
   await s.player.preloadPack(s.lang);
   s.firstRun = !s.settings.firstRunDone;
-  void playFirstRun(s.settings, () => s.tutorial()); // F10: once ever; "help" replays it
+  void playFirstRun(s.settings, () => s.firstRunStart.emit()); // once ever: the app tour (P17); "help" plays the spoken tutorial
   // F10: "Internet chala gaya, alerts chalu hain" / "Internet wapas aa gaya", without flapping spam.
   const announcer = new ConnectivityAnnouncer((key) => {
     const id = s.metrics.start('system', 'enqueued');
