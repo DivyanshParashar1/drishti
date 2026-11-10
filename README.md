@@ -61,7 +61,7 @@ The relay is a thin FastAPI service. It holds every API key; the app holds only 
 ## Repository
 
 - `app/`: the Android app (React Native + Expo, TypeScript)
-- `server/`: the relay (Python, FastAPI)
+- `server/`: the relay (Python, FastAPI); `docker-compose.yml` runs it locally
 - `docs/`: write-up, demo checklist, deployment notes and the video script
 - `solution-pitch/`: the one-page pitch (PDF)
 - [PLAN.md](PLAN.md): the build plan. [LIMITATIONS.md](LIMITATIONS.md): known gaps and what's planned for each.
@@ -92,6 +92,18 @@ uv sync
 uv run uvicorn app.main:app --reload --host 0.0.0.0
 uv run pytest               # live tests (real credits) only with: uv run pytest -m live
 ```
+
+**Server with Docker** (no Python or uv needed; from the repo root):
+
+```sh
+cp server/.env.example server/.env   # optional: without it the relay starts with APP_TOKEN=dev-token and no keys
+docker compose up                    # relay on http://localhost:8000, reloads when server/app changes
+docker compose run --rm test         # server tests in the same image (never reads server/.env)
+```
+
+`docker build -t drishti-relay server` builds the production image that Cloud Run runs (non-root, with a healthcheck).
+
+**CI:** GitHub Actions (`.github/workflows/ci.yml`) runs the server tests, builds and smoke-tests the Docker image, and runs the app's tests and typecheck on every push and pull request. Live (credit-spending) tests never run in CI.
 
 Deployment to Cloud Run is described in [docs/deploy.md](docs/deploy.md).
 
