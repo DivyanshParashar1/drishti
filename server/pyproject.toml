@@ -2,6 +2,7 @@
 name = "drishti-relay"
 version = "0.1.0"
 description = "Thin relay for Drishti: holds API keys, relays Gnani STT/TTS and the vision model"
+license = "AGPL-3.0-only"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "fastapi",

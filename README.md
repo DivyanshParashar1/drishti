@@ -66,6 +66,10 @@ The relay is a thin FastAPI service. It holds every API key; the app holds only 
 - `solution-pitch/`: the one-page pitch (PDF)
 - [PLAN.md](PLAN.md): the build plan. [LIMITATIONS.md](LIMITATIONS.md): known gaps and what's planned for each.
 
+## Download
+
+The latest release APK (Android) is on the [Releases page](https://github.com/DivyanshParashar1/drishti/releases/latest). Install it, allow camera and microphone, and say "Drishti".
+
 ## Running
 
 **App** (no Android Studio needed):
@@ -73,8 +77,9 @@ The relay is a thin FastAPI service. It holds every API key; the app holds only 
 ```sh
 cd app
 npm install
+cp .env.example .env                           # set SERVER_URL / APP_TOKEN
 eas build -p android --profile development   # once, and again only when native packages change
-npx expo start --dev-client                    # day to day; set SERVER_URL / APP_TOKEN in app/.env
+npx expo start --dev-client                    # day to day
 npm test && npm run typecheck
 ```
 
@@ -115,7 +120,9 @@ Versions were pinned on 2026-11-06; don't upgrade them mid-build.
 | MobileFaceNet (face signatures; 112×112 input, 128-number output) | Apache-2.0 (weights from [foamliu/MobileFaceNet](https://github.com/foamliu/MobileFaceNet)) | [Qualcomm AI Hub v0.66.0 TFLite float](https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/mobile_facenet/releases/v0.66.0/mobile_facenet-tflite-float.zip) |
 | Vosk `vosk-model-small-hi-0.22` (wake word) | Apache-2.0 | [alphacephei.com/vosk/models](https://alphacephei.com/vosk/models) |
 
-The repository's own licence isn't set yet; because of YOLO11n it would have to be AGPL-3.0-compatible.
+## Licence
+
+Drishti is released under the [GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0-only), which shipping YOLO11n requires. The bundled models keep their own licences, listed above.
 
 ## Team
 
