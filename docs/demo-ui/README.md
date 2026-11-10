@@ -55,3 +55,13 @@ The `.dc.html` files load `./support.js` from the design tool. It is not needed 
 - Temples are the only buttons on the main screen. Keep right-temple taps out of the triple-tap debug gesture.
 - Tags go inside the box when it touches the top of the frame.
 - Caption panel: max 3 lines for the current sentence; truncate earlier sentences, never the current one.
+
+## Logo
+
+- `logo/drishti-mark.svg`: primary mark (white brackets, cyan eye and waveform), for dark backgrounds.
+- `logo/drishti-mark-mono.svg`: single colour via `currentColor`.
+- `logo/drishti-app-icon.svg`: 512 px launcher icon on `#0A0E11`.
+- `logo/drishti-icon-foreground.svg`: Android adaptive icon foreground (432 px, mark inside the safe zone); set the adaptive background colour to `#0A0E11`.
+- `Logo.dc.html`: the logo sheet (colourways, icon sizes, size ladder, strip and splash usage, rules). The wordmark is set in Noto Sans Bold with दृष्टि in Noto Sans Devanagari beneath; it is live text on the sheet, not an SVG.
+- Concept: viewfinder corners (the same brackets as the detection boxes), an eye, and a three-bar voice waveform as the pupil. At 32 px and below use the heavier-stroke variant shown on the sheet.
+- In the app: `app/scripts/make_brand_assets.py` renders these into the launcher and adaptive icons, the splash mark, and the in-app marks (`app/assets/brand/`). Rerun it after changing the logo; the icon and splash need an APK rebuild.

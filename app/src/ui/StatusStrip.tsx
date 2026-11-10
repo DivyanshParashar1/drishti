@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import { Image, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import type { Services } from '../core/services';
 import type { ModelState } from '../vision/useReflexCamera';
 import type { HudState } from './hudStore';
 import { Chip, ChipText, Dot, LANG_CHIP, MicIcon, Spinner } from './parts';
+import { MARK } from './brand';
 import { colors, fonts, shape } from './tokens';
 
 /**
@@ -32,7 +33,10 @@ export function StatusStrip({
   return (
     <View style={[st.strip, { top }]} onLayout={onLayout} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <View style={st.row}>
-        <Text style={st.wordmark}>Drishti</Text>
+        <View style={st.brand}>
+          <Image source={MARK} style={st.mark} />
+          <Text style={st.wordmark}>Drishti</Text>
+        </View>
         <Chip color={flash ? colors.brand : colors.text} border={flash ? colors.brand : undefined}>
           {LANG_CHIP[lang]}
         </Chip>
@@ -103,6 +107,8 @@ function usePhrasePack(services: Services): { ready: number; total: number } | n
 const st = StyleSheet.create({
   strip: { position: 'absolute', left: shape.margin, right: shape.margin, minHeight: shape.stripMinHeight, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: colors.scrim, borderRadius: shape.radiusPanel, justifyContent: 'center' },
   row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: 8, rowGap: 6 },
+  brand: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  mark: { width: 24, height: 24 },
   wordmark: { color: colors.brand, fontFamily: fonts.text, fontSize: 16, fontWeight: '700', letterSpacing: 0.2, marginRight: 2 },
   end: { marginLeft: 'auto' },
   break: { flexBasis: '100%', height: 0 },

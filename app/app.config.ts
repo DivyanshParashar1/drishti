@@ -13,9 +13,8 @@ const config: ExpoConfig = {
   android: {
     package: 'com.divyanshparashar.drishti',
     adaptiveIcon: {
-      backgroundColor: '#000000',
+      backgroundColor: '#0A0E11', // logo sheet: the icon's background
       foregroundImage: './assets/android-icon-foreground.png',
-      backgroundImage: './assets/android-icon-background.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },
     predictiveBackGestureEnabled: false,
@@ -41,6 +40,8 @@ const config: ExpoConfig = {
     // P14: on-device recognition for offline commands (Android 13+ on-device recognizer).
     ['expo-speech-recognition', { androidSpeechServicePackages: ['com.google.android.as', 'com.google.android.googlequicksearchbox'] }],
     ['expo-build-properties', { android: { minSdkVersion: 26 } }],
+    // The Drishti mark on black while the app starts (assets from scripts/make_brand_assets.py).
+    ['expo-splash-screen', { image: './assets/splash-icon.png', backgroundColor: '#000000', imageWidth: 120 }],
     // P17 wake word "दृष्टि": Vosk small Hindi model (Apache-2.0), copied into the APK's assets.
     ['react-native-vosk', { models: ['assets/vosk/model-hi'] }],
   ],

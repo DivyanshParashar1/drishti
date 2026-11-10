@@ -340,3 +340,4 @@ Everything skipped or postponed so far, in one place. Device checks (`DT-x.y`) a
 | DT-17.4 | "Drishti" then silence → "Samajh nahi aaya" after ~5 s; the tutorial saying "Drishti" never wakes it | P17 | pending | | |
 | DT-17.5 | Hold-to-talk with the wake word on and off; both send the question; no mic errors | P17 | pending | | |
 | DT-17.6 | Airplane mode: wake word, then "ruko", works through the offline recognizer; the wake word resumes after | P17 | pending | | |
+| DT-17.7 | Rebuilt APK: the new launcher icon (also with themed icons on), the splash mark on black, the mark in the status strip, permission screens and real-user mode | P17 | pending | | |

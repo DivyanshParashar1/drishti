@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Animated, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Animated, Image, StatusBar, StyleSheet, Text, View } from 'react-native';
 import type { Services } from '../core/services';
 import type { ModelState } from '../vision/useReflexCamera';
 import type { VoiceController } from '../voice/voiceController';
@@ -9,6 +9,7 @@ import { LatencyCard, ToastView } from './LatencyCard';
 import { useHud } from './parts';
 import { StatusStrip } from './StatusStrip';
 import { Temples } from './Temples';
+import { MARK_MONO } from './brand';
 import { colors, fonts, motion, shape } from './tokens';
 
 const TOAST_H = 34;
@@ -48,6 +49,7 @@ export function Hud({
     return (
       <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
         <View style={hd.black} pointerEvents="none">
+          <Image source={MARK_MONO} style={hd.dimLogo} />
           <Text style={hd.dimMark}>Drishti</Text>
         </View>
         <Temples voice={voice} store={store} listening={listening} feedback={null} top={top + 60} bottom={176} hidden onTouch={onTempleTouch} />
@@ -93,6 +95,8 @@ function EdgeGlow() {
 
 const hd = StyleSheet.create({
   black: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
+  // Real-user mode: the mark and wordmark in text-3 at 30%, so a sighted helper sees the app is running.
+  dimLogo: { width: 48, height: 48, marginBottom: 12, tintColor: 'rgba(142,142,147,0.3)' },
   dimMark: { color: 'rgba(142,142,147,0.3)', fontFamily: fonts.text, fontSize: 30, fontWeight: '600', letterSpacing: 0.5 },
   shade: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.45)' },
   glow1: { borderWidth: 3, borderColor: colors.listen },

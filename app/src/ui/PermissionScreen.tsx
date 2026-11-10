@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ClipKey } from '../audio/clips.generated';
+import { MARK } from './brand';
 import { colors, fonts, shape, type } from './tokens';
 
 export type PermissionKind = 'camera' | 'microphone';
@@ -36,7 +37,10 @@ export function PermissionScreen({
   }, [kind, settings, c.key, say]);
   return (
     <View style={ps.root}>
-      <Text style={ps.wordmark}>Drishti</Text>
+      <View style={ps.brand}>
+        <Image source={MARK} style={ps.mark} />
+        <Text style={ps.wordmark}>Drishti</Text>
+      </View>
       <View style={ps.group}>
         <View style={ps.icon}>
           {kind === 'camera' ? (
@@ -70,7 +74,9 @@ export function PermissionScreen({
 
 const ps = StyleSheet.create({
   root: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: colors.bg },
-  wordmark: { position: 'absolute', top: 48, left: 0, right: 0, textAlign: 'center', color: colors.brand, fontFamily: fonts.text, fontSize: 16, fontWeight: '700', letterSpacing: 0.2 },
+  brand: { position: 'absolute', top: 48, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  mark: { width: 24, height: 24 },
+  wordmark: { color: colors.brand, fontFamily: fonts.text, fontSize: 16, fontWeight: '700', letterSpacing: 0.2 },
   group: { flex: 1, marginHorizontal: shape.margin, alignItems: 'center', justifyContent: 'center', gap: 16 },
   icon: { width: 64, height: 64, alignItems: 'center', justifyContent: 'center' },
   eyeOuter: { position: 'absolute', width: 56, height: 32, borderRadius: 16, borderWidth: 2.5, borderColor: colors.brand },
