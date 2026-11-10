@@ -26,7 +26,8 @@
     "F19-First-Run.dc.html": { "x": 1476, "y": 3825, "w": 412, "h": 915, "title": "19 First run, cane line" },
     "F20-Narrow-360.dc.html": { "x": 1968, "y": 3825, "w": 360, "h": 800, "title": "20 360 dp check of frame 07" },
     "Sheet-Components.dc.html": { "x": 0, "y": 5100, "w": 1560, "h": 2500, "title": "Component sheet" },
-    "Sheet-Tokens.dc.html": { "x": 1640, "y": 5100, "w": 1000, "h": 2400, "title": "Design tokens, final values" }
+    "Sheet-Tokens.dc.html": { "x": 1640, "y": 5100, "w": 1000, "h": 2400, "title": "Design tokens, final values" },
+    "Logo.dc.html": { "x": 2720, "y": 5100, "w": 1400, "h": 2000, "title": "Logo" }
   },
   "order": [
     "Main.dc.html",
@@ -50,7 +51,8 @@
     "F19-First-Run.dc.html",
     "F20-Narrow-360.dc.html",
     "Sheet-Components.dc.html",
-    "Sheet-Tokens.dc.html"
+    "Sheet-Tokens.dc.html",
+    "Logo.dc.html"
   ],
   "notes": {
     "t1": { "x": 0, "y": -240, "text": "Detection, names and listening", "kind": "title1", "maxW": 2380 },
