@@ -28,8 +28,8 @@ export interface FrameInfo {
 }
 
 /**
- * One utterance per alert, just the object's name ("Bottle", "Car"; P17: no direction or
- * distance), most important first. They share the frameId so the scheduler coalesces them
+ * One utterance per alert, [object] [direction] [distance] ("Kursi aage, paas"), most
+ * important first. They share the frameId so the scheduler coalesces them
  * (max 2 per frame).
  */
 export function buildAlertUtterances(
@@ -50,7 +50,11 @@ export function buildAlertUtterances(
         lang,
         createdAt: frame.frameTs,
         frameId: frame.frameId,
-        parts: [{ kind: 'clip' as const, key: ALERT_CLASSES[t.label] as ClipKey }],
+        parts: [
+          { kind: 'clip' as const, key: ALERT_CLASSES[t.label] as ClipKey },
+          { kind: 'clip' as const, key: `dir.${t.dir}` as ClipKey },
+          { kind: 'clip' as const, key: `dist.${t.dist}` as ClipKey },
+        ],
       };
     });
 }

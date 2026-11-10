@@ -1,10 +1,10 @@
 import { buildAlertUtterances, passesQuietMode, rank, schedulerPriority } from '../alerts';
 import type { Alert, Track } from '../tracker';
 
-const track = (label: string, dir: 'left' | 'ahead' | 'right' = 'ahead'): Track => ({
-  id: 1, label, score: 0.9, box: [0, 0, 1, 1], dir, firstSeen: 0, lastSeen: 0, announced: true,
+const track = (label: string, dir: 'left' | 'ahead' | 'right' = 'ahead', dist: 'near' | 'far' = 'far'): Track => ({
+  id: 1, label, score: 0.9, box: [0, 0, 1, 1], dir, dist, firstSeen: 0, lastSeen: 0, announced: true, announcedNear: dist === 'near',
 });
-const alert = (label: string, dir?: 'left' | 'ahead' | 'right'): Alert => ({ track: track(label, dir), reason: 'new' });
+const alert = (label: string, dir?: 'left' | 'ahead' | 'right', dist?: 'near' | 'far'): Alert => ({ track: track(label, dir, dist), reason: 'new' });
 
 test('order: vehicles, people, animals, everything else', () => {
   const sorted = ['bottle', 'person', 'dog', 'bench', 'bicycle'].sort((a, b) => rank(a) - rank(b));
@@ -24,18 +24,18 @@ test('quiet mode keeps vehicles only', () => {
   expect(passesQuietMode('person', false)).toBe(true);
 });
 
-test('utterances: just the object name, vehicles first, sharing the frame', () => {
+test('utterances: [object] [direction] [distance], vehicles first, sharing the frame', () => {
   let n = 0;
   const us = buildAlertUtterances(
-    [alert('chair', 'right'), alert('bottle', 'left'), alert('car', 'left')],
+    [alert('chair', 'ahead', 'near'), alert('bottle', 'left'), alert('car', 'left')],
     { frameId: 42, frameTs: 1234 },
     'hi-en',
     { quiet: false, newId: () => `r${++n}` },
   );
   expect(us.map((u) => u.parts)).toEqual([
-    [{ kind: 'clip', key: 'obj.car' }],
-    [{ kind: 'clip', key: 'obj.chair' }],
-    [{ kind: 'clip', key: 'obj.bottle' }],
+    [{ kind: 'clip', key: 'obj.car' }, { kind: 'clip', key: 'dir.left' }, { kind: 'clip', key: 'dist.far' }],
+    [{ kind: 'clip', key: 'obj.chair' }, { kind: 'clip', key: 'dir.ahead' }, { kind: 'clip', key: 'dist.near' }],
+    [{ kind: 'clip', key: 'obj.bottle' }, { kind: 'clip', key: 'dir.left' }, { kind: 'clip', key: 'dist.far' }],
   ]);
   expect(us.map((u) => u.priority)).toEqual([0, 2, 2]);
   expect(us.every((u) => u.frameId === 42 && u.createdAt === 1234 && u.source === 'reflex')).toBe(true);

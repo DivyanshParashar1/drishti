@@ -1,18 +1,19 @@
 import { VISION, type VisionConfig } from './config';
 import { iou } from './decode';
-import { direction } from './geometry';
-import type { Box, Detection, Direction } from './types';
+import { direction, distance } from './geometry';
+import type { Box, Detection, Direction, Distance } from './types';
 
 /**
- * F2 tracking and de-duplication (P17: object names only).
+ * F2 tracking and de-duplication.
  *
  * - Greedy matching across frames: same class and IoU > 0.3, best pairs first.
- * - A track is announced once, when it appears. It is forgotten after 3 s unseen, so an object
- *   that comes back is announced again.
+ * - A track is announced once when it appears ("Kursi aage, door"), and once more when it turns
+ *   near ("Kursi aage, paas"): walking towards an object is what the user must hear. It is
+ *   forgotten after 3 s unseen, so an object that comes back is announced again.
  * - Per-class cooldown: a new object of a class announced in the last 4 s is not announced at
  *   all (the user just heard that word); it counts as announced, so it isn't said later either.
- * - The direction is still tracked (with hysteresis) for names ("Rahul ... left mein"), the
- *   on-screen tags and /ask, but it is not spoken in object alerts.
+ *   Turning near always bypasses the cooldown (safety first).
+ * - Direction changes are tracked (with hysteresis) but not re-announced.
  */
 export interface Track {
   id: number;
@@ -20,12 +21,14 @@ export interface Track {
   score: number;
   box: Box;
   dir: Direction;
+  dist: Distance;
   firstSeen: number;
   lastSeen: number;
   announced: boolean;
+  announcedNear: boolean;
 }
 
-export type AlertReason = 'new';
+export type AlertReason = 'new' | 'near';
 
 export interface Alert {
   track: Track;
@@ -37,7 +40,7 @@ export interface TrackUpdate {
   alerts: Alert[];
 }
 
-type TrackerConfig = Pick<VisionConfig, 'trackIou' | 'trackTtlMs' | 'classCooldownMs' | 'directionHysteresis'>;
+type TrackerConfig = Pick<VisionConfig, 'trackIou' | 'trackTtlMs' | 'classCooldownMs' | 'directionHysteresis' | 'nearHeight' | 'nearBottom'>;
 
 export class Tracker {
   private tracks: Track[] = [];
@@ -84,6 +87,7 @@ export class Tracker {
         t.box = det.box;
         t.score = det.score;
         t.dir = direction(det.box, t.dir, this.cfg.directionHysteresis);
+        t.dist = distance(det.box, this.cfg);
         t.lastSeen = now;
       } else {
         t = {
@@ -92,20 +96,27 @@ export class Tracker {
           score: det.score,
           box: det.box,
           dir: direction(det.box, undefined, this.cfg.directionHysteresis),
+          dist: distance(det.box, this.cfg),
           firstSeen: now,
           lastSeen: now,
           announced: false,
+          announcedNear: false,
         };
         this.tracks.push(t);
       }
       visible.push(t);
       if (!t.announced) {
         t.announced = true;
+        t.announcedNear = t.dist === 'near';
         const last = this.lastClassAlert.get(t.label);
-        if (last === undefined || now - last >= this.cfg.classCooldownMs) {
+        if (t.dist === 'near' || last === undefined || now - last >= this.cfg.classCooldownMs) {
           alerts.push({ track: { ...t }, reason: 'new' });
           this.lastClassAlert.set(t.label, now);
         }
+      } else if (t.dist === 'near' && !t.announcedNear) {
+        t.announcedNear = true;
+        alerts.push({ track: { ...t }, reason: 'near' });
+        this.lastClassAlert.set(t.label, now);
       }
     });
     return { visible, alerts };

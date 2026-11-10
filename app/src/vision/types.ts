@@ -8,3 +8,4 @@ export interface Detection {
 }
 
 export type Direction = 'left' | 'ahead' | 'right';
+export type Distance = 'near' | 'far';

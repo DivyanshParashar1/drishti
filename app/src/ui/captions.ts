@@ -23,7 +23,7 @@ export interface CaptionText {
   script: Script;
   /** Clip key when the caption is one fixed phrase (consent badge, tutorial step, saved tick). */
   key: ClipKey | null;
-  /** Object clip keys of an urgent (vehicle, P0) alert, so the matching boxes pulse. */
+  /** Object clip keys of an urgent (vehicle or near) alert, so the matching boxes pulse. */
   urgent: ClipKey[];
 }
 
@@ -66,9 +66,10 @@ function lines(u: Utterance): { said: string; en: string | null } {
       en.push(p.en ?? null);
     }
   }
-  // An alert is just the object (P17): "Kursi" / "Chair".
+  // An alert is [object] [direction] [distance]: "Kursi aage, paas" / "Chair ahead, close".
   // A name is [name line] [direction]: "Rahul aapke saamne hai, left mein".
   const join = (xs: string[]) => {
+    if (isAlert(u) && xs.length === 3) return `${xs[0]} ${xs[1]}, ${xs[2]}`;
     if (u.parts.length === 2 && u.parts[0].kind !== 'clip' && u.parts[1].kind === 'clip') return xs.join(', ');
     return xs.join(' ');
   };
@@ -89,7 +90,7 @@ export function captionFor(members: readonly Utterance[], lang: Lang): CaptionTe
   if (first.source === 'answer' || key === 'sys.looking') return { ...base, source: 'answer', tag: 'ANSWER', tone: 'brand' };
   if (keys.includes('sys.unknown_person')) return { ...base, source: 'name', tag: 'NAME', tone: 'unknown' };
   if (members.some(isAlert)) {
-    const urgentMembers = members.filter((m) => isAlert(m) && m.priority === 0);
+    const urgentMembers = members.filter((m) => isAlert(m) && (m.priority === 0 || clipKeys(m).includes('dist.near')));
     return {
       ...base,
       source: 'alert',

@@ -29,14 +29,25 @@ test('a chair held still for 30 s gives exactly one alert, despite jitter and mi
   expect(alerts[0]).toMatch(/^chair:ahead@\d+$/);
 });
 
-test('walking toward an object (box grows) is not announced again', () => {
+test('walking toward an object: announced when it appears, once more when it turns near', () => {
+  const tr = new Tracker();
   const frames = [
     [det('chair', chairAhead)],
     [det('chair', [0.38, 0.3, 0.62, 0.7])],
-    [det('chair', [0.35, 0.3, 0.65, 0.88])],
+    [det('chair', [0.35, 0.3, 0.65, 0.88])], // bottom in the lowest 15% → near (inside the 4 s cooldown)
     [det('chair', [0.35, 0.3, 0.65, 0.9])],
+    [det('chair', [0.3, 0.1, 0.7, 0.95])],
   ];
-  expect(run(new Tracker(), frames)).toEqual(['chair:ahead@0']);
+  expect(run(tr, frames)).toEqual(['chair:ahead@0', 'chair:ahead@200']);
+  expect(tr.all[0].dist).toBe('near');
+});
+
+test('an object first seen near is announced as near once, and never again while tracked', () => {
+  const tr = new Tracker();
+  const near: Box = [0.3, 0.2, 0.7, 0.95];
+  const a = tr.update([det('chair', near)], 0).alerts;
+  expect(a.map((x) => [x.reason, x.track.dist])).toEqual([['new', 'near']]);
+  expect(tr.update([det('chair', near)], 100).alerts).toEqual([]);
 });
 
 test('a direction change is tracked but not announced', () => {

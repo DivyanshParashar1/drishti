@@ -27,7 +27,7 @@ function setup(people: NamedPerson[] = [rahul, priya]) {
 }
 
 function track(id: number, box: Box = [0.2, 0.1, 0.8, 0.95], dir: Track['dir'] = 'ahead'): Track {
-  return { id, label: 'person', score: 0.9, box, dir, firstSeen: 0, lastSeen: 0, announced: true };
+  return { id, label: 'person', score: 0.9, box, dir, dist: 'near', firstSeen: 0, lastSeen: 0, announced: true, announcedNear: true };
 }
 
 const face = (embedding: number[] | null, box: Box = [0.4, 0.15, 0.6, 0.3], widthPx = 120): FaceObs => ({ box, widthPx, embedding });

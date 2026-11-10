@@ -24,7 +24,11 @@ test('a new chair is enqueued once with reflex metrics backdated to the frame', 
   lane.handle(frame([chair], 2));
   expect(enqueued).toHaveLength(1);
   const u = enqueued[0];
-  expect(u.parts).toEqual([{ kind: 'clip', key: 'obj.chair' }]);
+  expect(u.parts).toEqual([
+    { kind: 'clip', key: 'obj.chair' },
+    { kind: 'clip', key: 'dir.ahead' },
+    { kind: 'clip', key: 'dist.far' },
+  ]);
   expect(u.priority).toBe(2);
   expect(u.createdAt).toBe(960); // 1000 - 40 ms worklet time
   expect(metrics.get(u.id)!.stages).toEqual({ frame_ts: 0, detect_done: 40, enqueued: 40 });

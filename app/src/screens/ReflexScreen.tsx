@@ -115,7 +115,7 @@ export function ReflexScreen({
           return (
             <View key={t.id} pointerEvents="none" style={[styles.box, r]}>
               <Text style={styles.boxLabel}>
-                #{t.id} {t.label} {t.dir} {(t.score * 100).toFixed(0)}%
+                #{t.id} {t.label} {t.dir} {t.dist} {(t.score * 100).toFixed(0)}%
                 {who ? ` · ${who.label}${who.sim !== null ? ` ${who.sim.toFixed(2)}` : ''}` : ''}
               </Text>
             </View>

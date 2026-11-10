@@ -98,14 +98,14 @@ function describe(t: Track, r: Rect, who: ReturnType<Services['faces']['identity
   if (t.label === 'person') return { ...base, kind: 'person', tag: 'PERSON' };
   const name = CLIPS.en[key].text.toUpperCase();
   const spoken = CLIPS[lang][key].text;
-  // P17: no near/far. Vehicles (the only alerts that interrupt) are drawn red and pulse when spoken.
-  const vehicle = VEHICLES.has(t.label);
+  // Vehicles and near objects are drawn red and pulse when spoken.
+  const urgent = VEHICLES.has(t.label) || t.dist === 'near';
   return {
     ...base,
-    kind: vehicle ? 'near' : 'far',
-    tag: `${name} · ${DIR[t.dir]}`,
+    kind: urgent ? 'near' : 'far',
+    tag: `${name} · ${DIR[t.dir]} · ${t.dist === 'near' ? 'NEAR' : 'FAR'}`,
     word: lang !== 'en' && spoken.toUpperCase() !== name ? spoken : null,
-    pulseKey: vehicle ? key : null,
+    pulseKey: urgent ? key : null,
   };
 }
 
@@ -137,7 +137,7 @@ function Countdown({ capture, at, now }: { capture: NonNullable<HudState['captur
   );
 }
 
-/** One 300 ms pulse when the vehicle alert for this box is spoken. */
+/** One 300 ms pulse when the vehicle or near alert for this box is spoken. */
 function Pulse() {
   const [p] = useState(() => new Animated.Value(0));
   useEffect(() => {
