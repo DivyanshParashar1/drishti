@@ -1,0 +1,49 @@
+model,case,lang,run,code,ttft_ms,first_sentence_ms,total_ms,answer
+openrouter:qwen/qwen3.8-27b,bus_number,hi-en,0,ok,3030.3,3033.7,3033.7,Ye SR
+openrouter:qwen/qwen3.8-27b,autos,en,0,ok,1965.6,2059.6,2059.7,"No, it's not safe to walk ahead right now because there are auto-rickshaws moving on the road directly in front of you."
+openrouter:qwen/qwen3.8-27b,potholes,hi,0,ok,706.3,730.5,730.5,आगे रास्ता मिट्टी का है और बीच
+openrouter:qwen/qwen3.8-27b,stairs,hi-en,0,empty_answer,,,1548.8,
+openrouter:qwen/qwen3.8-27b,drain,ta,0,empty_answer,,,1398.4,
+openrouter:qwen/qwen3.8-27b,sign,en,0,ok,1355.2,1441.4,1565.6,"The sign says, ""Women are the equal partners of our society. Never neglect or disrespect them."" and at the bottom, ""Earn respect for you"
+openrouter:qwen/qwen3.8-27b,market,hi-en,0,ok,1034.5,1039.1,1039.1,"Haan, y"
+openrouter:qwen/qwen3.8-27b,footpath,ta,0,ok,1331.7,1630.4,1642.2,"ஆம், இடது பக்கத்தில் ஒரு பச்சை நிற அமர்வு இருக்கிறது. {Yes, there is a"
+openrouter:nvidia/nemotron-3.5-super-vl,bus_number,hi-en,0,empty_answer,,,1157.6,
+openrouter:nvidia/nemotron-3.5-super-vl,autos,en,0,empty_answer,,,1060.4,
+openrouter:nvidia/nemotron-3.5-super-vl,potholes,hi,0,empty_answer,,,1034.3,
+openrouter:nvidia/nemotron-3.5-super-vl,stairs,hi-en,0,empty_answer,,,1700.6,
+openrouter:nvidia/nemotron-3.5-super-vl,drain,ta,0,empty_answer,,,987.7,
+openrouter:nvidia/nemotron-3.5-super-vl,sign,en,0,empty_answer,,,942.2,
+openrouter:nvidia/nemotron-3.5-super-vl,market,hi-en,0,empty_answer,,,995.0,
+openrouter:nvidia/nemotron-3.5-super-vl,footpath,ta,0,empty_answer,,,1105.0,
+openrouter:meta/muse-glimmer-30b,bus_number,hi-en,0,empty_answer,,,11831.3,
+openrouter:meta/muse-glimmer-30b,autos,en,0,empty_answer,,,8955.2,
+openrouter:meta/muse-glimmer-30b,potholes,hi,0,empty_answer,,,9472.4,
+openrouter:meta/muse-glimmer-30b,stairs,hi-en,0,empty_answer,,,8719.3,
+openrouter:meta/muse-glimmer-30b,drain,ta,0,empty_answer,,,7623.7,
+openrouter:meta/muse-glimmer-30b,sign,en,0,ok,5636.3,6792.7,7017.9,The sign says “Women are the equal partners of our society. Never neglect or dis
+openrouter:meta/muse-glimmer-30b,market,hi-en,0,empty_answer,,,7924.4,
+openrouter:meta/muse-glimmer-30b,footpath,ta,0,empty_answer,,,7562.1,
+openrouter:z-ai/glm-5.3-flash,bus_number,hi-en,0,ok,1625.3,1849.3,2156.6,"Ye ek laal public transport bus hai, aage khadi hai. Bus ka number plate yellow hai par exact number saaf nahi dikh raha. {This is a red public transport bus, standing ahead. The bus has a yellow number plate but the exact number isn't clearly visible.}"
+openrouter:z-ai/glm-5.3-flash,autos,en,0,ok,1047.7,1524.2,1524.2,"Not fully safe — there are several auto-rickshaws moving on the road ahead, so please watch out before walking."
+openrouter:z-ai/glm-5.3-flash,potholes,hi,0,ok,1543.5,1903.8,1977.3,"आगे रास्ते में बड़ा पानी भरा गड्ढा है, रास्ता कीचड़ से भरा लग रहा है। {Ahead there is a large water-filled pothole on the road, the"
+openrouter:z-ai/glm-5.3-flash,stairs,hi-en,0,ok,1718.0,2567.3,2691.2,"Saamne ek badi lal patthar ki imaarat hai jiske aage lambi seedhiyan hain, aur ek safed kapdon wala banda seedhiyan chad raha hai. {Ahead there is a large red stone structure with long steps in front, and a person in white clothes is climbing the steps.}"
+openrouter:z-ai/glm-5.3-flash,drain,ta,0,ok,863.0,1537.0,1644.2,"முன்னால் பெரிய அகழி உள்ளது, நடக்க முடியாது. {There is a big trench ahead, you cannot walk.} இடது"
+openrouter:z-ai/glm-5.3-flash,sign,en,0,ok,1253.7,1338.9,1504.8,"The sign says, ""Women are the equal partners of our society. Never neglect or disrespect them,"" and at the bottom, ""Earn respect for you. Respect women."""
+openrouter:z-ai/glm-5.3-flash,market,hi-en,0,ok,964.2,1209.5,1256.3,"Haan, kaafi bheed hai, aage aur dono taraf log hain. {Yes, there's quite a crowd, people ahead and on both sides.}"
+openrouter:z-ai/glm-5.3-flash,footpath,ta,0,ok,930.2,1426.2,1437.9,"ஆமாம், இடதுபுறத்தில் பச்சை நிற பெஞ்ச் ஒன்று உள்ளது. {Yes, there is a green bench on the left."
+openrouter:deepseek/deepseek-v4.1-flash,bus_number,hi-en,0,empty_answer,,,1083.5,
+openrouter:deepseek/deepseek-v4.1-flash,autos,en,0,empty_answer,,,821.9,
+openrouter:deepseek/deepseek-v4.1-flash,potholes,hi,0,empty_answer,,,2243.7,
+openrouter:deepseek/deepseek-v4.1-flash,stairs,hi-en,0,empty_answer,,,1008.0,
+openrouter:deepseek/deepseek-v4.1-flash,drain,ta,0,empty_answer,,,1136.2,
+openrouter:deepseek/deepseek-v4.1-flash,sign,en,0,empty_answer,,,1500.7,
+openrouter:deepseek/deepseek-v4.1-flash,market,hi-en,0,empty_answer,,,1714.3,
+openrouter:deepseek/deepseek-v4.1-flash,footpath,ta,0,empty_answer,,,1261.1,
+openrouter:google/gemini-3.5-flash-lite,bus_number,hi-en,0,ok,1467.4,1546.3,1548.7,Ek laal aur peeli bus aage hai jiska number 79 hai. {There is a red and yellow bus ahead with the number 79.}
+openrouter:google/gemini-3.5-flash-lite,autos,en,0,ok,1396.9,1524.7,1524.7,"No, it is not safe to walk ahead because auto-rickshaws are moving on the road."
+openrouter:google/gemini-3.5-flash-lite,potholes,hi,0,ok,1424.4,1483.1,1594.7,आगे रास्ते पर पानी से भरे बड़े गड्ढे हैं। {There are large water-filled potholes on the road ahead.}
+openrouter:google/gemini-3.5-flash-lite,stairs,hi-en,0,ok,1222.1,1431.9,1542.1,Saamne ek bada laal pathar ka gate aur upar jaane wali seedhiyaan hain. {Ahead is a large red stone gate and stairs leading up.} Ek vyakti seedhiyon par aage chal raha hai. {A person is walking ahead on the stairs.}
+openrouter:google/gemini-3.5-flash-lite,drain,ta,0,ok,1254.5,1254.5,1322.3,"முன்னால் சேறும் குழியும் உள்ள வடிகால் உள்ளது. {There is a muddy and deep drainage ahead.} எனவே, கவனமாக இருக்கவும். {Therefore, please be careful.}"
+openrouter:google/gemini-3.5-flash-lite,sign,en,0,ok,1455.8,1558.4,1558.4,The sign says women are the equal partners of our society and urges you to respect women.
+openrouter:google/gemini-3.5-flash-lite,market,hi-en,0,ok,1483.0,1569.9,1646.5,"Haan, aage aur aaspaas kaafi bheed hai. {Yes, there is quite a crowd ahead and all around.}"
+openrouter:google/gemini-3.5-flash-lite,footpath,ta,0,ok,2069.5,2122.1,2235.0,"ஆம், இடதுபுறம் ஒரு பெஞ்ச் இருக்கிறது. {Yes, there is a bench on the left.}"

@@ -1,5 +1,13 @@
 # Deploy: Cloud Run relay and the preview APK (P13)
 
+**Live (P17, 2026-11-10):** service `screenify-v` in `screenify-497419`, `asia-south1`, at https://screenify-v-151562783671.asia-south1.run.app. VLM: OpenRouter `z-ai/glm-5.3-flash` (open weights). Secrets: `screenify-v-app-token`, `screenify-v-gnani-key`, and the existing `ripple-openrouter-key`. Redeploy:
+
+```sh
+PROJECT=screenify-497419 SERVICE=screenify-v OPENROUTER_SECRET=ripple-openrouter-key ./server/deploy.sh
+```
+
+The production APK (`eas build --profile production --platform android`) reads `SERVER_URL` and `APP_TOKEN` from the EAS `production` environment.
+
 Everything here spends money or credits, so none of it runs automatically. Run the steps in order.
 
 ## 1. Relay on Cloud Run

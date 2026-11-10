@@ -1,0 +1,7 @@
+model,ok,ttft_p50,ttft_p95,first_sentence_p50,first_sentence_p95,total_p50,total_p95
+openrouter:qwen/qwen3.8-27b,6/8,1343,3030,1536,3034,1604,3034
+openrouter:nvidia/nemotron-3.5-super-vl,0/8,,,,,,
+openrouter:meta/muse-glimmer-30b,1/8,5636,5636,6793,6793,7018,7018
+openrouter:z-ai/glm-5.3-flash,8/8,1151,1718,1531,2567,1584,2691
+openrouter:deepseek/deepseek-v4.1-flash,0/8,,,,,,
+openrouter:google/gemini-3.5-flash-lite,8/8,1440,2070,1536,2122,1554,2235
