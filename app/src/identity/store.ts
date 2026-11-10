@@ -94,6 +94,24 @@ export class IdentityStore {
     await this.reload();
   }
 
+  /**
+   * Rename a person (P17 faces screen). Their name clips said the old name, so the clip rows are
+   * dropped and returned for file cleanup; NameClipSync makes new ones. Throws if the new name is
+   * empty or taken by someone else.
+   */
+  async rename(personId: number, name: string): Promise<{ person: Person; oldClips: string[] }> {
+    const clean = name.trim();
+    const p = this.cache.find((x) => x.id === personId);
+    if (!p) throw new Error('no such person');
+    if (!clean) throw new Error('empty name');
+    const other = this.find(clean);
+    if (other && other.id !== personId) throw new Error(`name exists: ${clean}`);
+    await this.db.runAsync('UPDATE people SET name = ? WHERE id = ?', [clean, personId]);
+    await this.db.runAsync('DELETE FROM name_clips WHERE person_id = ?', [personId]);
+    await this.reload();
+    return { person: this.cache.find((x) => x.id === personId)!, oldClips: Object.values(p.clips) as string[] };
+  }
+
   /** Delete a person and every embedding and clip row. Returns what was removed (to delete files). */
   async remove(name: string): Promise<Person | null> {
     const p = this.find(name);

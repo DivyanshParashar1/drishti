@@ -9,6 +9,8 @@ import { IDENTITY } from './src/identity/config';
 import { ReflexScreen } from './src/screens/ReflexScreen';
 import { DemoBoxes } from './src/ui/DemoBoxes';
 import { DemoMenu, type WakeInfo } from './src/ui/DemoMenu';
+import { VoiceCommands } from './src/ui/VoiceCommands';
+import { FacesManager } from './src/ui/FacesManager';
 import { TwoFingerHold } from './src/ui/gestures';
 import { Hud } from './src/ui/Hud';
 import { HudStore } from './src/ui/hudStore';
@@ -31,7 +33,9 @@ export default function App() {
   const [detectorState, setDetectorState] = useState<ModelState['state']>('loading');
   const [facesOn, setFacesOn] = useState(true);
   const [front, setFront] = useState(false);
-  const [menu, setMenu] = useState(false);
+  // P17: one full-screen panel at a time (menu → voice commands / saved faces), or the app tour.
+  const [panel, setPanel] = useState<null | 'menu' | 'commands' | 'faces'>(null);
+  const [tour, setTour] = useState(false);
   const [demo, setDemo] = useState(services.demoMode);
   const { voice, wake } = useVoiceController(services);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
@@ -115,7 +119,7 @@ export default function App() {
       <ReflexScreen services={services} detector={detector} debug={debug} facesOn={facesOn} front={front} hasPermission={perms.camera.granted} onStatus={setDetectorState} />
       {demo && !debug && <BoxesLayer services={services} store={store} />}
       <TalkSurface voice={voice} />
-      <Hud services={services} voice={voice} store={store} demo={demo} detector={detectorState} facesOn={facesOn} onMenu={() => setMenu(true)} />
+      <Hud services={services} voice={voice} store={store} demo={demo} detector={detectorState} facesOn={facesOn} onMenu={() => setPanel('menu')} />
       {debug && (
         <DebugOverlay
           services={services}
@@ -126,10 +130,16 @@ export default function App() {
           onToggleFaces={toggleFaces}
         />
       )}
-      {menu && (
+      {panel === 'menu' && (
         <DemoMenu
           services={services}
-          onClose={() => setMenu(false)}
+          onClose={() => setPanel(null)}
+          onOpen={(what) => {
+            if (what === 'tour') {
+              setPanel(null);
+              setTour(true);
+            } else setPanel(what);
+          }}
           detector={detector}
           detectorState={detectorState}
           onSwitchDetector={() => setDetector((d) => (d === 'yolo11n' ? 'efficientdet_lite0' : 'yolo11n'))}
@@ -142,6 +152,8 @@ export default function App() {
           wake={wakeInfo}
         />
       )}
+      {panel === 'faces' && <FacesManager services={services} onClose={() => setPanel('menu')} />}
+      {panel === 'commands' && <VoiceCommands lang={services.lang} wakePhrase={wake.phrase} onClose={() => setPanel('menu')} />}
       {perms.screen && <PermissionScreen kind={perms.screen.kind} canRequest={perms.screen.canRequest} onRequest={perms.screen.request} onSkip={perms.screen.skip} say={services.say} />}
     </View>
   );

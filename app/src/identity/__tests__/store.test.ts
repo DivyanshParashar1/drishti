@@ -74,3 +74,19 @@ test('addEmbeddings appends to an existing person', async () => {
   await s.addEmbeddings(p.id, [BASIS[1], BASIS[2]]);
   expect(s.find('rahul')!.embeddings).toHaveLength(3);
 });
+
+test('rename changes the name, drops the old name clips, and refuses a taken or empty name', async () => {
+  const s = new IdentityStore(memoryDb(), () => 1);
+  await s.init();
+  const rahul = await s.add('Rahul', [[1, 0]]);
+  await s.add('Priya', [[0, 1]]);
+  await s.setClip(rahul.id, 'hi-en', 'file:///names/1-hi-en.mp3');
+  const { person, oldClips } = await s.rename(rahul.id, '  Rahul Kumar ');
+  expect(person).toMatchObject({ id: rahul.id, name: 'Rahul Kumar', clips: {} });
+  expect(person.embeddings).toHaveLength(1);
+  expect(oldClips).toEqual(['file:///names/1-hi-en.mp3']);
+  expect(s.find('rahul kumar')?.id).toBe(rahul.id);
+  await expect(s.rename(rahul.id, 'priya')).rejects.toThrow('name exists');
+  await expect(s.rename(rahul.id, ' ')).rejects.toThrow('empty name');
+  await expect(s.rename(rahul.id, 'RAHUL KUMAR')).resolves.toBeTruthy(); // its own name in other case is fine
+});
