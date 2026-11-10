@@ -5,9 +5,9 @@
 | # | Part | Length | Made by | Voice |
 | --- | --- | --- | --- | --- |
 | 1 | Intro | ~10–15 s | Divyansh (shoot) | Divyansh |
-| 2 | Animated explainer: the problem and the idea | ~25 s | Claude | Yashraj (Timbre v3.0) |
+| 2 | Animated explainer: the problem and the idea | ~29 s | Claude | Yashraj (Timbre v3.0) |
 | 3 | Demo: 7 features, each after a title card | 60 s footage + 14 s cards | You shoot; Claude adds cards and captions | Drishti (Shivani) and the user |
-| 4 | How it works: two paths, offline and online | ~55 s | Claude | Yashraj |
+| 4 | How it works: two paths, offline and online | ~62 s | Claude | Yashraj |
 | 5 | Credits | ~5 s | Claude | — |
 
 The video is in English. Three voices, so viewers always know who is talking: Divyansh (Part 1), the app's own voice Shivani (Part 3), and the narrator Yashraj (Parts 2 and 4).
@@ -41,25 +41,20 @@ Other one-liners, if you prefer:
 - "Drishti turns your phone into a pair of eyes that speaks your language."
 - "Drishti watches the road for blind people, and tells them what's ahead, in Hindi, Tamil, English and eight more languages."
 
---- | --- | --- |
-| 0–4 s | Front camera, both of you in frame; name boxes appear | **Drishti:** "Divyansh aapke saamne hai… Nakshatra aapke saamne hai." |
-| 4–9 s | Same shot | **Divyansh:** "Haan! Main Divyansh, aur ye hai Nakshatra." |
-| 9–15 s | Same shot | **Nakshatra:** "Aur ye hai Drishti: ek app jo blind logon ke liye dekhti hai, aur unki bhasha mein bolti hai." |
-
-**Captions:** "Divyansh is in front of you… Nakshatra is in front of you." / "Yes! I'm Divyansh, and this is Nakshatra." / "And this is Drishti: an app that sees for blind people, and speaks their language."
-
-If both names don't come out cleanly in one take, one is enough.
 
 ---
 
-## Part 2 — Animated explainer (~25 s) · Claude
+## Part 2 — Animated explainer (~29 s) · Claude · **rendered**
+
+The phone hangs on a lanyard on the chest, camera facing the world (no glasses). The point to land: Drishti is designed to run even on a ₹5,000 phone; light on-device models do the work, not costly hardware.
 
 | Time | Visual | Narration (Yashraj) |
 | --- | --- | --- |
-| 0–5 s | A figure walking with a white cane; the cane's sweep lights up the ground | "A white cane finds what's at your feet." |
-| 5–13 s | Three things light up one by one beyond the cane's reach: a car on the left, a friend walking up, a notice on a wall | *(pause)* "But not the car pulling out on your left. Not the friend who just walked up. Not the notice on the wall." |
-| 13–19 s | The figure now wears glasses; they turn into a phone with the Drishti logo | "Drishti is the software for smart glasses, running today on any Android phone." |
-| 19–25 s | Speech bubbles in several scripts (Hindi, Tamil, Bengali, English…) come out of the phone | "It watches the road with you, and tells you what's there, in your own language." |
+| 0–4.6 s | A figure walking with a white cane; the cane's sweep lights up the ground | "A white cane finds what's at your feet." |
+| 4.8–11 s | A car, a friend walking up and a notice on a wall light up one by one, beyond the cane's reach | "But not the car pulling out on your left. Not the friend who just walked up. Not the notice on the wall." |
+| 11.6–16.2 s | A phone drops onto the chest on a lanyard; a camera cone sweeps forward and puts detection boxes on the car, "Nakshatra" and the notice | "With Drishti, a phone hangs around your neck, its camera facing the world." |
+| 16.2–23 s | Close-up of the phone with a yellow **₹5,000** tag; "Any Android phone · Light on-device models · No special hardware" | "It's designed to run even on a five-thousand-rupee phone. Light models do the work, not expensive hardware." |
+| 23–29 s | Speech bubbles in Hindi, English, Tamil, Bengali, Telugu and Kannada | "It watches the road with you, and tells you what's there, in your own language." |
 
 ---
 
@@ -85,7 +80,7 @@ Each clip follows a two-second title card (the feature name, plus one line). Aim
 
 ## Part 4 — How it works (~55 s) · Claude
 
-Animated diagram: the phone on the left, the cloud on the right, two lanes between them.
+Animated diagram, rendered (61.5 s). Vertical layout: the cloud panel on top (Prisma › Vision › Timbre), the phone panel below (Mic; Camera › On-device models › Speaker), so the fast lane runs inside the phone and the slow lane loops up through the cloud and back down to the shared speaker.
 
 | Time | Visual | Narration (Yashraj) |
 | --- | --- | --- |
@@ -116,3 +111,10 @@ github.com/DivyanshParashar1/drishti
 - Captions: burned in (LinkedIn autoplays muted). The app's speech is in white, the user's in yellow, the narrator's in no caption box (the on-screen labels carry it).
 - Audio: normalise the phone clips to the same loudness as the narration (`loudnorm`); a short crossfade between parts.
 - Export: H.264 / AAC MP4, under 5 GB and 10 minutes (LinkedIn limits).
+
+## Where things are
+
+- Generators: `scripts/video/narrate.py` (Timbre narration; one request at a time, Timbre rejects concurrent requests; lines over ~8 s get cut, so keep them short) and `scripts/video/render.py` (all animation; needs `brew install libraqm` and `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` for Indic text).
+- Rendered parts: `~/Desktop/drishti-video/rendered/` and `~/Movies/drishti-video/` (Edits is sandboxed and only reads from ~/Movies).
+- Edits project **"Drishti submission"**: Part 2 → the seven title cards → Part 4 → credits. Put your clips in `~/Movies/drishti-video/` so the demo clips can go in after each card and the intro at the start.
+- Credits roles: re-render with `ROLES="role1|role2" python3 render.py OUT part5`.
