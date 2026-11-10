@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Drishti: Solution Pitch</title>
+<style>
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, "Helvetica Neue", Arial, sans-serif; color: #1c1c1e; font-size: 10pt; line-height: 1.36; }
+.page { width: 210mm; height: 297mm; padding: 12mm 15mm 10mm; display: flex; flex-direction: column; }
+header { border-bottom: 3px solid #d9822b; padding-bottom: 8px; margin-bottom: 12px; }
+h1 { font-size: 30pt; letter-spacing: -0.5px; }
+h1 span { color: #d9822b; font-weight: 400; font-size: 13pt; margin-left: 8px; }
+.tag { font-size: 12.5pt; color: #444; margin-top: 3px; }
+h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 1px; color: #d9822b; margin: 9px 0 4px; }
+p { margin-bottom: 5px; }
+ul { margin-left: 16px; } li { margin-bottom: 3px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.box { background: #faf4ec; border-left: 3px solid #d9822b; padding: 7px 10px; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9.4pt; }
+th, td { text-align: left; padding: 3px 6px; border-bottom: 1px solid #e3ddd4; vertical-align: top; }
+th { background: #f3ece2; font-weight: 600; }
+em { color: #555; }
+footer { margin-top: auto; font-size: 8.5pt; color: #777; border-top: 1px solid #ddd; padding-top: 5px; }
+</style></head>
+<body><div class="page">
+<header>
+  <h1>Drishti <span>दृष्टि · "sight"</span></h1>
+  <div class="tag">A voice-first seeing aid that tells blind and low-vision people what is ahead, in Hindi, Hinglish, English and Tamil.</div>
+</header>
+
+<div class="grid">
+<div>
+  <h2>The problem</h2>
+  <p>India has millions of blind and low-vision people. A cane finds what is at foot level, but not the car pulling out on the left, the friend who just walked up, or what the notice on the wall says.</p>
+  <p>Most assistive apps assume English and a good connection, and make you point, tap, wait and listen to a long description. On a busy street that is too slow to be useful.</p>
+</div>
+<div>
+  <h2>Who it's for</h2>
+  <p>Blind and low-vision people in India who speak Hindi, Hinglish, English or Tamil and carry an everyday Android phone, including a ₹5,000 one.</p>
+  <p>The phone hangs on a lanyard with the camera facing the world. Drishti works <b>alongside a cane, never instead of one</b>. Long term, the same software runs on smart sunglasses.</p>
+</div>
+</div>
+
+<h2>The solution</h2>
+<p>Say <b>"Drishti"</b> or hold the screen and speak. Everything else is automatic. The whole screen is one button.</p>
+<table>
+<tr><th style="width:30%">What the user hears</th><th>How</th><th style="width:15%">Network</th></tr>
+<tr><td>"Car left mein, paas"</td><td>Instant hazard alerts with direction and distance: on-device object detection and tracking, pre-recorded voice clips</td><td>Offline</td></tr>
+<tr><td>"Rahul aapke saamne hai"</td><td>Names people the user saved, only after their spoken consent; strangers are only ever "unknown"</td><td>Offline</td></tr>
+<tr><td>"Saamne kya hai?"</td><td>Any question about the scene: speech → Gnani Prisma → vision model → Gnani Timbre, spoken sentence by sentence</td><td>Online</td></tr>
+<tr><td>Signs and notices</td><td>On-device text recognition (Latin and Devanagari), read aloud with Timbre</td><td>Mostly offline</td></tr>
+<tr><td>"Tamil mein bolo"</td><td>Switch language, save or delete people, all by voice</td><td>—</td></tr>
+</table>
+
+<div class="grid">
+<div>
+  <h2>Why it's different</h2>
+  <ul>
+    <li><b>Speaks the user's language</b>, including mixed Hinglish, through Gnani Prisma (speech-to-text) and Timbre (text-to-speech).</li>
+    <li><b>Safety first when offline:</b> hazard alerts and face recognition run on the phone with no network delay.</li>
+    <li><b>Short, interruptible speech:</b> one speech queue where a vehicle alert cuts through any answer and stale alerts are dropped, not played late.</li>
+  </ul>
+</div>
+<div>
+  <h2>Privacy by design</h2>
+  <ul>
+    <li>No photos stored; saved people are kept only as face signatures on the phone.</li>
+    <li>No transcripts, questions, answers, images or names logged, on the phone or the server.</li>
+    <li>A name is spoken only when the match is clear; a wrong name is treated as worse than "unknown".</li>
+    <li>A covered or dark camera is announced, so the user never assumes alerts are working when they aren't.</li>
+  </ul>
+</div>
+</div>
+
+<h2>Team and individual contributions</h2>
+<table>
+<tr><th style="width:30%">Member</th><th>Contribution</th></tr>
+<tr><td><b>Divyansh Parashar</b></td><td>Ideation, coding (Android app and server relay), video recording and editing</td></tr>
+<tr><td><b>Nakshatra</b></td><td>Ideation</td></tr>
+</table>
+
+<div class="box" style="margin-top:9px"><b>Built with:</b> React Native + Expo (Android), on-device TFLite models (object detection, MobileFaceNet), ML Kit (faces, text), a FastAPI relay on Cloud Run, Gnani Prisma and Timbre, and a hosted vision model.</div>
+
+<footer>Drishti · Gnani AI Great Indian AI Internship Challenge · November 2026</footer>
+</div></body></html>
