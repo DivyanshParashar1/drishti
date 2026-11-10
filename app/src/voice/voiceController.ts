@@ -63,7 +63,7 @@ const OFFLINE_NEEDS_NET = new Set<Command['kind']>(['question', 'describe', 'nex
 
 const ERROR_LINES = new Set<ClipKey>(['sys.didnt_hear', 'sys.answer_failed', 'sys.no_internet']);
 
-export const MIN_HOLD_MS = 300; // shorter presses are taps (e.g. the debug triple-tap), not speech
+export const MIN_HOLD_MS = 300; // shorter presses are taps, not speech
 
 type State = 'idle' | 'listening' | 'busy';
 

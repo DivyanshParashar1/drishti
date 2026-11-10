@@ -5,7 +5,6 @@ import { View, type GestureResponderEvent } from 'react-native';
 import { useCameraPermission, useMicrophonePermission } from 'react-native-vision-camera';
 import { createServices, startServices } from './src/core/services';
 import { DebugOverlay } from './src/debug/DebugOverlay';
-import { createTapCounter } from './src/debug/tapCounter';
 import { IDENTITY } from './src/identity/config';
 import { ReflexScreen } from './src/screens/ReflexScreen';
 import { DemoBoxes } from './src/ui/DemoBoxes';
@@ -34,8 +33,6 @@ export default function App() {
   const [front, setFront] = useState(false);
   const [menu, setMenu] = useState(false);
   const [demo, setDemo] = useState(services.demoMode);
-  const tap = useRef(createTapCounter()).current;
-  const templeTouch = useRef(false);
   const { voice, wake } = useVoiceController(services);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
   const [, setWakeTick] = useState(0);
@@ -79,15 +76,7 @@ export default function App() {
     return () => cleanup?.();
   }, [services]);
 
-  const onTouchEnd = (e: GestureResponderEvent) => {
-    hold.touches(e.nativeEvent.touches.length);
-    if (templeTouch.current) {
-      templeTouch.current = false; // right-temple taps never count towards the debug triple-tap
-      return;
-    }
-    if (menu) return; // taps on the menu's own buttons never count towards the triple-tap
-    if (hold.countsAsTap && tap()) setMenu(true); // P17: triple-tap opens the demo menu
-  };
+  const onTouchEnd = (e: GestureResponderEvent) => hold.touches(e.nativeEvent.touches.length);
 
   const toggleFaces = () =>
     setFacesOn((f) => {
@@ -126,7 +115,7 @@ export default function App() {
       <ReflexScreen services={services} detector={detector} debug={debug} facesOn={facesOn} front={front} hasPermission={perms.camera.granted} onStatus={setDetectorState} />
       {demo && !debug && <BoxesLayer services={services} store={store} />}
       <TalkSurface voice={voice} />
-      <Hud services={services} voice={voice} store={store} demo={demo} detector={detectorState} facesOn={facesOn} onTempleTouch={() => (templeTouch.current = true)} />
+      <Hud services={services} voice={voice} store={store} demo={demo} detector={detectorState} facesOn={facesOn} onMenu={() => setMenu(true)} />
       {debug && (
         <DebugOverlay
           services={services}

@@ -18,6 +18,7 @@ export function StatusStrip({
   detector,
   facesOn,
   top,
+  right,
   onLayout,
 }: {
   hud: HudState;
@@ -25,13 +26,15 @@ export function StatusStrip({
   detector: ModelState['state'];
   facesOn: boolean;
   top: number;
+  /** Inset from the right edge (leaves room for the menu button). */
+  right: number;
   onLayout: (e: LayoutChangeEvent) => void;
 }) {
   const pack = usePhrasePack(services);
   const lang = hud.lang;
   const flash = hud.langFlash;
   return (
-    <View style={[st.strip, { top }]} onLayout={onLayout} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={[st.strip, { top, right }]} onLayout={onLayout} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <View style={st.row}>
         <View style={st.brand}>
           <Image source={MARK} style={st.mark} />

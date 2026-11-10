@@ -16,7 +16,7 @@ export interface WakeInfo {
 }
 
 /**
- * P17 demo menu (triple-tap anywhere): every toggle in one place, plus a live list of what the
+ * P17 demo menu (the menu button, top right): every toggle in one place, plus a live list of what the
  * detector sees on each frame (before the alert filters), so a tester can tell "YOLO didn't see
  * it" from "YOLO saw it but it wasn't announced". For sighted testers; the blind user never
  * needs it (everything here also works by voice).

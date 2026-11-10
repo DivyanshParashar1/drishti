@@ -29,7 +29,7 @@ export function Temples({
   top: number;
   bottom: number;
   hidden: boolean;
-  onTouch: () => void;
+  onTouch?: () => void;
 }) {
   const tap = useMemo(
     () =>

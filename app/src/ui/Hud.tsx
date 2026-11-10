@@ -6,6 +6,7 @@ import type { VoiceController } from '../voice/voiceController';
 import { CaptionDock } from './CaptionDock';
 import type { HudStore } from './hudStore';
 import { LatencyCard, ToastView } from './LatencyCard';
+import { MENU_BUTTON_SIZE, MenuButton } from './MenuButton';
 import { useHud } from './parts';
 import { StatusStrip } from './StatusStrip';
 import { Temples } from './Temples';
@@ -26,7 +27,7 @@ export function Hud({
   demo,
   detector,
   facesOn,
-  onTempleTouch,
+  onMenu,
 }: {
   services: Services;
   voice: VoiceController;
@@ -34,7 +35,8 @@ export function Hud({
   demo: boolean;
   detector: ModelState['state'];
   facesOn: boolean;
-  onTempleTouch: () => void;
+  /** P17: the menu button (replaces the triple-tap). */
+  onMenu: () => void;
 }) {
   const hud = useHud(store);
   const [stripH, setStripH] = useState<number>(shape.stripMinHeight);
@@ -52,8 +54,9 @@ export function Hud({
           <Image source={MARK_MONO} style={hd.dimLogo} />
           <Text style={hd.dimMark}>Drishti</Text>
         </View>
-        <Temples voice={voice} store={store} listening={listening} feedback={null} top={top + 60} bottom={176} hidden onTouch={onTempleTouch} />
+        <Temples voice={voice} store={store} listening={listening} feedback={null} top={top + 60} bottom={176} hidden />
         {hud.toast && <ToastView toast={hud.toast} top={stripBottom + 8} />}
+        <MenuButton top={top} dim onPress={onMenu} />
       </View>
     );
   }
@@ -61,10 +64,11 @@ export function Hud({
     <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
       {listening && <EdgeGlow />}
       {hud.caption?.key === 'sys.cane' && <View style={hd.shade} pointerEvents="none" />}
-      <StatusStrip hud={hud} services={services} detector={detector} facesOn={facesOn} top={top} onLayout={(e) => setStripH(e.nativeEvent.layout.height)} />
+      <StatusStrip hud={hud} services={services} detector={detector} facesOn={facesOn} top={top} right={shape.margin + MENU_BUTTON_SIZE + 8} onLayout={(e) => setStripH(e.nativeEvent.layout.height)} />
       {hud.toast && <ToastView toast={hud.toast} top={stripBottom + 8} />}
       <LatencyCard latency={hud.latency} top={belowTop} />
-      <Temples voice={voice} store={store} listening={listening} feedback={hud.feedback} top={belowTop} bottom={templeBottom} hidden={false} onTouch={onTempleTouch} />
+      <Temples voice={voice} store={store} listening={listening} feedback={hud.feedback} top={belowTop} bottom={templeBottom} hidden={false} />
+      <MenuButton top={top} dim={false} onPress={onMenu} />
       <CaptionDock hud={hud} onLayout={(e) => setDockH(e.nativeEvent.layout.height)} />
     </View>
   );
