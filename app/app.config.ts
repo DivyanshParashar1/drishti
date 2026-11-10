@@ -39,7 +39,22 @@ const config: ExpoConfig = {
     'expo-sqlite',
     // P14: on-device recognition for offline commands (Android 13+ on-device recognizer).
     ['expo-speech-recognition', { androidSpeechServicePackages: ['com.google.android.as', 'com.google.android.googlequicksearchbox'] }],
-    ['expo-build-properties', { android: { minSdkVersion: 26 } }],
+    [
+      'expo-build-properties',
+      {
+        android: {
+          minSdkVersion: 26,
+          // Release builds (R8): Vosk's JNA references desktop java.awt classes that Android lacks,
+          // and JNA + Vosk are reached through reflection/JNI, so they must not be shrunk away.
+          extraProguardRules: [
+            '-dontwarn java.awt.**',
+            '-keep class com.sun.jna.** { *; }',
+            '-keepclassmembers class * extends com.sun.jna.** { public *; }',
+            '-keep class org.vosk.** { *; }',
+          ].join('\n'),
+        },
+      },
+    ],
     // The Drishti mark on black while the app starts (assets from scripts/make_brand_assets.py).
     ['expo-splash-screen', { image: './assets/splash-icon.png', backgroundColor: '#000000', imageWidth: 120 }],
     // P17 wake word "दृष्टि": Vosk small Hindi model (Apache-2.0), copied into the APK's assets.
