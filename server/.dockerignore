@@ -1,5 +1,15 @@
-.venv
+# Keep the build context small and free of secrets. tests/ stays: only the dev stage copies it.
+.venv/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
 .env
-tests
-__pycache__
-.pytest_cache
+.env.*
+*.env
+!.env.example
+bench/
+scripts/
+*.mp3
+Dockerfile
+.dockerignore
