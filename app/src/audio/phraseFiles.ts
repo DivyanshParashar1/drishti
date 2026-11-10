@@ -24,3 +24,12 @@ export async function listPhrases(lang: Lang): Promise<Partial<Record<ClipKey, s
   }
   return out;
 }
+
+/** DEMO live Timbre lines (liveTts.ts): cache/live/<name>.mp3, rebuilt each session. */
+export async function writeLiveLine(name: string, mp3: ArrayBuffer): Promise<string> {
+  const d = new Directory(Paths.cache, 'live');
+  if (!d.exists) d.create({ idempotent: true, intermediates: true });
+  const f = new File(d, `${name}.mp3`);
+  await f.write(new Uint8Array(mp3));
+  return f.uri;
+}

@@ -16,6 +16,9 @@ export interface AudioBackend {
 /** A Timbre file saved at run time for a phrase with no bundled clip (PhraseCache). */
 export type PhraseLookup = (lang: Lang, key: ClipKey) => string | undefined;
 
+/** Timbre audio for a whole line, fetched live (demo mode, liveTts.ts); null if not available in time. */
+export type LiveLookup = (text: string, lang: Lang) => Promise<string | null>;
+
 export type Step =
   | { kind: 'source'; source: number | string }
   | { kind: 'speak'; text: string }
@@ -26,11 +29,12 @@ export type Step =
  * text. Neighbouring spoken pieces merge into one TTS call so the fallback sounds like one
  * sentence ("Car left mein paas, Kursi aage") instead of separate words with gaps.
  */
-export function toSteps(parts: AudioPart[], lang: Lang, lookup?: PhraseLookup): Step[] {
+export function toSteps(parts: AudioPart[], lang: Lang, lookup?: PhraseLookup, allText = false): Step[] {
   const raw: Step[] = parts.map((p): Step => {
     switch (p.kind) {
       case 'clip': {
         const clip = CLIPS[lang][p.key];
+        if (allText) return { kind: 'speak', text: clip.text }; // live Timbre: the whole line as text
         if (clip.asset !== null) return { kind: 'source', source: clip.asset };
         const saved = lookup?.(lang, p.key);
         return saved ? { kind: 'source', source: saved } : { kind: 'speak', text: clip.text };
@@ -61,15 +65,30 @@ export function toSteps(parts: AudioPart[], lang: Lang, lookup?: PhraseLookup): 
 export class ClipPlayer implements Player {
   private generation = 0;
   private wakePause: (() => void) | null = null;
+  private wakeFetch: (() => void) | null = null;
 
   constructor(
     private readonly backend: AudioBackend,
     private readonly lookup?: PhraseLookup,
+    private readonly live?: LiveLookup,
   ) {}
 
   async play(parts: AudioPart[], lang: Lang): Promise<PlayOutcome> {
     const gen = ++this.generation;
-    for (const step of toSteps(parts, lang, this.lookup)) {
+    let steps: Step[] | null = null;
+    if (this.live) {
+      // Demo mode: every spoken run (clips merged into one sentence, plain text) as live Timbre.
+      // If any piece can't be had in time, the whole line plays the normal way.
+      const live = toSteps(parts, lang, undefined, true);
+      const fetched = Promise.all(live.map((s) => (s.kind === 'speak' ? this.live!(s.text, lang) : Promise.resolve(''))));
+      // stop() must not wait for the network (a hazard interrupts within 50 ms).
+      const stopped = new Promise<null>((resolve) => (this.wakeFetch = () => resolve(null)));
+      const uris = await Promise.race([fetched, stopped]);
+      this.wakeFetch = null;
+      if (uris === null || gen !== this.generation) return 'stopped';
+      if (uris.every((u) => u !== null)) steps = live.map((s, i) => (s.kind === 'speak' ? { kind: 'source', source: uris[i]! } : s));
+    }
+    for (const step of steps ?? toSteps(parts, lang, this.lookup)) {
       if (gen !== this.generation) return 'stopped';
       let outcome: PlayOutcome;
       if (step.kind === 'source') outcome = await this.backend.playSource(step.source);
@@ -83,6 +102,7 @@ export class ClipPlayer implements Player {
   async stop(): Promise<void> {
     this.generation++;
     this.wakePause?.();
+    this.wakeFetch?.();
     await this.backend.stop();
   }
 

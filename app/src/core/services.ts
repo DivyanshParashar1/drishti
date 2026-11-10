@@ -1,6 +1,7 @@
 import { ClipPlayer } from '../audio/clipPlayer';
+import { LiveTts, TIMBRE_EVERYTHING } from '../audio/liveTts';
 import { PhraseCache } from '../audio/phraseCache';
-import { listPhrases, writePhrase } from '../audio/phraseFiles';
+import { listPhrases, writeLiveLine, writePhrase } from '../audio/phraseFiles';
 import { ExpoAudioBackend } from '../audio/expoBackend';
 import { SpeechScheduler, type AudioPart } from '../audio/scheduler';
 import { openDatabaseSync } from 'expo-sqlite';
@@ -66,13 +67,26 @@ export function createServices(): Services {
   const connectivity = createConnectivityMonitor();
   // Fixed phrases in Gnani Timbre's voice: fetched once per language when online, then played
   // from files (offline too). expo-speech only until a phrase is saved.
-  const phrases = new PhraseCache({ tts: fetchTts, write: writePhrase, list: listPhrases, online: () => connectivity.online });
+  // DEMO: live Timbre for every line (liveTts.ts) shares the relay's 30 requests/min, so the
+  // background phrase download slows to one every 6 s (10/min) while it's on.
+  const phrases = new PhraseCache({ tts: fetchTts, write: writePhrase, list: listPhrases, online: () => connectivity.online }, TIMBRE_EVERYTHING ? 6000 : 2500);
+  const live = TIMBRE_EVERYTHING
+    ? new LiveTts({
+        tts: (text, lang, timeoutMs) => fetchTts(text, lang, fetch, timeoutMs),
+        write: writeLiveLine,
+        online: () => connectivity.online,
+      })
+    : null;
   // A phrase played without its Timbre file yet (spoken by the phone) is fetched next (P17).
-  const player = new ClipPlayer(new ExpoAudioBackend(), (lang, key) => {
-    const uri = phrases.uri(lang, key);
-    if (!uri) phrases.want(lang, key);
-    return uri;
-  });
+  const player = new ClipPlayer(
+    new ExpoAudioBackend(),
+    (lang, key) => {
+      const uri = phrases.uri(lang, key);
+      if (!uri) phrases.want(lang, key);
+      return uri;
+    },
+    live ? (text, lang) => live.get(text, lang) : undefined,
+  );
   const scheduler = new SpeechScheduler(player, {
     onStart: (u, at) => metrics.mark(u.id, 'play_start', at),
     onEnd: (u, reason) => {

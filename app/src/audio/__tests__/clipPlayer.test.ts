@@ -153,3 +153,30 @@ test('a phrase with no bundled clip plays its saved Timbre file when there is on
     { kind: 'speak', text: 'paas' },
   ]);
 });
+
+describe('live Timbre (demo mode)', () => {
+  test('a whole alert line is one live fetch, played as one file', async () => {
+    const b = new FakeBackend();
+    const live = jest.fn(async (text: string) => `live:${text}`);
+    const p = new ClipPlayer(b, () => undefined, live);
+    await p.play([{ kind: 'clip', key: 'obj.chair' }, { kind: 'clip', key: 'dir.ahead' }, { kind: 'clip', key: 'dist.near' }], 'hi-en');
+    expect(live).toHaveBeenCalledWith('Kursi aage paas', 'hi-en');
+    expect(b.calls).toEqual(['src:live:Kursi aage paas']);
+  });
+
+  test('if any piece is unavailable, the line plays the normal way', async () => {
+    const b = new FakeBackend();
+    const p = new ClipPlayer(b, () => undefined, async () => null);
+    await p.play([{ kind: 'clip', key: 'obj.car' }, { kind: 'clip', key: 'dir.left' }], 'hi-en');
+    expect(b.calls).toEqual(['src:101', 'src:102']);
+  });
+
+  test('stop() during a live fetch returns at once', async () => {
+    const b = new FakeBackend();
+    const p = new ClipPlayer(b, () => undefined, () => new Promise<string | null>(() => undefined)); // never answers
+    const playing = p.play([{ kind: 'speak', text: 'Rahul aapke saamne hai' }], 'hi-en');
+    await p.stop();
+    await expect(playing).resolves.toBe('stopped');
+    expect(b.calls).toEqual(['stop']);
+  });
+});
