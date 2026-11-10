@@ -1,14 +1,14 @@
 # Drishti — submission video script
 
-Target: about 2:30 in total, plus a 60-second cut (intro and the best demo clips) for the Demo Day Drop award.
+Target: **2:30–3:00 in total.** The demo footage you record (Part 3) is **60 seconds**; everything else is added around it.
 
 | # | Part | Length | Made by | Voice |
 | --- | --- | --- | --- | --- |
-| 1 | Intro | ~12 s | Divyansh and Nakshatra (shoot) | You two |
-| 2 | Animated explainer: the problem and the idea | ~20 s | Claude (animation and Timbre narration) | Yashraj (Timbre v3.0) |
-| 3 | Demo: 7 features, each with a title card | ~70 s | You (shoot); Claude adds the cards and captions | Drishti (Shivani) and the user |
-| 4 | How it works: two latency paths, offline and online | ~45 s | Claude (animation and Timbre narration) | Yashraj |
-| 5 | Credits card | ~4 s | Claude | — |
+| 1 | Intro | ~15 s | Divyansh and Nakshatra (shoot) | You two |
+| 2 | Animated explainer: the problem and the idea | ~25 s | Claude (animation and Timbre narration) | Yashraj (Timbre v3.0) |
+| 3 | Demo: 7 features, each with a title card | 60 s of footage (+ ~2 s per title card) | You (shoot); Claude adds the cards and captions | Drishti (Shivani) and the user |
+| 4 | How it works: two latency paths, offline and online | ~50 s | Claude (animation and Timbre narration) | Yashraj |
+| 5 | Credits card | ~5 s | Claude | — |
 
 Three voices, so viewers always know who is talking: you (Part 1), the app's own voice Shivani (Part 3), and the narrator Yashraj (Parts 2 and 4).
 
@@ -25,14 +25,14 @@ Three voices, so viewers always know who is talking: you (Part 1), the app's own
 
 ---
 
-## Part 1 — Intro (~12 s) · you shoot
+## Part 1 — Intro (~15 s) · you shoot
 
 **Setup:** demo menu → front camera on. Save both of you beforehand ("Isko Divyansh ke naam se save karo", then the same for Nakshatra).
 
 | Time | On screen | Audio |
 | --- | --- | --- |
 | 0–3 s | Front camera, both of you in frame, name boxes appear | **Drishti:** "Divyansh aapke saamne hai… Nakshatra aapke saamne hai" |
-| 3–12 s | Same shot | **Divyansh:** "Haan! Main Divyansh, aur ye hai Nakshatra." **Nakshatra:** "Aur ye hai Drishti: ek app jo blind logon ke liye dekhti hai, aur unki bhasha mein bolti hai." |
+| 3–15 s | Same shot | **Divyansh:** "Haan! Main Divyansh, aur ye hai Nakshatra." **Nakshatra:** "Aur ye hai Drishti: ek app jo blind logon ke liye dekhti hai, aur unki bhasha mein bolti hai." |
 
 English captions (I'll add them): "Yes! I'm Divyansh, and this is Nakshatra." / "And this is Drishti: an app that sees for blind people, and speaks their language."
 
@@ -40,7 +40,7 @@ If both names don't come out cleanly in one take, one person is enough. Drishti 
 
 ---
 
-## Part 2 — Animated explainer (~20 s) · Claude makes it
+## Part 2 — Animated explainer (~25 s) · Claude makes it
 
 Motion graphics: a figure walking with a cane, then the hazards a cane can't detect light up one by one, then the phone (and glasses) with Drishti's logo.
 
@@ -50,9 +50,9 @@ Motion graphics: a figure walking with a cane, then the hazards a cane can't det
 
 ---
 
-## Part 3 — Demo (~70 s) · you shoot, Claude adds title cards
+## Part 3 — Demo (60 s of footage) · you shoot, Claude adds title cards
 
-Each clip gets a two-second title card first (feature name plus one line). The clips are 6–12 s each.
+Each clip gets a two-second title card first (feature name plus one line); the cards don't count towards the 60 s. Aim for about 8–9 s per clip (7 clips ≈ 60 s); 3.3 (save by voice) can run to ~15 s if the others are shorter.
 
 | # | Title card | One line under it | What to shoot | Must be heard or seen |
 | --- | --- | --- | --- | --- |
@@ -64,11 +64,11 @@ Each clip gets a two-second title card first (feature name plus one line). The c
 | 3.6 | **Speaks your language** | Hinglish + 10 Indian languages | "Tamil mein bolo", then ask anything | The answer in Tamil |
 | 3.7 | **Hands-free** | Just say its name | Say "Drishti" without touching the screen, then ask a question | Drishti responds with nobody touching the phone |
 
-If time is short, shoot 3.1, 3.2, 3.4 and 3.5 first: those four alone make a complete demo.
+Shoot in this order, so the most important ones are done first: 3.1, 3.2, 3.4, 3.5, then 3.3, 3.6, 3.7.
 
 ---
 
-## Part 4 — How it works (~45 s) · Claude makes it
+## Part 4 — How it works (~50 s) · Claude makes it
 
 Animated diagram: the phone on the left, the cloud on the right, two lanes between them: a fast lane that stays on the phone, and a slow lane out to the cloud and back.
 
@@ -84,14 +84,8 @@ On-screen labels: "Fast path: on the phone, offline" · "Slow path: Prisma → v
 
 ---
 
-## Part 5 — Credits (~4 s)
+## Part 5 — Credits (~5 s)
 
 **Drishti** · Divyansh Parashar ([role]) · Nakshatra ([role])
 Built on Gnani AI **Prisma v3.0** (speech-to-text) and **Timbre v3.0 / v2.5** (text-to-speech)
 github.com/DivyanshParashar1/drishti · #GreatIndianAIInternshipChallenge #GnaniAI
-
----
-
-## 60-second cut
-
-Part 1 (12 s) plus 3.1, 3.2, 3.4 and 3.5 (about 40 s) plus the credits. No explainer and no architecture.
