@@ -59,6 +59,41 @@ TTS: dict[Lang, TtsConfig] = {
 }
 
 
+# Prisma v3.0 context (docs.gnani.ai "Prisma v3.0 → Context", 2026-11-10): keyterms favour the
+# app's command phrasings so one misheard word doesn't push a command to the VLM as a question
+# (the router matches exact phrases). With `transliterate`, context must be in Latin letters.
+# Gnani reports keyterms never hurt accuracy in their tests, and unspoken terms aren't inserted.
+STT_TOPIC = (
+    "A blind person giving short voice commands to a phone assistant called Drishti that sees "
+    "through the camera: what is in front, read this sign, who is this, save or delete a person "
+    "by name, repeat, stop, quiet mode, switch language."
+)
+_HINGLISH_TERMS = [
+    "Drishti", "saamne kya hai", "aage kya hai", "kya dikh raha hai", "ye padho", "padho",
+    "kya likha hai", "kaun hai", "ye kaun hai", "kaun kaun saved hai", "ke naam se save karo",
+    "isko", "save karo", "delete karo", "hatao", "ruko", "band karo", "bas", "aage", "agla",
+    "phir se bolo", "dobara bolo", "madad", "quiet mode", "shaant", "kam bolo", "sab batao",
+    "demo mode", "mein bolo", "Hinglish", "Hindi", "English", "Tamil", "haan", "nahi",
+    "theek hai", "raazi",
+]
+_ENGLISH_TERMS = [
+    "Drishti", "what is ahead", "what is in front", "what do you see", "describe", "read this",
+    "what does it say", "who is this", "who is here", "who is saved", "save this as",
+    "delete", "forget", "stop", "next", "repeat", "say that again", "help", "quiet mode",
+    "demo mode", "speak in Hindi", "speak in Hinglish", "speak in Tamil", "yes", "no",
+]
+_TAMIL_TERMS = [
+    "த்ருஷ்டி", "முன்னால் என்ன இருக்கிறது", "என்ன தெரிகிறது", "இதைப் படி", "இது யார்",
+    "சேமி", "நீக்கு", "நிறுத்து", "அடுத்து", "மீண்டும் சொல்", "உதவி", "அமைதி", "ஆம்", "இல்லை",
+]
+STT_KEYTERMS: dict[Lang, list[str]] = {
+    "hi": _HINGLISH_TERMS,
+    "hi-en": _HINGLISH_TERMS + _ENGLISH_TERMS[1:],
+    "en": _ENGLISH_TERMS,
+    "ta": _TAMIL_TERMS,
+}
+
+
 def parse_lang(value: str | None) -> Lang:
     if value in LANGS:
         return value  # type: ignore[return-value]

@@ -37,6 +37,37 @@ def test_headers_follow_the_docs():
     assert h["x-sample-rate"] == "16000"
 
 
+def test_plain_headers_send_no_tuning():
+    h = build_headers("key", "hi-en")
+    assert not {"x-vad-threshold", "keyterms", "topic"} & h.keys()
+
+
+def test_tuned_headers():
+    h = build_headers("key", "hi-en", vad_threshold=0.5, context=True)
+    assert h["x-vad-threshold"] == "0.5"
+    terms = json.loads(h["keyterms"])
+    assert "saamne kya hai" in terms and "ye padho" in terms and len(terms) <= 200
+    assert h["topic"].isascii() and len(h["topic"]) <= 1600
+
+
+def test_keyterms_are_ascii_escaped_for_headers():
+    h = build_headers("key", "ta", context=True)
+    assert h["keyterms"].isascii()
+    assert "இதைப் படி" in json.loads(h["keyterms"])
+    # Languages without a keyterm list still get the topic.
+    assert "keyterms" not in build_headers("key", "bn", context=True)
+    assert "topic" in build_headers("key", "bn", context=True)
+
+
+def test_route_sends_tuned_headers_from_settings(settings):
+    prisma = FakePrisma(on_frames={2: [{"type": "speech_start"}]}, on_commit=[T("ruko")])
+    run(settings, prisma)
+    h = prisma.headers
+    assert h["x-vad-threshold"] == "0.5" and "keyterms" in h and "topic" in h
+    # Live check 2026-11-10: streaming still rejects "hi-IN,en-IN" ("exactly one locale").
+    assert "," not in h["language_code"]
+
+
 def test_final_transcript_after_commit(settings):
     prisma = FakePrisma(
         on_frames={2: [{"type": "speech_start"}]},

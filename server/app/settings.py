@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     tts_max_concurrency: int = 1  # some Gnani accounts allow one active request at a time
     tts_retry_backoff_s: float = 0.4
     stt_final_timeout_s: float = 3.0
+    # Prisma tuning (2026-11-10), each switchable on Cloud Run by env var without a rebuild.
+    stt_vad_threshold: float = 0.5  # 0 = don't send (Prisma default 0.7, tuned for telephony)
+    stt_context: bool = True  # send command keyterms + topic
 
     vlm_timeout_s: float = 15.0
     vlm_min_reasoning: bool = True  # lowest thinking the model allows: it adds latency, eats tokens

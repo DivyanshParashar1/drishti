@@ -39,7 +39,13 @@ async def stt(ws: WebSocket) -> None:
 
     try:
         async with ws.app.state.stt_connector(
-            settings.gnani_stt_url, build_headers(settings.gnani_api_key, lang)
+            settings.gnani_stt_url,
+            build_headers(
+                settings.gnani_api_key,
+                lang,
+                vad_threshold=settings.stt_vad_threshold,
+                context=settings.stt_context,
+            ),
         ) as conn:
             session = SttSession(conn, settings.stt_final_timeout_s)
             try:

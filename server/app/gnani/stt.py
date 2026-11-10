@@ -18,7 +18,7 @@ from websockets.exceptions import InvalidStatus
 
 from app.gnani.errors import UpstreamError, code_for_status
 from app.gnani.framing import PcmFramer
-from app.gnani.languages import STT, Lang
+from app.gnani.languages import STT, STT_KEYTERMS, STT_TOPIC, Lang
 
 SAMPLE_RATE = 16000
 COMMIT_GRACE_S = 0.15  # wait this long after commit for a late speech_start before giving up
@@ -32,9 +32,17 @@ class UpstreamConn(Protocol):
 Connector = Callable[[str, dict[str, str]], AbstractAsyncContextManager[UpstreamConn]]
 
 
-def build_headers(api_key: str, lang: Lang) -> dict[str, str]:
+def build_headers(
+    api_key: str,
+    lang: Lang,
+    *,
+    vad_threshold: float | None = None,
+    context: bool = False,
+) -> dict[str, str]:
+    """Upgrade headers for one session. The keyword options default to the plain 2026-11-06
+    config; the /stt route passes the tuned values from Settings."""
     cfg = STT[lang]
-    return {
+    headers = {
         "x-api-key-id": api_key,
         "model": "prisma-v3.0",
         "language_code": cfg.language_code,
@@ -45,6 +53,15 @@ def build_headers(api_key: str, lang: Lang) -> dict[str, str]:
         # splitting a question at a natural pause; it doesn't add latency at the end.
         "x-min-silence-ms": "800",
     }
+    if vad_threshold:
+        # Default 0.7 is Gnani's telephony value; a phone held close is a "clean mic" (0.45–0.55).
+        # Too high and Prisma opens the segment late, clipping the first word.
+        headers["x-vad-threshold"] = f"{vad_threshold:g}"
+    if context:
+        if terms := STT_KEYTERMS.get(lang):
+            headers["keyterms"] = json.dumps(terms)  # ASCII-escaped, as headers require
+        headers["topic"] = STT_TOPIC
+    return headers
 
 
 @asynccontextmanager
