@@ -1,91 +1,107 @@
 # Drishti — submission video script
 
-Target: **2:30–3:00 in total.** The demo footage you record (Part 3) is **60 seconds**; everything else is added around it.
+**Total: about 2:55.** The demo footage you record (Part 3) is 60 seconds; everything else is built around it.
 
 | # | Part | Length | Made by | Voice |
 | --- | --- | --- | --- | --- |
-| 1 | Intro | ~15 s | Divyansh and Nakshatra (shoot) | You two |
-| 2 | Animated explainer: the problem and the idea | ~25 s | Claude (animation and Timbre narration) | Yashraj (Timbre v3.0) |
-| 3 | Demo: 7 features, each with a title card | 60 s of footage (+ ~2 s per title card) | You (shoot); Claude adds the cards and captions | Drishti (Shivani) and the user |
-| 4 | How it works: two latency paths, offline and online | ~50 s | Claude (animation and Timbre narration) | Yashraj |
-| 5 | Credits card | ~5 s | Claude | — |
+| 1 | Intro | ~15 s | Divyansh and Nakshatra (shoot) | You two, and Drishti |
+| 2 | Animated explainer: the problem and the idea | ~25 s | Claude | Yashraj (Timbre v3.0) |
+| 3 | Demo: 7 features, each after a title card | 60 s footage + 14 s cards | You shoot; Claude adds cards and captions | Drishti (Shivani) and the user |
+| 4 | How it works: two paths, offline and online | ~55 s | Claude | Yashraj |
+| 5 | Credits | ~5 s | Claude | — |
 
-Three voices, so viewers always know who is talking: you (Part 1), the app's own voice Shivani (Part 3), and the narrator Yashraj (Parts 2 and 4).
+Three voices, so viewers always know who is talking: you two (Part 1), the app's own voice Shivani (Parts 1 and 3), and the narrator Yashraj (Parts 2 and 4).
 
 ---
 
 ## How to shoot (Parts 1 and 3)
 
-- **Use Android's built-in screen recorder with "Device audio and microphone".** Device audio records Drishti's voice cleanly; the microphone picks up what you say. Turn on the debug overlay (triple-tap) so boxes, names and transcripts are visible.
-- **Optional extra angle:** a second phone filming over the shoulder (the user, the cane, the scene). If you have both, I'll show them side by side. Screen recordings alone are enough.
-- **One clip per feature.** Name the files `1_intro.mp4`, `3_1_hazard.mp4`, `3_2_faces.mp4` and so on, and put them in one folder. A few seconds of slack at each end is fine; I'll trim.
-- **Holding the phone:** vertical, at chest height, as the glasses would be. Keep it steady.
-- **Before each take:** warm the server (`/health`) and use the release APK, not the dev build. Airplane mode only for the offline clip.
-- **Do another take if** Drishti mishears. A clean take beats a long one.
+- **Android screen recorder, "Device audio and microphone".** Device audio records Drishti's voice cleanly; the microphone picks up what you say. Turn on the debug overlay (triple-tap) so boxes, names and transcripts show.
+- **Phone vertical, at chest height**, as the glasses would be. Keep it steady.
+- **Release APK** (not the dev build), and warm up the server first (`/health`).
+- **One clip per feature**, with a few seconds of slack at each end. Name the files `1_intro.mp4`, `3_1_hazard.mp4`, `3_2_faces.mp4`, `3_3_save.mp4`, `3_4_ask.mp4`, `3_5_read.mp4`, `3_6_language.mp4`, `3_7_wake.mp4`, all in one folder.
+- **Do another take** if Drishti mishears. A clean take beats a long one.
+- **Optional:** a second phone filming over the shoulder (user, cane, scene). Claude can show it side by side with the screen.
 
 ---
 
 ## Part 1 — Intro (~15 s) · you shoot
 
-**Setup:** demo menu → front camera on. Save both of you beforehand ("Isko Divyansh ke naam se save karo", then the same for Nakshatra).
+**Setup:** demo menu → front camera on. Save both of you beforehand: "Isko Divyansh ke naam se save karo", then the same for Nakshatra.
 
 | Time | On screen | Audio |
 | --- | --- | --- |
-| 0–3 s | Front camera, both of you in frame, name boxes appear | **Drishti:** "Divyansh aapke saamne hai… Nakshatra aapke saamne hai" |
-| 3–15 s | Same shot | **Divyansh:** "Haan! Main Divyansh, aur ye hai Nakshatra." **Nakshatra:** "Aur ye hai Drishti: ek app jo blind logon ke liye dekhti hai, aur unki bhasha mein bolti hai." |
+| 0–4 s | Front camera, both of you in frame; name boxes appear | **Drishti:** "Divyansh aapke saamne hai… Nakshatra aapke saamne hai." |
+| 4–9 s | Same shot | **Divyansh:** "Haan! Main Divyansh, aur ye hai Nakshatra." |
+| 9–15 s | Same shot | **Nakshatra:** "Aur ye hai Drishti: ek app jo blind logon ke liye dekhti hai, aur unki bhasha mein bolti hai." |
 
-English captions (I'll add them): "Yes! I'm Divyansh, and this is Nakshatra." / "And this is Drishti: an app that sees for blind people, and speaks their language."
+**Captions:** "Divyansh is in front of you… Nakshatra is in front of you." / "Yes! I'm Divyansh, and this is Nakshatra." / "And this is Drishti: an app that sees for blind people, and speaks their language."
 
-If both names don't come out cleanly in one take, one person is enough. Drishti naming either of you is the hook.
+If both names don't come out cleanly in one take, one is enough.
 
 ---
 
-## Part 2 — Animated explainer (~25 s) · Claude makes it
+## Part 2 — Animated explainer (~25 s) · Claude
 
-Motion graphics: a figure walking with a cane, then the hazards a cane can't detect light up one by one, then the phone (and glasses) with Drishti's logo.
-
-**Narration (Yashraj):**
-> A white cane finds what's at your feet. <pauses> But not the car pulling out on your left, the friend who just walked up, or the notice on the wall.
-> Drishti is the software for smart glasses, running today on any Android phone. It watches the road with you, and tells you what's there, in your own language.
+| Time | Visual | Narration (Yashraj) |
+| --- | --- | --- |
+| 0–5 s | A figure walking with a white cane; the cane's sweep lights up the ground | "A white cane finds what's at your feet." |
+| 5–13 s | Three things light up one by one beyond the cane's reach: a car on the left, a friend walking up, a notice on a wall | *(pause)* "But not the car pulling out on your left. Not the friend who just walked up. Not the notice on the wall." |
+| 13–19 s | The figure now wears glasses; they turn into a phone with the Drishti logo | "Drishti is the software for smart glasses, running today on any Android phone." |
+| 19–25 s | Speech bubbles in several scripts (Hindi, Tamil, Bengali, English…) come out of the phone | "It watches the road with you, and tells you what's there, in your own language." |
 
 ---
 
 ## Part 3 — Demo (60 s of footage) · you shoot, Claude adds title cards
 
-Each clip gets a two-second title card first (feature name plus one line); the cards don't count towards the 60 s. Aim for about 8–9 s per clip (7 clips ≈ 60 s); 3.3 (save by voice) can run to ~15 s if the others are shorter.
+Each clip follows a two-second title card (the feature name, plus one line). Aim for about 8–9 s per clip; 3.3 can run to about 15 s if the others are shorter.
 
-| # | Title card | One line under it | What to shoot | Must be heard or seen |
+| # | Title card | Line under it | What to shoot | Must be heard or seen |
 | --- | --- | --- | --- | --- |
-| 3.1 | **Instant hazard alerts** | Fully offline | Pull down the shade and turn **airplane mode on** (keep it in the shot), then walk towards a chair | "Kursi aage, paas" plays instantly; the OFFLINE badge |
+| 3.1 | **Instant hazard alerts** | Fully offline | Pull down the shade and turn **airplane mode on** (in the shot), then walk towards a chair | "Kursi aage, paas" plays instantly; the OFFLINE badge |
 | 3.2 | **Knows your people** | Only with their spoken consent | A saved person walks up; then someone **not** saved | "Nakshatra aapke saamne hai, left mein" / "Koi anjaan vyakti saamne hai" |
 | 3.3 | **Save someone by voice** | No screen, no typing | "Isko Rahul ke naam se save karo" → "Kya aap save hone ke liye raazi hain?" → the person says "Haan" → "Teen second camera ki taraf dekhiye" → "Save ho gaya" | The whole consent exchange |
-| 3.4 | **Ask anything** | Answers in about two seconds | Hold the screen: "Saamne kya hai?" (point at something worth describing: a door, stairs, a table with objects) | The spoken answer; the transcript on the overlay |
-| 3.5 | **Reads signs aloud** | Hindi and English | "Ye padho" at a printed Hindi sign, 30–40 cm away, well lit | The sign in frame; Drishti reading it |
+| 3.4 | **Ask anything** | Answers in about two seconds | Hold the screen: "Saamne kya hai?" (point at a door, stairs, or a table with objects) | The spoken answer; the transcript on the overlay |
+| 3.5 | **Reads signs aloud** | Hindi and English | "Ye padho" at a printed Hindi sign, 30–40 cm away, well lit | The sign in frame, read aloud |
 | 3.6 | **Speaks your language** | Hinglish + 10 Indian languages | "Tamil mein bolo", then ask anything | The answer in Tamil |
-| 3.7 | **Hands-free** | Just say its name | Say "Drishti" without touching the screen, then ask a question | Drishti responds with nobody touching the phone |
+| 3.7 | **Hands-free** | Just say its name | Say "Drishti" without touching the phone, then ask a question | Drishti responds; nobody touches the phone |
 
-Shoot in this order, so the most important ones are done first: 3.1, 3.2, 3.4, 3.5, then 3.3, 3.6, 3.7.
+**English captions** for every Hindi line, for example: "Chair ahead, close" · "Nakshatra is in front of you, on the left" · "An unknown person is in front of you" · "Save this person as Rahul" · "Do you agree to be saved?" · "Yes" · "Look at the camera for three seconds" · "Saved" · "What's in front?" · "Read this" · "Speak in Tamil".
 
----
-
-## Part 4 — How it works (~50 s) · Claude makes it
-
-Animated diagram: the phone on the left, the cloud on the right, two lanes between them: a fast lane that stays on the phone, and a slow lane out to the cloud and back.
-
-**Narration (Yashraj):**
-> So how does Drishti work? It thinks on two clocks.
-> **The fast path never leaves the phone.** Models on the phone spot cars, chairs and people many times a second, and recognise saved faces. Alerts play instantly from voice clips we made in advance with Gnani Timbre, so even with no internet, Drishti speaks in Gnani's voice.
-> **The slow path goes to the cloud,** when you ask something. Gnani Prisma turns your speech into text as you speak. A vision model looks at the scene, and Gnani Timbre speaks the answer back, sentence by sentence, in about two seconds.
-> **The two paths share one voice.** A car alert always cuts in ahead of an answer. When someone is saved, their name is spoken by Timbre once, and the clip is stored on the phone, so recognising them works offline. If the internet drops, Drishti tells you, and keeps the alerts running.
-> No photos are stored. Nothing you say is logged. And Drishti works alongside a cane, never instead of one.
-> Oh, and this voice you've been hearing? <pauses> That's Gnani Timbre too.
-
-On-screen labels: "Fast path: on the phone, offline" · "Slow path: Prisma → vision model → Timbre, ~2 s" · "Hazards interrupt" · "Name clips cached offline" · "Internet lost → announced; alerts keep running".
+**Shoot in this order** (most important first): 3.1 → 3.2 → 3.4 → 3.5 → 3.3 → 3.6 → 3.7.
 
 ---
 
-## Part 5 — Credits (~5 s)
+## Part 4 — How it works (~55 s) · Claude
 
-**Drishti** · Divyansh Parashar ([role]) · Nakshatra ([role])
+Animated diagram: the phone on the left, the cloud on the right, two lanes between them.
+
+| Time | Visual | Narration (Yashraj) |
+| --- | --- | --- |
+| 0–5 s | Title "How Drishti works"; two clocks appear, one fast and one slow | "So how does Drishti work? It thinks on two clocks." |
+| 5–20 s | **Fast lane** lights up inside the phone: camera → on-device models → a speaker icon; a "no Wi-Fi" icon stays lit. Label: *"Fast path: on the phone, offline"* | "The fast path never leaves the phone. On-device models spot cars, chairs and people, and recognise saved faces. Alerts play instantly from clips we made in advance with Gnani Timbre, so even offline, Drishti speaks in Gnani's voice." |
+| 20–33 s | **Slow lane**: mic → cloud → **Prisma** → vision model → **Timbre** → back to the phone. Label: *"Slow path: Prisma → vision model → Timbre, ~2 s"* | "The slow path goes to the cloud. Gnani Prisma turns your question into text as you speak, a vision model looks at the scene, and Timbre speaks the answer back, sentence by sentence, in about two seconds." |
+| 33–45 s | Both lanes merge into a single speaker; a car alert cuts in ahead of an answer. Labels: *"Hazards interrupt"* · *"Name clips cached offline"* · *"Internet lost → announced; alerts keep running"* | "Both paths share one voice, and a hazard always cuts in first. Saved names are spoken once by Timbre and kept on the phone. If the internet drops, Drishti says so, and the alerts keep running." |
+| 45–51 s | Icons: crossed-out camera roll, crossed-out log file, a white cane | "No photos are stored, nothing you say is logged, and Drishti works alongside a cane, never instead of one." |
+| 51–55 s | The Gnani Timbre name appears | "Oh, and this voice you've been hearing? *(pause)* That's Gnani Timbre too." |
+
+---
+
+## Part 5 — Credits (~5 s) · Claude
+
+**Drishti**
+Divyansh Parashar — [role] · Nakshatra — [role]
 Built on Gnani AI **Prisma v3.0** (speech-to-text) and **Timbre v3.0 / v2.5** (text-to-speech)
-github.com/DivyanshParashar1/drishti · #GreatIndianAIInternshipChallenge #GnaniAI
+github.com/DivyanshParashar1/drishti
+#GreatIndianAIInternshipChallenge #GnaniAI
+
+---
+
+## Production notes for Claude
+
+- Narration: Timbre v3.0, voice **Yashraj**, `language: en-IN`, WAV 24 kHz; one request per sentence (≤ 200 characters). `<pauses>` is a valid v3.0 audio tag. Listen for how "Gnani" is pronounced; respell it if needed.
+- The animation: Pillow frames → ffmpeg, 1080×1920 vertical to match the phone footage (or 1080×1080 if mixed). Dark background, one accent colour, large text.
+- Title cards: 2 s each, with the feature name large and the line under it smaller.
+- Captions: burned in (LinkedIn autoplays muted). The app's speech is in white, the user's in yellow, the narrator's in no caption box (the on-screen labels carry it).
+- Audio: normalise the phone clips to the same loudness as the narration (`loudnorm`); a short crossfade between parts.
+- Export: H.264 / AAC MP4, under 5 GB and 10 minutes (LinkedIn limits).
