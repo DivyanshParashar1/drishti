@@ -165,6 +165,11 @@ export class VoskWake implements WakeControl {
     void this.trigger();
   }
 
+  async listenNow(): Promise<void> {
+    if (!this.running || this.d.target.state !== 'idle') return;
+    await this.trigger();
+  }
+
   private async trigger(): Promise<void> {
     await this.releaseMic();
     const offline = this.d.online() === false;

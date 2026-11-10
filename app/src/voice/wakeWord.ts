@@ -72,6 +72,8 @@ export interface WakeControl {
   releaseMic(): Promise<void>;
   /** The offline recognizer needs the mic. */
   suspend(): Promise<void>;
+  /** Open a hands-free turn now, as if the wake word was heard (the save dialog's answers). No-op when off or busy. */
+  listenNow(): Promise<void>;
   dispose(): Promise<void>;
 }
 
@@ -262,6 +264,11 @@ export class WakeService implements WakeControl {
       })
       .catch((e) => this.set({ state: 'error', message: messageOf(e) }));
   };
+
+  async listenNow(): Promise<void> {
+    if (!this.running || this.suspended || !this.engine || this.tapCb || this.d.target.state !== 'idle') return;
+    await this.trigger();
+  }
 
   /** "Drishti" heard: open a hands-free turn. */
   private async trigger(): Promise<void> {

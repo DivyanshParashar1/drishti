@@ -199,15 +199,16 @@ test('a person deleted while in view stops being present; the DT-8.1 log records
   expect(id.log[0].sim).toBeCloseTo(0.8, 6);
 });
 
-test('captureFaces: frames with exactly one embeddable face ≥ minPx; two faces skipped; stops at max', async () => {
+test('captureFaces: one embeddable face ≥ minPx, or a clearly largest one; two similar faces skipped; stops at max', async () => {
   const { id, step } = setup();
-  const p = id.captureFaces({ max: 2, durationMs: 3000, minPx: 100 });
+  const p = id.captureFaces({ max: 3, durationMs: 3000, minPx: 100 });
   step([face(like(BASIS[0]), undefined, 99)], [], 0); // embeddable but < 100 px
-  step([face(like(BASIS[0]), undefined, 150), face(like(BASIS[1]), undefined, 90)], [], 100); // two faces
+  step([face(like(BASIS[0]), undefined, 150), face(like(BASIS[1]), undefined, 120)], [], 100); // two similar faces
   step([face(like(BASIS[0]), undefined, 150), face(null, undefined, 40)], [], 200); // tiny bystander is fine
-  step([face(like(BASIS[0], 9), undefined, 120)], [], 300);
+  step([face(like(BASIS[0], 9), undefined, 160), face(like(BASIS[1]), undefined, 90)], [], 300); // 160 ≥ 1.4 × 90: the largest
+  step([face(like(BASIS[0], 10), undefined, 120)], [], 400);
   const r = await p;
-  expect(r.embeddings).toEqual([like(BASIS[0]), like(BASIS[0], 9)]);
+  expect(r.embeddings).toEqual([like(BASIS[0]), like(BASIS[0], 9), like(BASIS[0], 10)]);
   expect(r.multiFaceFrames).toBe(1);
 });
 

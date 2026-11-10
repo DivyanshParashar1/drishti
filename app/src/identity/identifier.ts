@@ -175,9 +175,11 @@ export class FaceIdentifier {
 
     if (this.capture) {
       const c = this.capture;
-      const big = faces.filter((x) => x.embedding && x.widthPx >= this.cfg.minFacePx);
-      if (big.length > 1) c.multiFace++;
-      else if (big.length === 1 && big[0].widthPx >= c.opts.minPx && now - c.lastAt >= (c.opts.minGapMs ?? 0)) {
+      const big = faces.filter((x) => x.embedding && x.widthPx >= this.cfg.minFacePx).sort((a, b) => b.widthPx - a.widthPx);
+      // The person being saved stands closest: with a second face, use the largest only if it clearly dominates.
+      const clear = big.length === 1 || (big.length > 1 && big[0].widthPx >= big[1].widthPx * this.cfg.enrollDominance);
+      if (big.length > 1 && !clear) c.multiFace++;
+      else if (clear && big[0].widthPx >= c.opts.minPx && now - c.lastAt >= (c.opts.minGapMs ?? 0)) {
         c.got.push(big[0].embedding!);
         c.lastAt = now;
       }

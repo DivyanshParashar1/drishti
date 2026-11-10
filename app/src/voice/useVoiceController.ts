@@ -13,6 +13,7 @@ import { rnWebSocketFactory, SttSession } from '../net/sttClient';
 import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-kit/text-recognition';
 import { readImage } from '../reading/ocr';
 import { micLevel, pcmLevel } from '../ui/micLevel';
+import { startDialogFollowUp } from './dialogFollowUp';
 import { VoiceController } from './voiceController';
 import { WakeService, type WakeControl, type WakeEngine } from './wakeWord';
 import { VoskWake, type VoskApi } from './voskWake';
@@ -86,7 +87,7 @@ export function useVoiceController(services: Services): { voice: VoiceController
   // Mic permission is requested by ReflexScreen right after the camera's (one dialog at a time).
   useEffect(() => () => Object.values(earcons).forEach((p) => p.remove()), [earcons]);
 
-  return useMemo(() => {
+  const built = useMemo(() => {
     let audioN = 0;
     const transport = xhrTransport();
     const box: { wake: WakeControl | null } = { wake: null };
@@ -178,4 +179,11 @@ export function useVoiceController(services: Services): { voice: VoiceController
       : new WakeService({ ...common, createEngine: createOwwEngine, source: wakeSource, configured: true }, undefined, undefined, WAKE_PHRASE);
     return { voice, wake: box.wake };
   }, [services, earcons, mic]);
+
+  // The save dialog's questions open a hands-free turn for the answer ("haan") when the wake word is on.
+  useEffect(
+    () => startDialogFollowUp({ scheduler: services.scheduler, dialog: services.enrollment, wake: built.wake, voice: built.voice }),
+    [built, services],
+  );
+  return built;
 }
