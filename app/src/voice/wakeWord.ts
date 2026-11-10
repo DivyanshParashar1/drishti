@@ -56,12 +56,31 @@ export interface WakeDeps {
   configured: boolean;
 }
 
+/** What the app and the voice controller use, whichever engine listens (openWakeWord or Vosk). */
+export interface WakeControl {
+  readonly status: WakeStatus;
+  readonly on: boolean;
+  /** The phrase to say, for the menu. */
+  readonly phrase: string;
+  /** True when turns read the mic through tap() (openWakeWord); false when the engine must let go (Vosk). */
+  readonly ownsMic: boolean;
+  onStatus(cb: () => void): () => void;
+  enable(on: boolean): Promise<void>;
+  tap(cb: (pcm: ArrayBuffer, level: number) => void): void;
+  untap(): void;
+  /** Free the mic before the recorder opens it (hold-to-talk or a wake turn); taken back after the turn. */
+  releaseMic(): Promise<void>;
+  /** The offline recognizer needs the mic. */
+  suspend(): Promise<void>;
+  dispose(): Promise<void>;
+}
+
 /** After a turn, ignore the wake word briefly (the answer's first words, the stop earcon). */
 export const REFRACTORY_MS = 1500;
 /** Offline hands-free turns get a fixed window: the recognizer owns the mic, so no loudness. */
 export const OFFLINE_TURN_MS = 5000;
 /** The app saying its own name ("Namaste, main Drishti hoon") must not wake itself. */
-const SELF_NAME = /drishti|दृष्टि|திருஷ்டி/i;
+export const SELF_NAME = /drishti|दृष्टि|திருஷ்டி/i;
 
 const frameLevel = (frame: number[]): number => {
   let sum = 0;
@@ -88,7 +107,7 @@ export function toPcmBytes(frame: number[]): ArrayBuffer {
  * by loudness (Endpointer): 0.9 s of quiet after speech sends the question; nothing said in 5 s
  * cancels with "Samajh nahi aaya".
  */
-export class WakeService {
+export class WakeService implements WakeControl {
   status: WakeStatus = { state: 'off' };
   private engine: WakeEngine | null = null;
   private running = false;
@@ -107,6 +126,7 @@ export class WakeService {
     private readonly d: WakeDeps,
     private readonly clock: Clock = monotonic,
     private readonly endpoint?: EndpointConfig,
+    readonly phrase = 'Hey Jarvis',
   ) {
     this.offs.push(
       d.scheduler.subscribe({
@@ -150,6 +170,9 @@ export class WakeService {
     this.clearOfflineTimer();
     this.quietUntil = this.clock() + REFRACTORY_MS;
   }
+
+  /** Turns read this engine's stream through tap(), so there is nothing to free. */
+  async releaseMic(): Promise<void> {}
 
   /** The offline recognizer needs the mic: let it go until the turn is over. */
   async suspend(): Promise<void> {
@@ -279,7 +302,7 @@ export class WakeService {
   }
 }
 
-function mentionsName(u: Utterance): boolean {
+export function mentionsName(u: Utterance): boolean {
   return u.parts.some((p) => {
     if (p.kind === 'clip') return SELF_NAME.test(CLIPS[u.lang][p.key].text);
     if (p.kind === 'file' || p.kind === 'speak') return SELF_NAME.test(p.text);
@@ -287,7 +310,7 @@ function mentionsName(u: Utterance): boolean {
   });
 }
 
-function messageOf(e: unknown): string {
+export function messageOf(e: unknown): string {
   return e instanceof Error ? e.message : String(e);
 }
 

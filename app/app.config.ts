@@ -41,6 +41,8 @@ const config: ExpoConfig = {
     // P14: on-device recognition for offline commands (Android 13+ on-device recognizer).
     ['expo-speech-recognition', { androidSpeechServicePackages: ['com.google.android.as', 'com.google.android.googlequicksearchbox'] }],
     ['expo-build-properties', { android: { minSdkVersion: 26 } }],
+    // P17 wake word "दृष्टि": Vosk small Hindi model (Apache-2.0), copied into the APK's assets.
+    ['react-native-vosk', { models: ['assets/vosk/model-hi'] }],
   ],
   owner: 'divyanshdp1212',
   extra: {

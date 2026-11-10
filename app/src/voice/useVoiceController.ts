@@ -13,11 +13,12 @@ import TextRecognition, { type TextRecognitionScript } from '@react-native-ml-ki
 import { readImage } from '../reading/ocr';
 import { micLevel, pcmLevel } from '../ui/micLevel';
 import { VoiceController } from './voiceController';
-import { WakeService, type WakeEngine } from './wakeWord';
+import { WakeService, type WakeControl, type WakeEngine } from './wakeWord';
+import { VoskWake, type VoskApi } from './voskWake';
 import { OwwEngine } from './oww';
 import { RecorderFrameSource } from './recorderSource';
 import { loadTensorflowModel } from 'react-native-fast-tflite';
-import { WAKE_FEATURE_ASSETS, WAKE_WORD_ASSET } from '../models/detectorAssets';
+import { WAKE_FEATURE_ASSETS, WAKE_PHRASE, WAKE_WORD_ASSET } from '../models/detectorAssets';
 
 const MIC = { sampleRate: 16000, channels: 1, encoding: 'pcm_16bit', interval: 40 } as const;
 
@@ -51,11 +52,22 @@ async function createOwwEngine(): Promise<WakeEngine> {
   });
 }
 
+/** react-native-vosk, or null when this APK was built without it (its native module throws on import). */
+function loadVosk(): VoskApi | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const v = require('react-native-vosk') as VoskApi;
+    return v;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Builds the VoiceController with the real mic, /stt, /ask, files, haptics and earcons, and the
  * wake-word service (P17, openWakeWord). While the wake word is on it owns the mic and turns read from it.
  */
-export function useVoiceController(services: Services): { voice: VoiceController; wake: WakeService } {
+export function useVoiceController(services: Services): { voice: VoiceController; wake: WakeControl } {
   const recorder = useAudioRecorder();
   const mic = useMemo(() => new MicBridge(), []);
   useEffect(() => mic.set(recorder), [mic, recorder]);
@@ -72,7 +84,7 @@ export function useVoiceController(services: Services): { voice: VoiceController
   return useMemo(() => {
     let audioN = 0;
     const transport = xhrTransport();
-    const box: { wake: WakeService | null } = { wake: null };
+    const box: { wake: WakeControl | null } = { wake: null };
     const voice = new VoiceController({
       scheduler: services.scheduler,
       metrics: services.metrics,
@@ -95,6 +107,7 @@ export function useVoiceController(services: Services): { voice: VoiceController
           });
           return;
         }
+        await wake?.releaseMic(); // Vosk listens on its own mic: let it go first
         await mic.get().startRecording({
           ...MIC,
           output: { primary: { enabled: false } },
@@ -147,15 +160,17 @@ export function useVoiceController(services: Services): { voice: VoiceController
         await mic.get().stopRecording();
       },
     });
-    box.wake = new WakeService({
-      createEngine: createOwwEngine,
-      source: wakeSource,
+    const common = {
       target: voice,
       scheduler: services.scheduler,
       noSpeech: () => services.say('sys.didnt_hear'),
       online: () => services.connectivity.online,
-      configured: true, // the models are bundled
-    });
+    };
+    // "दृष्टि" with Vosk when this APK has it; otherwise openWakeWord's "Hey Jarvis" (no rebuild).
+    const vosk = loadVosk();
+    box.wake = vosk
+      ? new VoskWake({ ...common, vosk, micLevel })
+      : new WakeService({ ...common, createEngine: createOwwEngine, source: wakeSource, configured: true }, undefined, undefined, WAKE_PHRASE);
     return { voice, wake: box.wake };
   }, [services, earcons, mic]);
 }

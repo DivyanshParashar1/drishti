@@ -20,7 +20,6 @@ import type { ModelState } from './src/vision/useReflexCamera';
 import { TalkSurface } from './src/voice/TalkSurface';
 import { useVoiceController } from './src/voice/useVoiceController';
 import { wakeStatusText } from './src/voice/wakeWord';
-import { WAKE_PHRASE } from './src/models/detectorAssets';
 
 export default function App() {
   // The camera can't run in the background, so keep the screen on (F10). On reload or activity
@@ -108,7 +107,7 @@ export default function App() {
   useEffect(() => () => void wake.dispose(), [wake]);
   const wakeInfo: WakeInfo = {
     on: wake.on,
-    status: wakeStatusText(wake.status, WAKE_PHRASE),
+    status: wakeStatusText(wake.status, wake.phrase),
     toggle: () => {
       const on = !wake.on;
       void services.settings.setFlag('wakeWord', on).catch(() => undefined);
