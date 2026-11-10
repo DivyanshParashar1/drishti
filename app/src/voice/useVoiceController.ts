@@ -3,6 +3,7 @@ import { createAudioPlayer, type AudioPlayer } from 'expo-audio';
 import { File, Paths } from 'expo-file-system';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useMemo } from 'react';
+import { TurboModuleRegistry } from 'react-native';
 import { EARCONS, type EarconName } from '../audio/clips.generated';
 import type { Services } from '../core/services';
 import { ask, xhrTransport } from '../net/askClient';
@@ -52,12 +53,16 @@ async function createOwwEngine(): Promise<WakeEngine> {
   });
 }
 
-/** react-native-vosk, or null when this APK was built without it (its native module throws on import). */
+/**
+ * react-native-vosk, or null when this APK was built without it. Checked with
+ * TurboModuleRegistry.get (returns null) before importing the package: its import calls
+ * getEnforcing, which throws and shows a red error in dev builds even when caught.
+ */
 function loadVosk(): VoskApi | null {
+  if (!TurboModuleRegistry.get('Vosk')) return null;
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const v = require('react-native-vosk') as VoskApi;
-    return v;
+    return require('react-native-vosk') as VoskApi;
   } catch {
     return null;
   }
